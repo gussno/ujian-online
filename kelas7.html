@@ -7,7 +7,7 @@
 <title>Asesmen Tema 4 Kelas 7</title>
 
 <div id="timerBox">
-  ⏰ Sisa Waktu: <span id="timer">30:00</span>
+  ⏰ <span id="timer">30:00</span>
 </div>
 
 <style>
@@ -19,6 +19,11 @@ body{
     line-height:1.6;
 }
 
+body{
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
 
 h1{
     text-align:center;
@@ -236,12 +241,13 @@ Nama:<br>
 </div>
 
 <div class="soal">
-<p>19. Peranan komunitas dalam kehidupan masyarakat adalah …</p>
-<label><input type="radio" name="q19" value="A"> Membatasi interaksi sosial</label><br>
-<label><input type="radio" name="q19" value="B"> Menghambat pembangunan</label><br>
-<label><input type="radio" name="q19" value="C"> Meningkatkan solidaritas</label><br>
-<label><input type="radio" name="q19" value="D"> Mengurangi kerjasama</label>
+<p>19. Posyandu merupakan salah satu bentuk peran komunitas di desa. Melalui kegiatan rutin, Posyandu berkontribusi terhadap …</p>
+<label><input type="radio" name="q21" value="A"> Membatasi layanan kesehatan hanya untuk kelompok tertentu</label><br>
+<label><input type="radio" name="q21" value="B"> Menyediakan kegiatan sosial tanpa kaitan dengan kesehatan</label><br>
+<label><input type="radio" name="q21" value="C"> Memberikan layanan kesehatan dasar sekaligus memperkuat solidaritas warga</label><br>
+<label><input type="radio" name="q21" value="D"> Mengurangi peran keluarga dalam menjaga kesehatan anak</label>
 </div>
+
 
 <div class="soal">
 <p>20. Pemberdayaan masyarakat dilakukan agar …</p>
@@ -256,32 +262,24 @@ Nama:<br>
 
 <script>
 
+// ======================
+// KUNCI JAWABAN
+// ======================
 const kunci = {
- q1:"A",
- q2:"B",
- q3:"C",
- q4:"B",
- q5:"A",
- q6:"D",
- q7:"B",
- q8:"C",
- q9:"B",
- q10:"D",
- q11:"B",
- q12:"C",
- q13:"C",
- q14:"B",
- q15:"A",
- q16:"A",
- q17:"B",
- q18:"D",
- q19:"C",
- q20:"B"
+ q1:"A", q2:"B", q3:"C", q4:"B", q5:"A",
+ q6:"D", q7:"B", q8:"C", q9:"B", q10:"D",
+ q11:"B", q12:"C", q13:"C", q14:"B", q15:"A",
+ q16:"A", q17:"B", q18:"D", q19:"C", q20:"B"
 };
 
-// GANTI DENGAN URL APPS SCRIPT MILIK GUSS
+// ======================
+// GOOGLE SCRIPT
+// ======================
 const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
 
+// ======================
+// DATA SISWA (DROPDOWN NAMA)
+// ======================
 const dataSiswa = {
 
 "7A":[
@@ -354,107 +352,105 @@ const dataSiswa = {
 
 };
 
+// ======================
+// ANTI COPY RINGAN
+// ======================
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ======================
+// DROPDOWN NAMA
+// ======================
 function updateNama(){
 
   const kelas = document.getElementById("kelas").value;
   const namaSelect = document.getElementById("nama");
 
-  namaSelect.innerHTML =
-    '<option value="">-- Pilih Nama --</option>';
+  namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
 
-  if(!kelas) return;
+  if(!kelas || !dataSiswa[kelas]) return;
 
   dataSiswa[kelas].forEach(nama => {
-
-    const option = document.createElement("option");
-
-    option.value = nama;
-    option.textContent = nama;
-
-    namaSelect.appendChild(option);
-
+    const opt = document.createElement("option");
+    opt.value = nama;
+    opt.textContent = nama;
+    namaSelect.appendChild(opt);
   });
 
 }
 
 // ======================
-// TIMER UJIAN
+// TIMER ANTI RESET (LOCALSTORAGE)
 // ======================
+const DURATION = 30 * 60;
+const KEY_START = "ujian_mulai";
 
-let waktu = 30 * 60; // 30 menit
+let startTime = localStorage.getItem(KEY_START);
 
-const timerElement = document.getElementById("timer");
-
-const hitungMundur = setInterval(function(){
-
-  let menit = Math.floor(waktu / 60);
-  let detik = waktu % 60;
-
-timerElement.innerHTML =
-  String(menit).padStart(2,'0') +
-  ":" +
-  String(detik).padStart(2,'0');
-
-  waktu--;
-if(waktu <= 300){
-  document.getElementById("timerBox").style.background = "#ff9800";
+if(!startTime){
+  startTime = Date.now();
+  localStorage.setItem(KEY_START, startTime);
 }
 
-if(waktu <= 60){
-  document.getElementById("timerBox").style.background = "#b71c1c";
-}if(waktu <= 300){
-  document.getElementById("timerBox").style.background = "#ff9800";
-}
+const timerEl = document.getElementById("timer");
+const timerBox = document.getElementById("timerBox");
 
-if(waktu <= 60){
-  document.getElementById("timerBox").style.background = "#b71c1c";
-}
+function updateTimer(){
 
-  if(waktu < 0){
+  let now = Date.now();
+  let elapsed = Math.floor((now - startTime) / 1000);
+  let remaining = DURATION - elapsed;
 
-    clearInterval(hitungMundur);
-
-    alert("Waktu habis! Jawaban akan dikirim.");
-
+  if(remaining <= 0){
+    remaining = 0;
+    clearInterval(timerInterval);
     kirim();
-
+    return;
   }
 
-},1000);
+  let m = Math.floor(remaining / 60);
+  let d = remaining % 60;
 
+  if(timerEl){
+    timerEl.innerHTML =
+      String(m).padStart(2,'0') + ":" +
+      String(d).padStart(2,'0');
+  }
 
-function kirim(){
+  if(timerBox){
+    if(remaining <= 300) timerBox.style.background = "#ff9800";
+    if(remaining <= 60) timerBox.style.background = "#b71c1c";
+  }
+}
+
+let timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+// ======================
+// KIRIM JAWABAN (AMAN)
+// ======================
+window.kirim = function(){
 
   const nama = document.getElementById("nama").value.trim();
   const kelas = document.getElementById("kelas").value.trim();
 
-  if(nama === ""){
-    alert("Nama harus diisi!");
-    return;
-  }
-
-  if(kelas === ""){
-    alert("Kelas harus diisi!");
+  if(!nama || !kelas){
+    alert("Nama dan kelas harus diisi!");
     return;
   }
 
   const tombol = document.getElementById("btnKirim");
+  if(tombol.disabled) return;
 
-  if(tombol.disabled){
-    return;
-  }
+  tombol.disabled = true;
+  tombol.innerHTML = "Mengirim...";
 
-clearInterval(hitungMundur);
-document.getElementById("timer").innerHTML = "SELESAI";
+  clearInterval(timerInterval);
 
   let benar = 0;
 
   for(let i=1;i<=20;i++){
-    const jawaban = document.querySelector(`input[name=q${i}]:checked`);
-
-    if(jawaban && jawaban.value === kunci[`q${i}`]){
-      benar++;
-    }
+    const j = document.querySelector(`input[name=q${i}]:checked`);
+    if(j && j.value === kunci[`q${i}`]) benar++;
   }
 
   const salah = 20 - benar;
@@ -463,45 +459,33 @@ document.getElementById("timer").innerHTML = "SELESAI";
   document.getElementById("hasil").innerHTML =
     "Nilai Anda : " + nilai;
 
-  const data = {
-    nama:nama,
-    kelas:kelas,
-    benar:benar,
-    salah:salah,
-    nilai:nilai
-  };
-
-  tombol.disabled = true;
-  tombol.innerHTML = "Ujian Selesai";
-
   fetch(scriptURL,{
-  method:"POST",
-  body:JSON.stringify(data)
-})
-.then(() => {
+    method:"POST",
+    body:JSON.stringify({nama, kelas, benar, salah, nilai})
+  })
+  .then(() => {
 
-  clearInterval(hitungMundur);
+    localStorage.removeItem(KEY_START);
 
-  tombol.disabled = true;
-  tombol.innerHTML = "Ujian Selesai";
+    if(timerEl) timerEl.innerHTML = "SELESAI";
 
-  document.getElementById("timerBox").innerHTML =
-    "✅ Ujian Selesai";
+    tombol.innerHTML = "Ujian Selesai";
 
-  alert("Jawaban berhasil dikirim!");
+    alert("Jawaban berhasil dikirim!");
 
-})
-.catch(error => {
+  })
+  .catch(err => {
 
-  console.error(error);
+    console.error(err);
 
-  alert(
-    "Gagal mengirim data.\n\nPeriksa koneksi internet lalu klik Kirim lagi."
-  );
+    alert("Gagal kirim, coba lagi.");
 
-});
+    tombol.disabled = false;
+    tombol.innerHTML = "Kirim Jawaban";
 
-}
+  });
+
+};
 
 </script>
 
