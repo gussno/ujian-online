@@ -4,19 +4,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asesmen IPS Tema 4 Kelas 8</title>
+<title>Asesmen Tema 4 Kelas 8</title>
+
+<div id="timerBox">
+  ⏰ <span id="timer">30:00</span>
+</div>
 
 <style>
 body{
     font-family:Arial, sans-serif;
     max-width:800px;
     margin:auto;
-    padding:20px;
+    padding:70px 20px 20px 20px;
     line-height:1.6;
 }
 
+body{
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+body{
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+}
+
+.soal{
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
 h1{
-    text-align:center;
+  text-align: center;
+  background: linear-gradient(90deg, #22c55e, #15803d);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .soal{
@@ -43,12 +71,58 @@ button{
     font-size:20px;
     font-weight:bold;
 }
+
+#timerBox{
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:9999;
+
+  background:#d32f2f;
+  color:white;
+
+  padding:10px 15px;
+  border-radius:10px;
+
+  font-size:20px;
+  font-weight:bold;
+
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
+}
+
+#btnKirim{
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin: 20px auto;
+}
+
+#btnKirim:hover{
+  background: #15803d;
+  transform: scale(1.03);
+}
+
+#btnKirim:disabled{
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+
+
 </style>
 
 </head>
 <body>
 
-<h1>Asesmen IPS Tema 4 Kelas 8</h1>
+<h1>Asesmen Tema 4 Kelas 8</h1>
 
 <h3>Identitas Peserta</h3>
 
@@ -69,43 +143,163 @@ Nama:<br>
 </p>
 
 <div class="soal">
-<p>1. ASEAN didirikan pada tahun ...</p>
-<label><input type="radio" name="q1" value="A"> 1965</label><br>
-<label><input type="radio" name="q1" value="B"> 1967</label><br>
-<label><input type="radio" name="q1" value="C"> 1970</label><br>
-<label><input type="radio" name="q1" value="D"> 1972</label>
+<p>1. Pada awal kemerdekaan, pemerintah Indonesia menghadapi tantangan ekonomi yang berat, salah satunya adalah inflasi tinggi akibat peredaran berbagai mata uang asing. Kebijakan yang ditempuh untuk mengatasi masalah ini adalah…</p>
+<label><input type="radio" name="q1" value="A"> Nasionalisasi perusahaan asing</label><br>
+<label><input type="radio" name="q1" value="B"> Gunting Syafruddin</label><br>
+<label><input type="radio" name="q1" value="C"> Program Benteng</label><br>
+<label><input type="radio" name="q1" value="D"> Pembangunan lima tahun</label>
 </div>
 
 <div class="soal">
-<p>2. Ibu kota Indonesia adalah ...</p>
-<label><input type="radio" name="q2" value="A"> Surabaya</label><br>
-<label><input type="radio" name="q2" value="B"> Bandung</label><br>
-<label><input type="radio" name="q2" value="C"> Jakarta</label><br>
-<label><input type="radio" name="q2" value="D"> Semarang</label>
+<p>2. Kehidupan ekonomi pada masa Orde Baru ditandai dengan adanya program pembangunan jangka panjang yang dikenal dengan…</p>
+<label><input type="radio" name="q2" value="A"> Rencana Pembangunan Lima Tahun (Repelita)</label><br>
+<label><input type="radio" name="q2" value="B"> Program Benteng</label><br>
+<label><input type="radio" name="q2" value="C"> Deklarasi Ekonomi</label><br>
+<label><input type="radio" name="q2" value="D"> Program Stabilitas Nasional</label>
 </div>
 
 <div class="soal">
-<p>3. Lambang sila ke-5 adalah ...</p>
-<label><input type="radio" name="q3" value="A"> Bintang</label><br>
-<label><input type="radio" name="q3" value="B"> Pohon Beringin</label><br>
-<label><input type="radio" name="q3" value="C"> Kepala Banteng</label><br>
-<label><input type="radio" name="q3" value="D"> Padi dan Kapas</label>
+<p>3. Pada masa Reformasi, salah satu kebijakan ekonomi yang menonjol adalah penerapan otonomi daerah. Dampak kebijakan ini terhadap perekonomian adalah…</p>
+<label><input type="radio" name="q3" value="A"> Semua daerah memperoleh pendapatan yang sama</label><br>
+<label><input type="radio" name="q3" value="B"> Daerah memiliki kewenangan mengelola sumber daya sendiri</label><br>
+<label><input type="radio" name="q3" value="C"> Pemerintah pusat menguasai seluruh pajak daerah</label><br>
+<label><input type="radio" name="q3" value="D"> Daerah tidak lagi menerima dana dari pusat</label>
 </div>
 
 <div class="soal">
-<p>4. Gunung tertinggi di Indonesia adalah ...</p>
-<label><input type="radio" name="q4" value="A"> Merapi</label><br>
-<label><input type="radio" name="q4" value="B"> Kerinci</label><br>
-<label><input type="radio" name="q4" value="C"> Puncak Jaya</label><br>
-<label><input type="radio" name="q4" value="D"> Semeru</label>
+<p>4. Ekspor dan impor merupakan bagian dari perdagangan internasional. Contoh kegiatan ekspor Indonesia yang berperan besar dalam devisa negara adalah…</p>
+<label><input type="radio" name="q4" value="A"> Mengimpor beras dari Thailand</label><br>
+<label><input type="radio" name="q4" value="B"> Menjual minyak kelapa sawit ke India</label><br>
+<label><input type="radio" name="q4" value="C"> Membeli mesin dari Jepang</label><br>
+<label><input type="radio" name="q4" value="D"> Mengimpor mobil dari Korea Selatan</label>
 </div>
 
 <div class="soal">
-<p>5. Proklamasi Kemerdekaan Indonesia dibacakan pada ...</p>
-<label><input type="radio" name="q5" value="A"> 17 Agustus 1945</label><br>
-<label><input type="radio" name="q5" value="B"> 18 Agustus 1945</label><br>
-<label><input type="radio" name="q5" value="C"> 20 Mei 1908</label><br>
-<label><input type="radio" name="q5" value="D"> 28 Oktober 1928</label>
+<p>5. Negara melakukan kerja sama ekonomi antarnegara karena…</p>
+<label><input type="radio" name="q5" value="A"> Semua negara memiliki sumber daya alam yang sama</label><br>
+<label><input type="radio" name="q5" value="B"> Tidak ada negara yang membutuhkan barang dari luar</label><br>
+<label><input type="radio" name="q5" value="C"> Setiap negara memiliki keunggulan dan keterbatasan masing-masing</label><br>
+<label><input type="radio" name="q5" value="D"> Kerja sama hanya untuk mempererat hubungan politik</label>
+</div>
+
+<div class="soal">
+<p>6. Perkembangan iptek memengaruhi ekonomi suatu negara. Contoh nyata di Indonesia adalah…</p>
+<label><input type="radio" name="q6" value="A"> Penggunaan teknologi pertanian modern meningkatkan produktivitas</label><br>
+<label><input type="radio" name="q6" value="B"> Penemuan mesin uap di Eropa abad ke-18</label><br>
+<label><input type="radio" name="q6" value="C"> Perdagangan rempah pada masa kolonial</label><br>
+<label><input type="radio" name="q6" value="D"> Sistem barter antar desa</label>
+</div>
+
+<div class="soal">
+<p>7. Dinamika kependudukan Indonesia ditandai dengan adanya bonus demografi. Maksud dari bonus demografi adalah…</p>
+<label><input type="radio" name="q7" value="A"> Jumlah penduduk lansia lebih banyak daripada usia produktif</label><br>
+<label><input type="radio" name="q7" value="B"> Jumlah penduduk usia produktif lebih besar daripada usia nonproduktif</label><br>
+<label><input type="radio" name="q7" value="C"> Jumlah penduduk anak-anak lebih banyak daripada orang dewasa</label><br>
+<label><input type="radio" name="q7" value="D"> Jumlah penduduk desa lebih banyak daripada kota</label>
+</div>
+
+<div class="soal">
+<p>8. Dampak negatif dari dinamika penduduk yang tidak terkendali adalah…</p>
+<label><input type="radio" name="q8" value="A"> Meningkatnya kualitas pendidikan</label><br>
+<label><input type="radio" name="q8" value="B"> Bertambahnya lapangan kerja</label><br>
+<label><input type="radio" name="q8" value="C"> Munculnya pengangguran dan kemiskinan</label><br>
+<label><input type="radio" name="q8" value="D"> Berkurangnya kebutuhan pangan</label>
+</div>
+
+<div class="soal">
+<p>9. Salah satu cara mengatasi permasalahan dinamika penduduk adalah…</p>
+<label><input type="radio" name="q9" value="A"> Meningkatkan angka kelahiran</label><br>
+<label><input type="radio" name="q9" value="B"> Mengurangi kualitas pendidikan</label><br>
+<label><input type="radio" name="q9" value="C"> Melaksanakan program keluarga berencana</label><br>
+<label><input type="radio" name="q9" value="D"> Membatasi migrasi antar daerah</label>
+</div>
+
+<div class="soal">
+<p>10. Pada masa awal kemerdekaan, Indonesia mengalami kesulitan ekonomi karena…</p>
+<label><input type="radio" name="q10" value="A"> Banyaknya investasi asing</label><br>
+<label><input type="radio" name="q10" value="B"> Surplus perdagangan internasional</label><br>
+<label><input type="radio" name="q10" value="C"> Tingginya harga minyak dunia</label><br>
+<label><input type="radio" name="q10" value="D"> Peredaran mata uang yang tidak terkendali</label>
+</div>
+
+<div class="soal">
+<p>11. Program Benteng pada masa awal kemerdekaan bertujuan untuk…</p>
+<label><input type="radio" name="q11" value="A"> Memberikan kesempatan pengusaha pribumi menguasai perdagangan</label><br>
+<label><input type="radio" name="q11" value="B"> Mengurangi impor barang dari luar negeri</label><br>
+<label><input type="radio" name="q11" value="C"> Meningkatkan ekspor hasil pertanian</label><br>
+<label><input type="radio" name="q11" value="D"> Menghapuskan sistem barter</label>
+</div>
+
+<div class="soal">
+<p>12. Pada masa Orde Baru, pemerintah berhasil menekan inflasi melalui…</p>
+<label><input type="radio" name="q12" value="A"> Penerapan sistem barter</label><br>
+<label><input type="radio" name="q12" value="B"> Kebijakan moneter dan fiskal yang ketat</label><br>
+<label><input type="radio" name="q12" value="C"> Menghapuskan pajak daerah</label><br>
+<label><input type="radio" name="q12" value="D"> Mengurangi jumlah penduduk</label>
+</div>
+
+<div class="soal">
+<p>13. Reformasi ekonomi di Indonesia ditandai dengan…</p>
+<label><input type="radio" name="q13" value="A"> Sentralisasi kekuasaan di pusat</label><br>
+<label><input type="radio" name="q13" value="B"> Penerapan otonomi daerah dan transparansi</label><br>
+<label><input type="radio" name="q13" value="C"> Penutupan perdagangan internasional</label><br>
+<label><input type="radio" name="q13" value="D"> Penghapusan pajak ekspor</label>
+</div>
+
+<div class="soal">
+<p>14. Perdagangan internasional memberikan manfaat bagi Indonesia, salah satunya adalah…</p>
+<label><input type="radio" name="q14" value="A"> Menutup akses barang luar negeri</label><br>
+<label><input type="radio" name="q14" value="B"> Mengurangi jumlah tenaga kerja</label><br>
+<label><input type="radio" name="q14" value="C"> Menghapuskan kebutuhan teknologi</label><br>
+<label><input type="radio" name="q14" value="D"> Menambah devisa negara melalui ekspor</label>
+</div>
+
+<div class="soal">
+<p>15. Kerja sama ekonomi antarnegara ASEAN diwujudkan dalam bentuk…</p>
+<label><input type="radio" name="q15" value="A"> NATO</label><br>
+<label><input type="radio" name="q15" value="B"> AFTA</label><br>
+<label><input type="radio" name="q15" value="C"> OPEC</label><br>
+<label><input type="radio" name="q15" value="D"> WHO</label>
+</div>
+
+<div class="soal">
+<p>16. Perkembangan iptek di bidang transportasi memengaruhi ekonomi karena…</p>
+<label><input type="radio" name="q16" value="A"> Memperlambat distribusi barang</label><br>
+<label><input type="radio" name="q16" value="B"> Membatasi perdagangan antarnegara</label><br>
+<label><input type="radio" name="q16" value="C"> Mengurangi jumlah produksi</label><br>
+<label><input type="radio" name="q16" value="D"> Mempercepat arus barang dan jasa</label>
+</div>
+
+<div class="soal">
+<p>17. Bonus demografi dapat menjadi peluang bagi Indonesia jika…</p>
+<label><input type="radio" name="q17" value="A"> Penduduk usia produktif memiliki kualitas dan keterampilan tinggi</label><br>
+<label><input type="radio" name="q17" value="B"> Penduduk usia produktif tidak bekerja</label><br>
+<label><input type="radio" name="q17" value="C"> Penduduk usia nonproduktif lebih banyak</label><br>
+<label><input type="radio" name="q17" value="D"> Pendidikan tidak diperhatikan</label>
+</div>
+
+<div class="soal">
+<p>18. Salah satu dampak positif dinamika penduduk adalah…</p>
+<label><input type="radio" name="q18" value="A"> Berkurangnya kualitas pendidikan</label><br>
+<label><input type="radio" name="q18" value="B"> Meningkatnya angka pengangguran</label><br>
+<label><input type="radio" name="q18" value="C"> Menurunnya daya beli masyarakat</label><br>
+<label><input type="radio" name="q18" value="D"> Bertambahnya tenaga kerja produktif</label>
+</div>
+
+<div class="soal">
+<p>19. Upaya mengatasi masalah kependudukan di Indonesia selain program KB adalah…</p>
+<label><input type="radio" name="q19" value="A"> Meningkatkan kualitas SDM melalui pendidikan</label><br>
+<label><input type="radio" name="q19" value="B"> Membatasi perdagangan internasional</label><br>
+<label><input type="radio" name="q19" value="C"> Mengurangi jumlah sekolah</label><br>
+<label><input type="radio" name="q19" value="D"> Menutup akses migrasi</label>
+</div>
+
+<div class="soal">
+<p>20. Perdagangan internasional Indonesia dipengaruhi oleh faktor geografis, salah satunya adalah…</p>
+<label><input type="radio" name="q20" value="A"> Jumlah penduduk yang sedikit</label><br>
+<label><input type="radio" name="q20" value="B"> Tidak adanya pelabuhan di Indonesia</label><br>
+<label><input type="radio" name="q20" value="C"> Indonesia tidak memiliki sumber daya alam</label><br>
+<label><input type="radio" name="q20" value="D"> Letak Indonesia di antara dua benua dan dua samudra</label>
 </div>
 
 <button id="btnKirim" onclick="kirim()">Kirim Jawaban</button>
@@ -114,17 +308,40 @@ Nama:<br>
 
 <script>
 
+// ======================
+// KUNCI JAWABAN
+// ======================
 const kunci = {
-  q1:"B",
-  q2:"C",
-  q3:"D",
-  q4:"C",
-  q5:"A"
+ q1:"B",
+ q2:"A",
+ q3:"B",
+ q4:"B",
+ q5:"C",
+ q6:"A",
+ q7:"B",
+ q8:"C",
+ q9:"C",
+ q10:"D",
+ q11:"A",
+ q12:"B",
+ q13:"B",
+ q14:"D",
+ q15:"B",
+ q16:"D",
+ q17:"A",
+ q18:"D",
+ q19:"A",
+ q20:"D"
 };
 
-// GANTI DENGAN URL APPS SCRIPT MILIK GUSS
+// ======================
+// GOOGLE SCRIPT
+// ======================
 const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
 
+// ======================
+// DATA SISWA (DROPDOWN NAMA)
+// ======================
 const dataSiswa = {
 
 "8A":[
@@ -195,90 +412,140 @@ const dataSiswa = {
 
 };
 
+// ======================
+// ANTI COPY RINGAN
+// ======================
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ======================
+// DROPDOWN NAMA
+// ======================
 function updateNama(){
 
   const kelas = document.getElementById("kelas").value;
   const namaSelect = document.getElementById("nama");
 
-  namaSelect.innerHTML =
-    '<option value="">-- Pilih Nama --</option>';
+  namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
 
-  if(!kelas) return;
+  if(!kelas || !dataSiswa[kelas]) return;
 
   dataSiswa[kelas].forEach(nama => {
-
-    const option = document.createElement("option");
-
-    option.value = nama;
-    option.textContent = nama;
-
-    namaSelect.appendChild(option);
-
+    const opt = document.createElement("option");
+    opt.value = nama;
+    opt.textContent = nama;
+    namaSelect.appendChild(opt);
   });
 
 }
 
-function kirim(){
+// ======================
+// TIMER ANTI RESET (LOCALSTORAGE)
+// ======================
+const DURATION = 30 * 60;
+const KEY_START = "ujian_mulai";
+
+let startTime = localStorage.getItem(KEY_START);
+
+if(!startTime){
+  startTime = Date.now();
+  localStorage.setItem(KEY_START, startTime);
+}
+
+const timerEl = document.getElementById("timer");
+const timerBox = document.getElementById("timerBox");
+
+function updateTimer(){
+
+  let now = Date.now();
+  let elapsed = Math.floor((now - startTime) / 1000);
+  let remaining = DURATION - elapsed;
+
+  if(remaining <= 0){
+    remaining = 0;
+    clearInterval(timerInterval);
+    kirim();
+    return;
+  }
+
+  let m = Math.floor(remaining / 60);
+  let d = remaining % 60;
+
+  if(timerEl){
+    timerEl.innerHTML =
+      String(m).padStart(2,'0') + ":" +
+      String(d).padStart(2,'0');
+  }
+
+  if(timerBox){
+    if(remaining <= 300) timerBox.style.background = "#ff9800";
+    if(remaining <= 60) timerBox.style.background = "#b71c1c";
+  }
+}
+
+let timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+// ======================
+// KIRIM JAWABAN (AMAN)
+// ======================
+window.kirim = function(){
 
   const nama = document.getElementById("nama").value.trim();
   const kelas = document.getElementById("kelas").value.trim();
 
-  if(nama === ""){
-    alert("Nama harus diisi!");
-    return;
-  }
-
-  if(kelas === ""){
-    alert("Kelas harus diisi!");
+  if(!nama || !kelas){
+    alert("Nama dan kelas harus diisi!");
     return;
   }
 
   const tombol = document.getElementById("btnKirim");
+  if(tombol.disabled) return;
 
-  if(tombol.disabled){
-    return;
-  }
+  tombol.disabled = true;
+  tombol.innerHTML = "Mengirim...";
+
+  clearInterval(timerInterval);
 
   let benar = 0;
 
-  for(let i=1;i<=5;i++){
-    const jawaban = document.querySelector(`input[name=q${i}]:checked`);
-
-    if(jawaban && jawaban.value === kunci[`q${i}`]){
-      benar++;
-    }
+  for(let i=1;i<=20;i++){
+    const j = document.querySelector(`input[name=q${i}]:checked`);
+    if(j && j.value === kunci[`q${i}`]) benar++;
   }
 
-  const salah = 5 - benar;
-  const nilai = benar * 20;
+  const salah = 20 - benar;
+  const nilai = benar * 5;
 
   document.getElementById("hasil").innerHTML =
     "Nilai Anda : " + nilai;
 
-  const data = {
-    nama:nama,
-    kelas:kelas,
-    benar:benar,
-    salah:salah,
-    nilai:nilai
-  };
-
-  tombol.disabled = true;
-  tombol.innerHTML = "Ujian Selesai";
-
   fetch(scriptURL,{
     method:"POST",
-    body:JSON.stringify(data)
+    body:JSON.stringify({nama, kelas, benar, salah, nilai})
   })
   .then(() => {
-    console.log("Data berhasil dikirim");
+
+    localStorage.removeItem(KEY_START);
+
+    if(timerEl) timerEl.innerHTML = "SELESAI";
+
+    tombol.innerHTML = "Ujian Selesai";
+
+    alert("Jawaban berhasil dikirim!");
+
   })
-  .catch(error => {
-    console.error(error);
-    alert("Gagal mengirim data");
+  .catch(err => {
+
+    console.error(err);
+
+    alert("Gagal kirim, coba lagi.");
+
+    tombol.disabled = false;
+    tombol.innerHTML = "Kirim Jawaban";
+
   });
 
-}
+};
 
 </script>
 
