@@ -102,27 +102,23 @@ const kunci = {
  q5:"A"
 };
 
-// GANTI DENGAN URL APPS SCRIPT MILIK GUSS
-const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+const scriptURL = "URL_APPS_SCRIPT_GUSS";
 
 function kirim(){
 
  let nama = document.getElementById("nama").value.trim();
  let kelas = document.getElementById("kelas").value.trim();
 
- // Validasi nama
  if(nama === ""){
    alert("Nama harus diisi!");
    return;
  }
 
- // Validasi kelas
  if(kelas === ""){
    alert("Kelas harus diisi!");
    return;
  }
 
- // Cegah kirim dua kali
  const tombol = document.getElementById("btnKirim");
 
  if(tombol.disabled){
@@ -153,7 +149,6 @@ function kirim(){
    nilai:nilai
  };
 
- // Nonaktifkan tombol
  tombol.disabled = true;
  tombol.innerHTML = "Ujian Selesai";
 
@@ -164,35 +159,6 @@ function kirim(){
 
 }
 
- let benar = 0;
-
- for(let i=1;i<=5;i++){
-   const jawaban = document.querySelector(`input[name=q${i}]:checked`);
-   if(jawaban && jawaban.value === kunci[`q${i}`]){
-      benar++;
-   }
- }
-
- let salah = 5 - benar;
- let nilai = benar * 20;
-
- document.getElementById("hasil").innerHTML =
-   "Nilai Anda : " + nilai;
-
- const data = {
-   nama: document.getElementById("nama").value,
-   kelas: document.getElementById("kelas").value,
-   benar: benar,
-   salah: salah,
-   nilai: nilai
- };
-
- fetch(scriptURL,{
-   method:"POST",
-   body:JSON.stringify(data)
- });
-
-}
 </script>
 
 </body>
