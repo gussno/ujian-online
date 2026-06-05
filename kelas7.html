@@ -4,16 +4,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ujian Online SMPN 4 Semin</title>
+<title>Asesmen Tema 4 Kelas 7</title>
+
+<div id="timerBox">
+  ⏰ Sisa Waktu: <span id="timer">30:00</span>
+</div>
 
 <style>
 body{
     font-family:Arial, sans-serif;
     max-width:800px;
     margin:auto;
-    padding:20px;
+    padding:70px 20px 20px 20px;
     line-height:1.6;
 }
+
 
 h1{
     text-align:center;
@@ -43,12 +48,31 @@ button{
     font-size:20px;
     font-weight:bold;
 }
+
+#timerBox{
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:9999;
+
+  background:#d32f2f;
+  color:white;
+
+  padding:10px 15px;
+  border-radius:10px;
+
+  font-size:20px;
+  font-weight:bold;
+
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
+}
+
 </style>
 
 </head>
 <body>
 
-<h1>Ujian Online SMPN 4 Semin</h1>
+<h1>Asesmen Tema 4 Kelas 7</h1>
 
 <h3>Identitas Peserta</h3>
 
@@ -68,45 +92,164 @@ Nama:<br>
 </select>
 </p>
 <div class="soal">
-<p>1. ASEAN didirikan pada tahun ...</p>
-<label><input type="radio" name="q1" value="A"> 1965</label><br>
-<label><input type="radio" name="q1" value="B"> 1967</label><br>
-<label><input type="radio" name="q1" value="C"> 1970</label><br>
-<label><input type="radio" name="q1" value="D"> 1972</label>
+<p>1. Tradisi pemakaman khas Suku Aga di Trunyan, Bali, yang jenazahnya diletakkan di bawah pohon Taru Menyan tanpa dikubur, merupakan contoh …</p>
+<label><input type="radio" name="q1" value="A"> Pengaruh isolasi geografis terhadap keragaman budaya</label><br>
+<label><input type="radio" name="q1" value="B"> Dampak urbanisasi terhadap kehidupan masyarakat</label><br>
+<label><input type="radio" name="q1" value="C"> Bentuk modernisasi dalam adat Bali</label><br>
+<label><input type="radio" name="q1" value="D"> Tradisi yang muncul akibat perdagangan internasional</label>
 </div>
 
 <div class="soal">
-<p>2. Ibu kota Indonesia adalah ...</p>
-<label><input type="radio" name="q2" value="A"> Surabaya</label><br>
-<label><input type="radio" name="q2" value="B"> Bandung</label><br>
-<label><input type="radio" name="q2" value="C"> Jakarta</label><br>
-<label><input type="radio" name="q2" value="D"> Semarang</label>
+<p>2. Perbedaan iklim antarwilayah di Indonesia memengaruhi keragaman budaya, misalnya …</p>
+<label><input type="radio" name="q2" value="A"> Bahasa daerah yang berbeda antarprovinsi</label><br>
+<label><input type="radio" name="q2" value="B"> Pola pakaian tradisional yang menyesuaikan suhu</label><br>
+<label><input type="radio" name="q2" value="C"> Sistem pemerintahan yang beragam</label><br>
+<label><input type="radio" name="q2" value="D"> Mata uang yang digunakan masyarakat</label>
 </div>
 
 <div class="soal">
-<p>3. Lambang sila ke-5 adalah ...</p>
-<label><input type="radio" name="q3" value="A"> Bintang</label><br>
-<label><input type="radio" name="q3" value="B"> Pohon Beringin</label><br>
-<label><input type="radio" name="q3" value="C"> Kepala Banteng</label><br>
-<label><input type="radio" name="q3" value="D"> Padi dan Kapas</label>
+<p>3. Sultan Nuku dari Tidore dikenal dalam sejarah lokal karena …</p>
+<label><input type="radio" name="q3" value="A"> Memimpin perlawanan terhadap Portugis di Jepara</label><br>
+<label><input type="radio" name="q3" value="B"> Mendirikan Kesultanan Pontianak di Kalimantan</label><br>
+<label><input type="radio" name="q3" value="C"> Mempersatukan Maluku dan Papua melawan Belanda</label><br>
+<label><input type="radio" name="q3" value="D"> Menjadi laksamana wanita pertama di dunia modern</label>
 </div>
 
 <div class="soal">
-<p>4. Gunung tertinggi di Indonesia adalah ...</p>
-<label><input type="radio" name="q4" value="A"> Merapi</label><br>
-<label><input type="radio" name="q4" value="B"> Kerinci</label><br>
-<label><input type="radio" name="q4" value="C"> Puncak Jaya</label><br>
-<label><input type="radio" name="q4" value="D"> Semeru</label>
+<p>4. Ratu Kalinyamat dari Jepara tercatat dalam sejarah karena …</p>
+<label><input type="radio" name="q4" value="A"> Mengembangkan pertanian di Jawa Tengah</label><br>
+<label><input type="radio" name="q4" value="B"> Memimpin armada laut besar melawan Portugis</label><br>
+<label><input type="radio" name="q4" value="C"> Menyebarkan agama Islam di Kalimantan</label><br>
+<label><input type="radio" name="q4" value="D"> Menjadi diplomat di Kesultanan Aceh</label>
 </div>
 
 <div class="soal">
-<p>5. Proklamasi Kemerdekaan Indonesia dibacakan pada ...</p>
-<label><input type="radio" name="q5" value="A"> 17 Agustus 1945</label><br>
-<label><input type="radio" name="q5" value="B"> 18 Agustus 1945</label><br>
-<label><input type="radio" name="q5" value="C"> 20 Mei 1908</label><br>
-<label><input type="radio" name="q5" value="D"> 28 Oktober 1928</label>
+<p>5. Laksamana Malahayati dari Aceh terkenal sebagai …</p>
+<label><input type="radio" name="q5" value="A"> Pemimpin armada laut yang menewaskan Cornelis de Houtman</label><br>
+<label><input type="radio" name="q5" value="B"> Pendiri Kesultanan Pontianak</label><br>
+<label><input type="radio" name="q5" value="C"> Tokoh perdagangan di Jepara</label><br>
+<label><input type="radio" name="q5" value="D"> Sultan Tidore yang bersekutu dengan Belanda</label>
 </div>
 
+<div class="soal">
+<p>6. Eksploitasi pembangunan yang berlebihan dapat menimbulkan masalah sosial budaya berupa …</p>
+<label><input type="radio" name="q6" value="A"> Bertambahnya lapangan kerja di perkotaan</label><br>
+<label><input type="radio" name="q6" value="B"> Meningkatnya toleransi antarwarga</label><br>
+<label><input type="radio" name="q6" value="C"> Berkurangnya urbanisasi di desa</label><br>
+<label><input type="radio" name="q6" value="D"> Kerusakan lingkungan dan berkurangnya kualitas hidup</label>
+</div>
+
+<div class="soal">
+<p>7. Salah satu bentuk kenakalan remaja yang merugikan masyarakat adalah …</p>
+<label><input type="radio" name="q7" value="A"> Belajar kelompok di luar sekolah</label><br>
+<label><input type="radio" name="q7" value="B"> Vandalisme berupa coretan liar di fasilitas umum</label><br>
+<label><input type="radio" name="q7" value="C"> Olahraga bersama di lapangan</label><br>
+<label><input type="radio" name="q7" value="D"> Gotong royong membersihkan lingkungan</label>
+</div>
+
+<div class="soal">
+<p>8. Uang memiliki berbagai fungsi dalam kehidupan ekonomi, salah satunya adalah …</p>
+<label><input type="radio" name="q8" value="A"> Alat konsumsi sehari-hari</label><br>
+<label><input type="radio" name="q8" value="B"> Alat produksi barang</label><br>
+<label><input type="radio" name="q8" value="C"> Alat tukar dalam transaksi</label><br>
+<label><input type="radio" name="q8" value="D"> Alat distribusi tenaga kerja</label>
+</div>
+
+<div class="soal">
+<p>9. Pendapatan keluarga biasanya diperoleh dari …</p>
+<label><input type="radio" name="q9" value="A"> Hiburan dan rekreasi</label><br>
+<label><input type="radio" name="q9" value="B"> Pekerjaan atau usaha</label><br>
+<label><input type="radio" name="q9" value="C"> Pinjaman dari bank</label><br>
+<label><input type="radio" name="q9" value="D"> Tabungan masa lalu</label>
+</div>
+
+<div class="soal">
+<p>10. Menyisihkan sebagian pendapatan untuk keperluan darurat dan masa depan disebut …</p>
+<label><input type="radio" name="q10" value="A"> Konsumsi</label><br>
+<label><input type="radio" name="q10" value="B"> Literasi</label><br>
+<label><input type="radio" name="q10" value="C"> Investasi</label><br>
+<label><input type="radio" name="q10" value="D"> Tabungan</label>
+</div>
+
+<div class="soal">
+<p>11. Investasi dilakukan dengan tujuan …</p>
+<label><input type="radio" name="q11" value="A"> Membatasi konsumsi masyarakat</label><br>
+<label><input type="radio" name="q11" value="B"> Menambah pendapatan di masa depan</label><br>
+<label><input type="radio" name="q11" value="C"> Mengurangi pengeluaran harian</label><br>
+<label><input type="radio" name="q11" value="D"> Menambah hutang keluarga</label>
+</div>
+
+<div class="soal">
+<p>12. Tingkatan literasi keuangan masyarakat jika sangat baik mengelola keuangan disebut …</p>
+<label><input type="radio" name="q12" value="A"> Illiterate</label><br>
+<label><input type="radio" name="q12" value="B"> Sufficient literate</label><br>
+<label><input type="radio" name="q12" value="C"> Well literate</label><br>
+<label><input type="radio" name="q12" value="D"> Less literate</label>
+</div>
+
+<div class="soal">
+<p>13. Urbanisasi yang tidak terkendali dapat menimbulkan masalah sosial budaya, salah satunya …</p>
+<label><input type="radio" name="q13" value="A"> Berkurangnya kepadatan penduduk kota</label><br>
+<label><input type="radio" name="q13" value="B"> Bertambahnya lahan pertanian di desa</label><br>
+<label><input type="radio" name="q13" value="C"> Meningkatnya kepadatan penduduk dan tekanan fasilitas umum</label><br>
+<label><input type="radio" name="q13" value="D"> Meningkatnya interaksi sosial antarwarga</label>
+</div>
+
+<div class="soal">
+<p>14. Salah satu bentuk peran komunitas dalam kehidupan masyarakat adalah …</p>
+<label><input type="radio" name="q14" value="A"> Membatasi partisipasi warga</label><br>
+<label><input type="radio" name="q14" value="B"> Meningkatkan solidaritas melalui gotong royong</label><br>
+<label><input type="radio" name="q14" value="C"> Menghambat pembangunan ekonomi</label><br>
+<label><input type="radio" name="q14" value="D"> Mengurangi kerjasama antarindividu</label>
+</div>
+
+<div class="soal">
+<p>15. Sejarah lokal penting dipelajari karena …</p>
+<label><input type="radio" name="q15" value="A"> Memberikan contoh nyata perjuangan tokoh daerah</label><br>
+<label><input type="radio" name="q15" value="B"> Tidak relevan dengan kehidupan masa kini</label><br>
+<label><input type="radio" name="q15" value="C"> Hanya berlaku di masa lalu</label><br>
+<label><input type="radio" name="q15" value="D"> Tidak memiliki hubungan dengan masyarakat</label>
+</div>
+
+<div class="soal">
+<p>16. Contoh pengelolaan keuangan keluarga yang baik adalah …</p>
+<label><input type="radio" name="q16" value="A"> Membuat anggaran belanja bulanan</label><br>
+<label><input type="radio" name="q16" value="B"> Membeli barang mewah tanpa perhitungan</label><br>
+<label><input type="radio" name="q16" value="C"> Menghabiskan seluruh pendapatan</label><br>
+<label><input type="radio" name="q16" value="D"> Berhutang tanpa rencana</label>
+</div>
+
+<div class="soal">
+<p>17. Tabungan keluarga sebaiknya digunakan untuk …</p>
+<label><input type="radio" name="q17" value="A"> Membayar hutang orang lain</label><br>
+<label><input type="radio" name="q17" value="B"> Keperluan darurat dan masa depan</label><br>
+<label><input type="radio" name="q17" value="C"> Barang konsumsi harian</label><br>
+<label><input type="radio" name="q17" value="D"> Hiburan semata</label>
+</div>
+
+<div class="soal">
+<p>18. Investasi pendidikan bertujuan untuk …</p>
+<label><input type="radio" name="q18" value="A"> Membatasi kesempatan kerja</label><br>
+<label><input type="radio" name="q18" value="B"> Menambah hutang</label><br>
+<label><input type="radio" name="q18" value="C"> Mengurangi pendapatan</label><br>
+<label><input type="radio" name="q18" value="D"> Meningkatkan kualitas SDM</label>
+</div>
+
+<div class="soal">
+<p>19. Peranan komunitas dalam kehidupan masyarakat adalah …</p>
+<label><input type="radio" name="q19" value="A"> Membatasi interaksi sosial</label><br>
+<label><input type="radio" name="q19" value="B"> Menghambat pembangunan</label><br>
+<label><input type="radio" name="q19" value="C"> Meningkatkan solidaritas</label><br>
+<label><input type="radio" name="q19" value="D"> Mengurangi kerjasama</label>
+</div>
+
+<div class="soal">
+<p>20. Pemberdayaan masyarakat dilakukan agar …</p>
+<label><input type="radio" name="q20" value="A"> Tradisi lokal dihapuskan</label><br>
+<label><input type="radio" name="q20" value="B"> Kemampuan masyarakat meningkat</label><br>
+<label><input type="radio" name="q20" value="C"> Peran masyarakat dibatasi</label><br>
+<label><input type="radio" name="q20" value="D"> Pendapatan berkurang</label>
+</div>
 <button id="btnKirim" onclick="kirim()">Kirim Jawaban</button>
 
 <div id="hasil"></div>
@@ -114,11 +257,26 @@ Nama:<br>
 <script>
 
 const kunci = {
-  q1:"B",
-  q2:"C",
-  q3:"D",
-  q4:"C",
-  q5:"A"
+ q1:"A",
+ q2:"B",
+ q3:"C",
+ q4:"B",
+ q5:"A",
+ q6:"D",
+ q7:"B",
+ q8:"C",
+ q9:"B",
+ q10:"D",
+ q11:"B",
+ q12:"C",
+ q13:"C",
+ q14:"B",
+ q15:"A",
+ q16:"A",
+ q17:"B",
+ q18:"D",
+ q19:"C",
+ q20:"B"
 };
 
 // GANTI DENGAN URL APPS SCRIPT MILIK GUSS
@@ -219,6 +377,52 @@ function updateNama(){
 
 }
 
+// ======================
+// TIMER UJIAN
+// ======================
+
+let waktu = 30 * 60; // 30 menit
+
+const timerElement = document.getElementById("timer");
+
+const hitungMundur = setInterval(function(){
+
+  let menit = Math.floor(waktu / 60);
+  let detik = waktu % 60;
+
+timerElement.innerHTML =
+  String(menit).padStart(2,'0') +
+  ":" +
+  String(detik).padStart(2,'0');
+
+  waktu--;
+if(waktu <= 300){
+  document.getElementById("timerBox").style.background = "#ff9800";
+}
+
+if(waktu <= 60){
+  document.getElementById("timerBox").style.background = "#b71c1c";
+}if(waktu <= 300){
+  document.getElementById("timerBox").style.background = "#ff9800";
+}
+
+if(waktu <= 60){
+  document.getElementById("timerBox").style.background = "#b71c1c";
+}
+
+  if(waktu < 0){
+
+    clearInterval(hitungMundur);
+
+    alert("Waktu habis! Jawaban akan dikirim.");
+
+    kirim();
+
+  }
+
+},1000);
+
+
 function kirim(){
 
   const nama = document.getElementById("nama").value.trim();
@@ -240,9 +444,12 @@ function kirim(){
     return;
   }
 
+clearInterval(hitungMundur);
+document.getElementById("timer").innerHTML = "SELESAI";
+
   let benar = 0;
 
-  for(let i=1;i<=5;i++){
+  for(let i=1;i<=20;i++){
     const jawaban = document.querySelector(`input[name=q${i}]:checked`);
 
     if(jawaban && jawaban.value === kunci[`q${i}`]){
@@ -250,8 +457,8 @@ function kirim(){
     }
   }
 
-  const salah = 5 - benar;
-  const nilai = benar * 20;
+  const salah = 20 - benar;
+  const nilai = benar * 5;
 
   document.getElementById("hasil").innerHTML =
     "Nilai Anda : " + nilai;
@@ -268,16 +475,31 @@ function kirim(){
   tombol.innerHTML = "Ujian Selesai";
 
   fetch(scriptURL,{
-    method:"POST",
-    body:JSON.stringify(data)
-  })
-  .then(() => {
-    console.log("Data berhasil dikirim");
-  })
-  .catch(error => {
-    console.error(error);
-    alert("Gagal mengirim data");
-  });
+  method:"POST",
+  body:JSON.stringify(data)
+})
+.then(() => {
+
+  clearInterval(hitungMundur);
+
+  tombol.disabled = true;
+  tombol.innerHTML = "Ujian Selesai";
+
+  document.getElementById("timerBox").innerHTML =
+    "✅ Ujian Selesai";
+
+  alert("Jawaban berhasil dikirim!");
+
+})
+.catch(error => {
+
+  console.error(error);
+
+  alert(
+    "Gagal mengirim data.\n\nPeriksa koneksi internet lalu klik Kirim lagi."
+  );
+
+});
 
 }
 
