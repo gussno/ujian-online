@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ujian Online SMPN 4 Semin</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    max-width:800px;
+    margin:auto;
+    padding:20px;
+    line-height:1.6;
+}
+
+h1{
+    text-align:center;
+}
+
+.soal{
+    margin-bottom:20px;
+    padding:15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+input[type=text]{
+    width:100%;
+    padding:8px;
+    box-sizing:border-box;
+}
+
+button{
+    padding:10px 20px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#hasil{
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Ujian Online SMPN 4 Semin</h1>
+
+<h3>Identitas Peserta</h3>
+
+<p>
+Kelas:<br>
+<select id="kelas" onchange="updateNama()">
+  <option value="">-- Pilih Kelas --</option>
+  <option value="7A">7A</option>
+  <option value="7B">7B</option>
+</select>
+</p>
+
+<p>
+Nama:<br>
+<select id="nama">
+  <option value="">-- Pilih Nama --</option>
+</select>
+</p>
+<div class="soal">
+<p>1. ASEAN didirikan pada tahun ...</p>
+<label><input type="radio" name="q1" value="A"> 1965</label><br>
+<label><input type="radio" name="q1" value="B"> 1967</label><br>
+<label><input type="radio" name="q1" value="C"> 1970</label><br>
+<label><input type="radio" name="q1" value="D"> 1972</label>
+</div>
+
+<div class="soal">
+<p>2. Ibu kota Indonesia adalah ...</p>
+<label><input type="radio" name="q2" value="A"> Surabaya</label><br>
+<label><input type="radio" name="q2" value="B"> Bandung</label><br>
+<label><input type="radio" name="q2" value="C"> Jakarta</label><br>
+<label><input type="radio" name="q2" value="D"> Semarang</label>
+</div>
+
+<div class="soal">
+<p>3. Lambang sila ke-5 adalah ...</p>
+<label><input type="radio" name="q3" value="A"> Bintang</label><br>
+<label><input type="radio" name="q3" value="B"> Pohon Beringin</label><br>
+<label><input type="radio" name="q3" value="C"> Kepala Banteng</label><br>
+<label><input type="radio" name="q3" value="D"> Padi dan Kapas</label>
+</div>
+
+<div class="soal">
+<p>4. Gunung tertinggi di Indonesia adalah ...</p>
+<label><input type="radio" name="q4" value="A"> Merapi</label><br>
+<label><input type="radio" name="q4" value="B"> Kerinci</label><br>
+<label><input type="radio" name="q4" value="C"> Puncak Jaya</label><br>
+<label><input type="radio" name="q4" value="D"> Semeru</label>
+</div>
+
+<div class="soal">
+<p>5. Proklamasi Kemerdekaan Indonesia dibacakan pada ...</p>
+<label><input type="radio" name="q5" value="A"> 17 Agustus 1945</label><br>
+<label><input type="radio" name="q5" value="B"> 18 Agustus 1945</label><br>
+<label><input type="radio" name="q5" value="C"> 20 Mei 1908</label><br>
+<label><input type="radio" name="q5" value="D"> 28 Oktober 1928</label>
+</div>
+
+<button id="btnKirim" onclick="kirim()">Kirim Jawaban</button>
+
+<div id="hasil"></div>
+
+<script>
+
+const kunci = {
+  q1:"B",
+  q2:"C",
+  q3:"D",
+  q4:"C",
+  q5:"A"
+};
+
+// GANTI DENGAN URL APPS SCRIPT MILIK GUSS
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+
+const dataSiswa = {
+
+"7A":[
+"ABID AQILA PRANAJA",
+"ADIB ALBAYHAQI",
+"AHMAD ZULFIKAR ERIANSYAH",
+"AISAHLANI",
+"AISYAH NILAM PERMATA DANIA",
+"ANANDA RIZKI",
+"BAMBANG HENDRI PRADITYA",
+"CIKAL LINTANG PERDANA",
+"DINI ANDREANI",
+"ELVINA DISTIYANI SYAFARA",
+"FEBRIAN AJI PRASETYO",
+"FRISTAYANTI NUR FADILLAH",
+"HABIB FIRMANSYAH",
+"HAFNA ILMY MUHALLA",
+"HAIKAL FADHIL ALMUDHOFAR",
+"IBNU HANDOKO",
+"JESICA ERUM FAIZULLOH",
+"LATIFAH NUR ANISA",
+"M. NUR HARDIANSYAH",
+"MEYSHA DINA RAHAYU",
+"MEYSHA DINI RAHAYU",
+"MUHAMMAD ARIYANTO N.",
+"MUHAMMAD ARYA FAQIH",
+"NADIA TIARA LESTARI",
+"NADYA AYU FEBRIYANI",
+"NAUVAL DICKTA ALVARO",
+"NAYLA ERLINTANG AZZAHARA P.",
+"NURUL DWI ARTIKASARI",
+"RIO DWI PANGESTU",
+"RIZQIA NESTY MEYLANI",
+"SURYA SAPUTRA"
+],
+
+"7B":[
+"ABDUL ANDREA RAHMA",
+"ADE JULIO PRATAMA",
+"AKBAR ZAKARIYA",
+"ALFINO PRAMUDYA WIJAYA",
+"ANGELITA NUR ISTIQOMAH",
+"ANISA DWI HABSARI",
+"ASSYIFATU ASKANA SAKHI",
+"AZKA APRILIANO EKA PUTRA",
+"AZKA ZAKIA KARIMA HAPSARI",
+"AZZILLA MEYFA KUSUMA",
+"BAYU PAMUDHI",
+"CALISTA ELMINA ZAHRA",
+"DESTA CASELLA",
+"FARIDA ATIKA ZAHRA",
+"FISABILL RAMADANU",
+"HAVIDZ SYARIFUDIN",
+"INES NUR AFYANI",
+"KAKA ALFIKRI",
+"MARSYA FELIYA ANJANI",
+"MIKAYLA SAHIRA SYIFA",
+"MUHAMMAD RISKI RAMADHAN",
+"NABILLA PUSPITA SARI",
+"NANDA AULIA PUTRI LESTARI",
+"NEYLA FALCO KINANTHI",
+"RAFI ADITAMA",
+"RAGIL PAMUNGKAS",
+"RENDY WAHYU AJI",
+"RIKI VERNANDA",
+"SALSABILA DWI SEPTIANI",
+"VERA ENJELLINA",
+"YHOSY"
+]
+
+};
+
+function updateNama(){
+
+  const kelas = document.getElementById("kelas").value;
+  const namaSelect = document.getElementById("nama");
+
+  namaSelect.innerHTML =
+    '<option value="">-- Pilih Nama --</option>';
+
+  if(!kelas) return;
+
+  dataSiswa[kelas].forEach(nama => {
+
+    const option = document.createElement("option");
+
+    option.value = nama;
+    option.textContent = nama;
+
+    namaSelect.appendChild(option);
+
+  });
+
+}
+
+function kirim(){
+
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+
+  if(nama === ""){
+    alert("Nama harus diisi!");
+    return;
+  }
+
+  if(kelas === ""){
+    alert("Kelas harus diisi!");
+    return;
+  }
+
+  const tombol = document.getElementById("btnKirim");
+
+  if(tombol.disabled){
+    return;
+  }
+
+  let benar = 0;
+
+  for(let i=1;i<=5;i++){
+    const jawaban = document.querySelector(`input[name=q${i}]:checked`);
+
+    if(jawaban && jawaban.value === kunci[`q${i}`]){
+      benar++;
+    }
+  }
+
+  const salah = 5 - benar;
+  const nilai = benar * 20;
+
+  document.getElementById("hasil").innerHTML =
+    "Nilai Anda : " + nilai;
+
+  const data = {
+    nama:nama,
+    kelas:kelas,
+    benar:benar,
+    salah:salah,
+    nilai:nilai
+  };
+
+  tombol.disabled = true;
+  tombol.innerHTML = "Ujian Selesai";
+
+  fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  })
+  .then(() => {
+    console.log("Data berhasil dikirim");
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Gagal mengirim data");
+  });
+
+}
+
+</script>
+
+</body>
+</html>
