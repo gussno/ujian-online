@@ -25,8 +25,27 @@ body{
   -ms-user-select: none;
 }
 
+body{
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+}
+
+.soal{
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
 h1{
-    text-align:center;
+  text-align: center;
+  color: #1e3a8a;
+  background: linear-gradient(90deg, #2563eb, #1e3a8a);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .soal{
@@ -71,6 +90,33 @@ button{
 
   box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
+
+#btnKirim{
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin: 20px auto;
+}
+
+#btnKirim:hover{
+  background: #15803d;
+  transform: scale(1.03);
+}
+
+#btnKirim:disabled{
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+
 
 </style>
 
