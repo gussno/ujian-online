@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asesmen Pemahaman Lokasi Melalui Peta - Kelas 7</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    max-width:800px;
+    margin:auto;
+    padding:70px 20px 20px 20px;
+    line-height:1.6;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    background: #f3f4f6;
+}
+
+.soal{
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border:1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+h1{
+    text-align: center;
+    color: white;
+    background: linear-gradient(90deg, #2563eb, #1e3a8a);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+select{
+    width:100%;
+    padding:8px;
+    box-sizing:border-box;
+}
+
+#hasil{
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+#timerBox{
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:9999;
+  background:#d32f2f;
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+  font-size:20px;
+  font-weight:bold;
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
+}
+
+#btnKirim{
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin: 20px auto;
+}
+
+#btnKirim:hover{ background: #15803d; transform: scale(1.03); }
+#btnKirim:disabled{ background: #9ca3af; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div id="timerBox">⏰ <span id="timer">30:00</span></div>
+
+<h1>Asesmen Pemahaman Lokasi Melalui Peta</h1>
+
+<h3>Identitas Peserta</h3>
+
+<p>
+Kelas:<br>
+<select id="kelas" onchange="updateNama()">
+  <option value="">-- Pilih Kelas --</option>
+</select>
+</p>
+
+<p>
+Nama:<br>
+<select id="nama">
+  <option value="">-- Pilih Nama --</option>
+</select>
+</p>
+
+<div class="soal">
+<p>1. Gambaran permukaan bumi yang digambar pada bidang datar dan diperkecil menggunakan perbandingan tertentu disebut …</p>
+<label><input type="radio" name="q1" value="A"> Atlas</label><br>
+<label><input type="radio" name="q1" value="B"> Globe</label><br>
+<label><input type="radio" name="q1" value="C"> Peta</label><br>
+<label><input type="radio" name="q1" value="D"> Denah</label>
+</div>
+
+<div class="soal">
+<p>2. Komponen peta yang menunjukkan isi atau tema suatu peta adalah …</p>
+<label><input type="radio" name="q2" value="A"> Legenda</label><br>
+<label><input type="radio" name="q2" value="B"> Judul peta</label><br>
+<label><input type="radio" name="q2" value="C"> Inset</label><br>
+<label><input type="radio" name="q2" value="D"> Skala peta</label>
+</div>
+
+<div class="soal">
+<p>3. Sebuah peta memiliki skala 1 : 1.000.000. Artinya, jarak 1 cm pada peta mewakili jarak sebenarnya di lapangan sejauh …</p>
+<label><input type="radio" name="q3" value="A"> 1 km</label><br>
+<label><input type="radio" name="q3" value="B"> 10 km</label><br>
+<label><input type="radio" name="q3" value="C"> 100 km</label><br>
+<label><input type="radio" name="q3" value="D"> 1.000 km</label>
+</div>
+
+<div class="soal">
+<p>4. Skala peta yang ditunjukkan dalam bentuk garis dengan ukuran tertentu disebut …</p>
+<label><input type="radio" name="q4" value="A"> Skala angka</label><br>
+<label><input type="radio" name="q4" value="B"> Skala verbal</label><br>
+<label><input type="radio" name="q4" value="C"> Skala grafis</label><br>
+<label><input type="radio" name="q4" value="D"> Skala numerik</label>
+</div>
+
+<div class="soal">
+<p>5. Simbol berbentuk panah pada peta biasanya menunjukkan …</p>
+<label><input type="radio" name="q5" value="A"> Legenda peta</label><br>
+<label><input type="radio" name="q5" value="B"> Orientasi arah utara</label><br>
+<label><input type="radio" name="q5" value="C"> Sumber peta</label><br>
+<label><input type="radio" name="q5" value="D"> Inset peta</label>
+</div>
+
+<div class="soal">
+<p>6. Simbol peta yang berbentuk lingkaran, segitiga, atau bujur sangkar termasuk jenis simbol …</p>
+<label><input type="radio" name="q6" value="A"> Simbol garis</label><br>
+<label><input type="radio" name="q6" value="B"> Simbol area</label><br>
+<label><input type="radio" name="q6" value="C"> Simbol titik</label><br>
+<label><input type="radio" name="q6" value="D"> Simbol warna</label>
+</div>
+
+<div class="soal">
+<p>7. Simbol garis pada peta biasanya digunakan untuk menggambarkan …</p>
+<label><input type="radio" name="q7" value="A"> Ibu kota provinsi</label><br>
+<label><input type="radio" name="q7" value="B"> Jalan dan sungai</label><br>
+<label><input type="radio" name="q7" value="C"> Kawasan hutan</label><br>
+<label><input type="radio" name="q7" value="D"> Ketinggian gunung</label>
+</div>
+
+<div class="soal">
+<p>8. Warna biru pada peta umumnya digunakan untuk menunjukkan …</p>
+<label><input type="radio" name="q8" value="A"> Kawasan hutan</label><br>
+<label><input type="radio" name="q8" value="B"> Daerah pegunungan</label><br>
+<label><input type="radio" name="q8" value="C"> Wilayah perairan</label><br>
+<label><input type="radio" name="q8" value="D"> Jalan raya</label>
+</div>
+
+<div class="soal">
+<p>9. Simbol area pada peta biasanya digunakan untuk menggambarkan objek berupa …</p>
+<label><input type="radio" name="q9" value="A"> Kota dan sungai</label><br>
+<label><input type="radio" name="q9" value="B"> Rel kereta api</label><br>
+<label><input type="radio" name="q9" value="C"> Kawasan yang memiliki luas tertentu, seperti sawah atau hutan</label><br>
+<label><input type="radio" name="q9" value="D"> Titik ketinggian</label>
+</div>
+
+<div class="soal">
+<p>10. Garis khayal pada peta yang terdiri atas garis lintang dan garis bujur disebut …</p>
+<label><input type="radio" name="q10" value="A"> Garis astronomis</label><br>
+<label><input type="radio" name="q10" value="B"> Garis kontur</label><br>
+<label><input type="radio" name="q10" value="C"> Garis tepi</label><br>
+<label><input type="radio" name="q10" value="D"> Garis skala</label>
+</div>
+
+<div class="soal">
+<p>11. Fungsi garis lintang pada peta adalah untuk menunjukkan …</p>
+<label><input type="radio" name="q11" value="A"> Batas administrasi wilayah</label><br>
+<label><input type="radio" name="q11" value="B"> Posisi suatu tempat terhadap garis khatulistiwa</label><br>
+<label><input type="radio" name="q11" value="C"> Ketinggian suatu wilayah</label><br>
+<label><input type="radio" name="q11" value="D"> Kepadatan penduduk</label>
+</div>
+
+<div class="soal">
+<p>12. Peta kecil yang disisipkan pada peta utama untuk menunjukkan lokasi suatu daerah dibanding wilayah yang lebih luas disebut …</p>
+<label><input type="radio" name="q12" value="A"> Legenda</label><br>
+<label><input type="radio" name="q12" value="B"> Inset</label><br>
+<label><input type="radio" name="q12" value="C"> Orientasi</label><br>
+<label><input type="radio" name="q12" value="D"> Skala</label>
+</div>
+
+<div class="soal">
+<p>13. Keterangan yang berisi penjelasan tentang simbol-simbol yang digunakan pada peta disebut …</p>
+<label><input type="radio" name="q13" value="A"> Inset</label><br>
+<label><input type="radio" name="q13" value="B"> Legenda</label><br>
+<label><input type="radio" name="q13" value="C"> Judul</label><br>
+<label><input type="radio" name="q13" value="D"> Sumber</label>
+</div>
+
+<div class="soal">
+<p>14. Informasi mengenai orang atau lembaga yang membuat peta dapat dilihat pada bagian …</p>
+<label><input type="radio" name="q14" value="A"> Legenda</label><br>
+<label><input type="radio" name="q14" value="B"> Sumber peta</label><br>
+<label><input type="radio" name="q14" value="C"> Inset</label><br>
+<label><input type="radio" name="q14" value="D"> Orientasi</label>
+</div>
+
+<div class="soal">
+<p>15. Jika 1 cm pada peta mewakili 5 km jarak sebenarnya di lapangan, maka skala angka peta tersebut adalah …</p>
+<label><input type="radio" name="q15" value="A"> 1 : 5.000</label><br>
+<label><input type="radio" name="q15" value="B"> 1 : 50.000</label><br>
+<label><input type="radio" name="q15" value="C"> 1 : 500.000</label><br>
+<label><input type="radio" name="q15" value="D"> 1 : 5.000.000</label>
+</div>
+
+<div class="soal">
+<p>16. Simbol ibu kota kabupaten pada peta umumnya digambarkan dengan bentuk …</p>
+<label><input type="radio" name="q16" value="A"> Segitiga</label><br>
+<label><input type="radio" name="q16" value="B"> Lingkaran</label><br>
+<label><input type="radio" name="q16" value="C"> Bujur sangkar</label><br>
+<label><input type="radio" name="q16" value="D"> Garis putus-putus</label>
+</div>
+
+<div class="soal">
+<p>17. Simbol gunung api pada peta umumnya digambarkan dengan bentuk …</p>
+<label><input type="radio" name="q17" value="A"> Lingkaran</label><br>
+<label><input type="radio" name="q17" value="B"> Segitiga</label><br>
+<label><input type="radio" name="q17" value="C"> Bujur sangkar</label><br>
+<label><input type="radio" name="q17" value="D"> Garis lurus</label>
+</div>
+
+<div class="soal">
+<p>18. Manfaat utama peta bagi seseorang yang sedang melakukan perjalanan adalah …</p>
+<label><input type="radio" name="q18" value="A"> Mengetahui harga bahan bakar</label><br>
+<label><input type="radio" name="q18" value="B"> Menentukan posisi dan arah tujuan</label><br>
+<label><input type="radio" name="q18" value="C"> Mengetahui jumlah penduduk suatu daerah</label><br>
+<label><input type="radio" name="q18" value="D"> Mengetahui hasil pertanian daerah tersebut</label>
+</div>
+
+<div class="soal">
+<p>19. Salah satu manfaat mempelajari peta dalam kehidupan sehari-hari adalah …</p>
+<label><input type="radio" name="q19" value="A"> Mengetahui arah dan jarak antarwilayah untuk membantu perencanaan perjalanan</label><br>
+<label><input type="radio" name="q19" value="B"> Menentukan harga barang di pasar</label><br>
+<label><input type="radio" name="q19" value="C"> Menghitung jumlah penduduk suatu negara</label><br>
+<label><input type="radio" name="q19" value="D"> Menentukan jadwal pelajaran di sekolah</label>
+</div>
+
+<div class="soal">
+<p>20. Ketebalan garis pada simbol garis di peta biasanya digunakan untuk menunjukkan …</p>
+<label><input type="radio" name="q20" value="A"> Jumlah penduduk</label><br>
+<label><input type="radio" name="q20" value="B"> Kelas atau tingkatan jalan</label><br>
+<label><input type="radio" name="q20" value="C"> Warna wilayah</label><br>
+<label><input type="radio" name="q20" value="D"> Skala peta</label>
+</div>
+
+<button id="btnKirim" onclick="kirim()">Kirim Jawaban</button>
+<div id="hasil"></div>
+
+<script>
+// ======================
+// NAMA UJIAN (menentukan nama sheet baru di spreadsheet)
+// ======================
+const NAMA_UJIAN = "Pemahaman Lokasi Melalui Peta";
+
+// ======================
+// KUNCI JAWABAN
+// ======================
+const kunci = {
+ q1:"C", q2:"B", q3:"B", q4:"C", q5:"B",
+ q6:"C", q7:"B", q8:"C", q9:"C", q10:"A",
+ q11:"B", q12:"B", q13:"B", q14:"B", q15:"C",
+ q16:"B", q17:"B", q18:"B", q19:"A", q20:"B"
+};
+
+// ======================
+// GOOGLE SCRIPT (Web App URL yang sama, dari Code.gs)
+// ======================
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+
+// ======================
+// AMBIL DATA SISWA DARI SHEET "Data_anak" (via Code.gs)
+// ======================
+let dataSiswa = {};
+
+async function muatDataSiswa(){
+  const kelasSelect = document.getElementById("kelas");
+  try{
+    const res = await fetch(scriptURL + "?action=siswa");
+    const json = await res.json();
+
+    if(json.status === "success"){
+      dataSiswa = json.data;
+      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      Object.keys(dataSiswa).sort().forEach(kelas => {
+        const opt = document.createElement("option");
+        opt.value = kelas;
+        opt.textContent = kelas;
+        kelasSelect.appendChild(opt);
+      });
+    } else {
+      alert("Gagal memuat data siswa: " + json.message);
+    }
+  } catch(err){
+    console.error(err);
+    alert("Gagal memuat data siswa. Periksa koneksi atau scriptURL.");
+  }
+}
+
+function updateNama(){
+  const kelas = document.getElementById("kelas").value;
+  const namaSelect = document.getElementById("nama");
+  namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+  if(!kelas || !dataSiswa[kelas]) return;
+  dataSiswa[kelas].forEach(nama => {
+    const opt = document.createElement("option");
+    opt.value = nama;
+    opt.textContent = nama;
+    namaSelect.appendChild(opt);
+  });
+}
+
+muatDataSiswa();
+
+// ======================
+// ANTI COPY RINGAN
+// ======================
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ======================
+// TIMER ANTI RESET (LOCALSTORAGE)
+// ======================
+const DURATION = 30 * 60;
+const KEY_START = "ujian_mulai_peta";
+
+let startTime = localStorage.getItem(KEY_START);
+if(!startTime){
+  startTime = Date.now();
+  localStorage.setItem(KEY_START, startTime);
+}
+
+const timerEl = document.getElementById("timer");
+const timerBox = document.getElementById("timerBox");
+
+function updateTimer(){
+  let now = Date.now();
+  let elapsed = Math.floor((now - startTime) / 1000);
+  let remaining = DURATION - elapsed;
+
+  if(remaining <= 0){
+    remaining = 0;
+    clearInterval(timerInterval);
+    kirim();
+    return;
+  }
+
+  let m = Math.floor(remaining / 60);
+  let d = remaining % 60;
+
+  if(timerEl){
+    timerEl.innerHTML = String(m).padStart(2,'0') + ":" + String(d).padStart(2,'0');
+  }
+  if(timerBox){
+    if(remaining <= 300) timerBox.style.background = "#ff9800";
+    if(remaining <= 60) timerBox.style.background = "#b71c1c";
+  }
+}
+
+let timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+// ======================
+// KIRIM JAWABAN
+// ======================
+window.kirim = function(){
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+
+  if(!nama || !kelas){
+    alert("Nama dan kelas harus diisi!");
+    return;
+  }
+
+  const tombol = document.getElementById("btnKirim");
+  if(tombol.disabled) return;
+
+  tombol.disabled = true;
+  tombol.innerHTML = "Mengirim...";
+
+  clearInterval(timerInterval);
+
+  const waktuSelesai = Date.now();
+
+  let benar = 0;
+  for(let i=1;i<=20;i++){
+    const j = document.querySelector(`input[name=q${i}]:checked`);
+    if(j && j.value === kunci[`q${i}`]) benar++;
+  }
+
+  const salah = 20 - benar;
+  const nilai = benar * 5;
+
+  document.getElementById("hasil").innerHTML = "Nilai Anda : " + nilai;
+
+  fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify({
+      ujian: NAMA_UJIAN,
+      nama, kelas, benar, salah, nilai,
+      waktuMulai: Number(startTime),
+      waktuSelesai: waktuSelesai
+    })
+  })
+  .then(() => {
+    localStorage.removeItem(KEY_START);
+    if(timerEl) timerEl.innerHTML = "SELESAI";
+    tombol.innerHTML = "Ujian Selesai";
+    alert("Jawaban berhasil dikirim!");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Gagal kirim, coba lagi.");
+    tombol.disabled = false;
+    tombol.innerHTML = "Kirim Jawaban";
+  });
+};
+</script>
+
+</body>
+</html>
