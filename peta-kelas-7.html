@@ -332,6 +332,51 @@ function updateNama(){
 muatDataSiswa();
 
 // ======================
+// CEK STATUS: apakah siswa ini sudah pernah mengerjakan ujian ini?
+// ======================
+function kunciUjian(nilaiLama){
+  clearInterval(timerInterval);
+  document.querySelectorAll('input[type=radio]').forEach(el => el.disabled = true);
+  document.getElementById("kelas").disabled = true;
+  document.getElementById("nama").disabled = true;
+
+  const tombol = document.getElementById("btnKirim");
+  tombol.disabled = true;
+  tombol.innerHTML = "Ujian Sudah Dikerjakan";
+
+  document.getElementById("hasil").innerHTML =
+    "Kamu sudah mengerjakan ujian ini sebelumnya. Nilai kamu: " + nilaiLama;
+
+  if(timerEl) timerEl.innerHTML = "SELESAI";
+}
+
+async function cekStatusPengerjaan(){
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+  if(!nama || !kelas) return;
+
+  try{
+    const url = scriptURL + "?action=cekStatus"
+      + "&ujian=" + encodeURIComponent(NAMA_UJIAN)
+      + "&nama=" + encodeURIComponent(nama)
+      + "&kelas=" + encodeURIComponent(kelas);
+
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if(json.status === "success" && json.sudahMengerjakan){
+      kunciUjian(json.nilai);
+    }
+  } catch(err){
+    console.error("Gagal cek status pengerjaan:", err);
+    // Kalau gagal cek (misal offline), biarkan siswa tetap bisa mengerjakan;
+    // duplikasi tetap akan ditolak oleh server saat submit.
+  }
+}
+
+document.getElementById("nama").addEventListener("change", cekStatusPengerjaan);
+
+// ======================
 // ANTI COPY RINGAN
 // ======================
 document.addEventListener('contextmenu', e => e.preventDefault());
@@ -420,7 +465,15 @@ window.kirim = function(){
       waktuSelesai: waktuSelesai
     })
   })
-  .then(() => {
+  .then(res => res.json())
+  .then(json => {
+    if(json.status === "duplicate"){
+      localStorage.removeItem(KEY_START);
+      kunciUjian(json.nilai);
+      alert("Ujian ini sudah pernah kamu kerjakan sebelumnya.");
+      return;
+    }
+
     localStorage.removeItem(KEY_START);
     if(timerEl) timerEl.innerHTML = "SELESAI";
     tombol.innerHTML = "Ujian Selesai";
