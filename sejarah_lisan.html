@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asesmen Sejarah Lisan - Kelas 7</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    max-width:800px;
+    margin:auto;
+    padding:70px 20px 20px 20px;
+    line-height:1.6;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    background: #f3f4f6;
+}
+
+.soal{
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border:1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+h1{
+    text-align: center;
+    color: white;
+    background: linear-gradient(90deg, #2563eb, #1e3a8a);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+select{
+    width:100%;
+    padding:8px;
+    box-sizing:border-box;
+}
+
+#hasil{
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+#timerBox{
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:9999;
+  background:#d32f2f;
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+  font-size:20px;
+  font-weight:bold;
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
+}
+
+#btnKirim{
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin: 20px auto;
+}
+
+#btnKirim:hover{ background: #15803d; transform: scale(1.03); }
+#btnKirim:disabled{ background: #9ca3af; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div id="timerBox">⏰ <span id="timer">30:00</span></div>
+
+<h1>Asesmen Sejarah Lisan</h1>
+
+<h3>Identitas Peserta</h3>
+
+<p>
+Kelas:<br>
+<select id="kelas" onchange="updateNama()">
+  <option value="">-- Pilih Kelas --</option>
+</select>
+</p>
+
+<p>
+Nama:<br>
+<select id="nama">
+  <option value="">-- Pilih Nama --</option>
+</select>
+</p>
+
+<div class="soal">
+<p>1. Cerita rakyat yang diwariskan secara turun-temurun oleh nenek moyang kepada generasi berikutnya merupakan bentuk dari …</p>
+<label><input type="radio" name="q1" value="A"> Sumber tertulis</label><br>
+<label><input type="radio" name="q1" value="B"> Tradisi lisan</label><br>
+<label><input type="radio" name="q1" value="C"> Sumber benda</label><br>
+<label><input type="radio" name="q1" value="D"> Dokumen sejarah</label>
+</div>
+
+<div class="soal">
+<p>2. Pada abad ke-19, cerita rakyat mulai dimanfaatkan sebagai …</p>
+<label><input type="radio" name="q2" value="A"> Bahan pendidikan bagi anak-anak</label><br>
+<label><input type="radio" name="q2" value="B"> Dokumen resmi kerajaan</label><br>
+<label><input type="radio" name="q2" value="C"> Alat pemungutan pajak</label><br>
+<label><input type="radio" name="q2" value="D"> Bahan perjanjian dagang</label>
+</div>
+
+<div class="soal">
+<p>3. Cerita Si Pitung dari Jakarta banyak mengajarkan nilai …</p>
+<label><input type="radio" name="q3" value="A"> Kesombongan dan keserakahan</label><br>
+<label><input type="radio" name="q3" value="B"> Kebaikan, tolong-menolong, dan keberanian</label><br>
+<label><input type="radio" name="q3" value="C"> Balas dendam antarwarga</label><br>
+<label><input type="radio" name="q3" value="D"> Persaingan dagang antarpedagang</label>
+</div>
+
+<div class="soal">
+<p>4. Cerita rakyat dapat digolongkan menjadi tiga jenis, yaitu …</p>
+<label><input type="radio" name="q4" value="A"> Prasasti, babad, dan biografi</label><br>
+<label><input type="radio" name="q4" value="B"> Monumen, ornamen, dan grafis</label><br>
+<label><input type="radio" name="q4" value="C"> Mitos, legenda, dan dongeng</label><br>
+<label><input type="radio" name="q4" value="D"> Wawancara, arsip, dan jurnal</label>
+</div>
+
+<div class="soal">
+<p>5. Jejak-jejak masa lampau sebagai sumber sejarah dapat digolongkan menjadi tiga jenis, yaitu …</p>
+<label><input type="radio" name="q5" value="A"> Sumber tertulis, sumber lisan, dan sumber benda</label><br>
+<label><input type="radio" name="q5" value="B"> Mitos, legenda, dan dongeng</label><br>
+<label><input type="radio" name="q5" value="C"> Prasasti, candi, dan makam saja</label><br>
+<label><input type="radio" name="q5" value="D"> Rekaman suara dan foto saja</label>
+</div>
+
+<div class="soal">
+<p>6. Berikut ini yang termasuk contoh sumber tertulis dalam sejarah adalah …</p>
+<label><input type="radio" name="q6" value="A"> Candi dan patung</label><br>
+<label><input type="radio" name="q6" value="B"> Prasasti, buku harian, dan surat kabar</label><br>
+<label><input type="radio" name="q6" value="C"> Rekaman suara saksi sejarah</label><br>
+<label><input type="radio" name="q6" value="D"> Mitos dan dongeng</label>
+</div>
+
+<div class="soal">
+<p>7. Candi, masjid, makam, dan patung merupakan sumber sejarah yang termasuk dalam kategori …</p>
+<label><input type="radio" name="q7" value="A"> Sumber lisan</label><br>
+<label><input type="radio" name="q7" value="B"> Sumber tertulis</label><br>
+<label><input type="radio" name="q7" value="C"> Monumen (sumber benda)</label><br>
+<label><input type="radio" name="q7" value="D"> Tradisi lisan</label>
+</div>
+
+<div class="soal">
+<p>8. Peta, sketsa topografis, dan tabel statistik termasuk contoh sumber benda jenis …</p>
+<label><input type="radio" name="q8" value="A"> Grafis</label><br>
+<label><input type="radio" name="q8" value="B"> Fonografis</label><br>
+<label><input type="radio" name="q8" value="C"> Monumen</label><br>
+<label><input type="radio" name="q8" value="D"> Ornamen</label>
+</div>
+
+<div class="soal">
+<p>9. Rekaman suara sebagai sumber sejarah termasuk dalam jenis sumber benda yang disebut …</p>
+<label><input type="radio" name="q9" value="A"> Ornamen</label><br>
+<label><input type="radio" name="q9" value="B"> Grafis</label><br>
+<label><input type="radio" name="q9" value="C"> Fonografis</label><br>
+<label><input type="radio" name="q9" value="D"> Monumen</label>
+</div>
+
+<div class="soal">
+<p>10. Sumber lisan dalam sejarah dapat dibedakan menjadi dua jenis, yaitu …</p>
+<label><input type="radio" name="q10" value="A"> Prasasti dan babad</label><br>
+<label><input type="radio" name="q10" value="B"> Oral history dan oral tradition</label><br>
+<label><input type="radio" name="q10" value="C"> Monumen dan ornamen</label><br>
+<label><input type="radio" name="q10" value="D"> Mitos dan legenda saja</label>
+</div>
+
+<div class="soal">
+<p>11. Kesaksian lisan yang diberikan langsung oleh pelaku yang terlibat dalam suatu peristiwa sejarah disebut …</p>
+<label><input type="radio" name="q11" value="A"> Oral tradition</label><br>
+<label><input type="radio" name="q11" value="B"> Oral history</label><br>
+<label><input type="radio" name="q11" value="C"> Folktale</label><br>
+<label><input type="radio" name="q11" value="D"> Legenda</label>
+</div>
+
+<div class="soal">
+<p>12. Dalam proses oral history, hasil wawancara dengan saksi sejarah biasanya …</p>
+<label><input type="radio" name="q12" value="A"> Dibiarkan tanpa dicatat</label><br>
+<label><input type="radio" name="q12" value="B"> Direkam dan ditranskripkan ke dalam tulisan</label><br>
+<label><input type="radio" name="q12" value="C"> Langsung dijadikan prasasti</label><br>
+<label><input type="radio" name="q12" value="D"> Dihafalkan turun-temurun tanpa catatan</label>
+</div>
+
+<div class="soal">
+<p>13. Tradisi lisan (oral tradition) di antaranya berupa …</p>
+<label><input type="radio" name="q13" value="A"> Surat kabar dan jurnal</label><br>
+<label><input type="radio" name="q13" value="B"> Mitos, legenda, dongeng, dan cerita rakyat</label><br>
+<label><input type="radio" name="q13" value="C"> Prasasti dan piagam</label><br>
+<label><input type="radio" name="q13" value="D"> Foto dan dokumentasi resmi</label>
+</div>
+
+<div class="soal">
+<p>14. Tradisi lisan lebih sulit dianalisis oleh sejarawan dibandingkan sumber tertulis karena …</p>
+<label><input type="radio" name="q14" value="A"> Tidak memiliki nilai budaya</label><br>
+<label><input type="radio" name="q14" value="B"> Perlu menangkap kenyataan di balik cerita yang didukung dokumen lain</label><br>
+<label><input type="radio" name="q14" value="C"> Selalu ditulis dengan bahasa asing</label><br>
+<label><input type="radio" name="q14" value="D"> Tidak pernah diwariskan ke generasi lain</label>
+</div>
+
+<div class="soal">
+<p>15. Cerita yang dianggap benar-benar terjadi dan dianggap suci oleh masyarakat pemiliknya disebut …</p>
+<label><input type="radio" name="q15" value="A"> Dongeng</label><br>
+<label><input type="radio" name="q15" value="B"> Legenda</label><br>
+<label><input type="radio" name="q15" value="C"> Mitos</label><br>
+<label><input type="radio" name="q15" value="D"> Babad</label>
+</div>
+
+<div class="soal">
+<p>16. Cerita rakyat zaman dahulu yang dianggap benar-benar terjadi oleh pemiliknya, namun tidak dianggap sesuci mitos, disebut …</p>
+<label><input type="radio" name="q16" value="A"> Legenda</label><br>
+<label><input type="radio" name="q16" value="B"> Dongeng</label><br>
+<label><input type="radio" name="q16" value="C"> Prasasti</label><br>
+<label><input type="radio" name="q16" value="D"> Babad</label>
+</div>
+
+<div class="soal">
+<p>17. Prosa yang dianggap tidak benar-benar terjadi dan penuh dengan unsur khayalan disebut …</p>
+<label><input type="radio" name="q17" value="A"> Mitos</label><br>
+<label><input type="radio" name="q17" value="B"> Legenda</label><br>
+<label><input type="radio" name="q17" value="C"> Dongeng</label><br>
+<label><input type="radio" name="q17" value="D"> Biografi</label>
+</div>
+
+<div class="soal">
+<p>18. Larangan bagi anak-anak untuk bermain di luar rumah saat malam karena "akan diculik hantu" sebenarnya memiliki penjelasan ilmiah, yaitu …</p>
+<label><input type="radio" name="q18" value="A"> Hantu benar-benar berkeliaran pada malam hari</label><br>
+<label><input type="radio" name="q18" value="B"> Malam hari membuat penglihatan terbatas sehingga anak berisiko celaka atau tersesat</label><br>
+<label><input type="radio" name="q18" value="C"> Anak-anak dilarang bermain karena aturan pemerintah</label><br>
+<label><input type="radio" name="q18" value="D"> Malam hari udara menjadi beracun</label>
+</div>
+
+<div class="soal">
+<p>19. Berikut ini yang BUKAN merupakan ciri-ciri cerita rakyat adalah …</p>
+<label><input type="radio" name="q19" value="A"> Disebarkan secara lisan dari orang ke orang</label><br>
+<label><input type="radio" name="q19" value="B"> Penciptanya diketahui dengan jelas dan tercatat resmi</label><br>
+<label><input type="radio" name="q19" value="C"> Memiliki versi berbeda di setiap daerah</label><br>
+<label><input type="radio" name="q19" value="D"> Menjadi milik bersama masyarakat</label>
+</div>
+
+<div class="soal">
+<p>20. Nilai-nilai luhur yang sering terkandung dalam cerita rakyat, seperti kejujuran, kerja keras, dan tolong-menolong, berfungsi untuk …</p>
+<label><input type="radio" name="q20" value="A"> Menghambat perkembangan budaya masyarakat</label><br>
+<label><input type="radio" name="q20" value="B"> Menanamkan nilai budi pekerti kepada generasi penerus</label><br>
+<label><input type="radio" name="q20" value="C"> Menghapus tradisi daerah asal</label><br>
+<label><input type="radio" name="q20" value="D"> Mengurangi rasa persatuan antarwarga</label>
+</div>
+
+<button id="btnKirim" onclick="kirim()">Kirim Jawaban</button>
+<div id="hasil"></div>
+
+<script>
+// ======================
+// NAMA UJIAN (menentukan nama sheet baru di spreadsheet)
+// ======================
+const NAMA_UJIAN = "Sejarah Lisan";
+
+// ======================
+// KUNCI JAWABAN
+// ======================
+const kunci = {
+ q1:"B", q2:"A", q3:"B", q4:"C", q5:"A",
+ q6:"B", q7:"C", q8:"A", q9:"C", q10:"B",
+ q11:"B", q12:"B", q13:"B", q14:"B", q15:"C",
+ q16:"A", q17:"C", q18:"B", q19:"B", q20:"B"
+};
+
+// ======================
+// GOOGLE SCRIPT (Web App URL dari Code.gs)
+// ======================
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+
+// ======================
+// AMBIL DATA SISWA DARI SHEET "Data_anak" (via Code.gs)
+// ======================
+let dataSiswa = {};
+
+async function muatDataSiswa(){
+  const kelasSelect = document.getElementById("kelas");
+  try{
+    const res = await fetch(scriptURL + "?action=siswa");
+    const json = await res.json();
+
+    if(json.status === "success"){
+      dataSiswa = json.data;
+      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      Object.keys(dataSiswa).sort().forEach(kelas => {
+        const opt = document.createElement("option");
+        opt.value = kelas;
+        opt.textContent = kelas;
+        kelasSelect.appendChild(opt);
+      });
+    } else {
+      alert("Gagal memuat data siswa: " + json.message);
+    }
+  } catch(err){
+    console.error(err);
+    alert("Gagal memuat data siswa. Periksa koneksi atau scriptURL.");
+  }
+}
+
+function updateNama(){
+  const kelas = document.getElementById("kelas").value;
+  const namaSelect = document.getElementById("nama");
+  namaSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+  if(!kelas || !dataSiswa[kelas]) return;
+  dataSiswa[kelas].forEach(nama => {
+    const opt = document.createElement("option");
+    opt.value = nama;
+    opt.textContent = nama;
+    namaSelect.appendChild(opt);
+  });
+}
+
+muatDataSiswa();
+
+// ======================
+// ANTI COPY RINGAN
+// ======================
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ======================
+// TIMER ANTI RESET (LOCALSTORAGE)
+// ======================
+const DURATION = 30 * 60;
+const KEY_START = "ujian_mulai_sejarah_lisan";
+
+let startTime = localStorage.getItem(KEY_START);
+if(!startTime){
+  startTime = Date.now();
+  localStorage.setItem(KEY_START, startTime);
+}
+
+const timerEl = document.getElementById("timer");
+const timerBox = document.getElementById("timerBox");
+
+function updateTimer(){
+  let now = Date.now();
+  let elapsed = Math.floor((now - startTime) / 1000);
+  let remaining = DURATION - elapsed;
+
+  if(remaining <= 0){
+    remaining = 0;
+    clearInterval(timerInterval);
+    kirim();
+    return;
+  }
+
+  let m = Math.floor(remaining / 60);
+  let d = remaining % 60;
+
+  if(timerEl){
+    timerEl.innerHTML = String(m).padStart(2,'0') + ":" + String(d).padStart(2,'0');
+  }
+  if(timerBox){
+    if(remaining <= 300) timerBox.style.background = "#ff9800";
+    if(remaining <= 60) timerBox.style.background = "#b71c1c";
+  }
+}
+
+let timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+// ======================
+// KUNCI UI KALAU SUDAH PERNAH MENGERJAKAN
+// ======================
+function kunciUjian(nilaiLama){
+  clearInterval(timerInterval);
+  document.querySelectorAll('input[type=radio]').forEach(el => el.disabled = true);
+  document.getElementById("kelas").disabled = true;
+  document.getElementById("nama").disabled = true;
+
+  const tombol = document.getElementById("btnKirim");
+  tombol.disabled = true;
+  tombol.innerHTML = "Ujian Sudah Dikerjakan";
+
+  document.getElementById("hasil").innerHTML =
+    "Kamu sudah mengerjakan ujian ini sebelumnya. Nilai kamu: " + nilaiLama;
+
+  if(timerEl) timerEl.innerHTML = "SELESAI";
+}
+
+// ======================
+// CEK STATUS: apakah siswa ini sudah pernah mengerjakan ujian ini?
+// ======================
+async function cekStatusPengerjaan(){
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+  if(!nama || !kelas) return;
+
+  try{
+    const url = scriptURL + "?action=cekStatus"
+      + "&ujian=" + encodeURIComponent(NAMA_UJIAN)
+      + "&nama=" + encodeURIComponent(nama)
+      + "&kelas=" + encodeURIComponent(kelas);
+
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if(json.status === "success" && json.sudahMengerjakan){
+      kunciUjian(json.nilai);
+    }
+  } catch(err){
+    console.error("Gagal cek status pengerjaan:", err);
+    // Kalau gagal cek (misal offline), biarkan siswa tetap bisa mengerjakan;
+    // duplikasi tetap akan ditolak oleh server saat submit.
+  }
+}
+
+document.getElementById("nama").addEventListener("change", cekStatusPengerjaan);
+
+// ======================
+// KIRIM JAWABAN
+// ======================
+window.kirim = function(){
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+
+  if(!nama || !kelas){
+    alert("Nama dan kelas harus diisi!");
+    return;
+  }
+
+  const tombol = document.getElementById("btnKirim");
+  if(tombol.disabled) return;
+
+  tombol.disabled = true;
+  tombol.innerHTML = "Mengirim...";
+
+  clearInterval(timerInterval);
+
+  const waktuSelesai = Date.now();
+
+  let benar = 0;
+  for(let i=1;i<=20;i++){
+    const j = document.querySelector(`input[name=q${i}]:checked`);
+    if(j && j.value === kunci[`q${i}`]) benar++;
+  }
+
+  const salah = 20 - benar;
+  const nilai = benar * 5;
+
+  document.getElementById("hasil").innerHTML = "Nilai Anda : " + nilai;
+
+  fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify({
+      ujian: NAMA_UJIAN,
+      nama, kelas, benar, salah, nilai,
+      waktuMulai: Number(startTime),
+      waktuSelesai: waktuSelesai
+    })
+  })
+  .then(res => res.json())
+  .then(json => {
+    if(json.status === "duplicate"){
+      localStorage.removeItem(KEY_START);
+      kunciUjian(json.nilai);
+      alert("Ujian ini sudah pernah kamu kerjakan sebelumnya.");
+      return;
+    }
+
+    localStorage.removeItem(KEY_START);
+    if(timerEl) timerEl.innerHTML = "SELESAI";
+    tombol.innerHTML = "Ujian Selesai";
+    alert("Jawaban berhasil dikirim!");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Gagal kirim, coba lagi.");
+    tombol.disabled = false;
+    tombol.innerHTML = "Kirim Jawaban";
+  });
+};
+</script>
+
+</body>
+</html>
