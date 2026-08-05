@@ -1,15 +1,312 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>PH IPS SMPN 4 Semin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asesmen IPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1e3a8a;
+    --blue:#2563eb;
+    --bg:#f3f4f6;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Plus Jakarta Sans', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:760px; margin:0 auto;}
+
+  header{
+    background:linear-gradient(120deg, var(--blue), var(--navy));
+    border-radius:16px;
+    padding:28px;
+    color:white;
+    box-shadow:0 8px 24px rgba(30,58,138,0.25);
+    margin-bottom:20px;
+  }
+  header h1{margin:0 0 4px; font-size:24px; font-weight:800; letter-spacing:-0.02em;}
+  header p{margin:0; font-size:14px; opacity:0.85; font-weight:500;}
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  input[type=text]{
+    flex:1;
+    padding:11px 14px;
+    border-radius:10px;
+    border:1.5px solid var(--line);
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    background:white;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--blue);}
+
+  button.reload{
+    padding:11px 16px;
+    border:none;
+    border-radius:10px;
+    background:var(--navy);
+    color:white;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+  }
+  button.reload:hover{background:#16296b;}
+
+  .list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+
+  .item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--card);
+    border-radius:12px;
+    padding:16px 18px;
+    text-decoration:none;
+    color:var(--ink);
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    transition:0.15s;
+    border:1.5px solid transparent;
+  }
+  .item:hover{border-color:var(--blue); transform:translateX(2px);}
+
+  .icon{
+    width:38px; height:38px;
+    border-radius:9px;
+    background:linear-gradient(135deg, var(--blue), var(--navy));
+    color:white;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    flex-shrink:0;
+  }
+
+  .info{flex:1; min-width:0;}
+  .info .nama{font-weight:700; font-size:15px; margin-bottom:2px;}
+  .info .file{font-size:12px; color:var(--muted); font-weight:500;}
+
+  .arrow{color:var(--muted); font-size:18px; flex-shrink:0;}
+
+  .status{
+    flex-shrink:0;
+    padding:6px 11px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .status.checking{background:#f3f4f6; color:var(--muted);}
+  .status.kosong{background:#f3f4f6; color:var(--muted);}
+  .status.parsial{background:#fffbeb; color:#b45309;}
+  .status.penuh{background:#f0fdf4; color:#166534;}
+  .status.nodata{background:#f3f4f6; color:#9ca3af;}
+
+  .status-msg{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--muted);
+    font-weight:600;
+    font-size:14px;
+  }
+  .status-msg.error{color:#dc2626;}
+
+  @media (max-width:480px){
+    .item{flex-wrap:wrap;}
+    .info{flex-basis:100%; order:1;}
+    .status{order:2; margin-left:52px;}
+    .arrow{order:3; margin-left:auto;}
+  }
+</style>
 </head>
 <body>
 
-<h2>Tugas BDR 4-5 Agustus 2026</h2>
+<div class="wrap">
 
-<p><a href="peta-kelas-7.html">Peta Kelas 7</a></p>
+  <header>
+    <h1>📚 Asesmen IPS</h1>
+    <p>Daftar ini otomatis mengikuti file yang ada di repository GitHub — tidak perlu diedit manual saat ada ujian baru.</p>
+  </header>
 
-<p><a href="kelas8.html">Kelas 8</a></p>
+  <div class="toolbar">
+    <input type="text" id="cari" placeholder="Cari nama ujian...">
+    <button class="reload" onclick="muatDaftar()">↻ Muat Ulang</button>
+  </div>
+
+  <ul class="list" id="daftar">
+    <li class="status-msg">Memuat daftar ujian dari GitHub...</li>
+  </ul>
+
+</div>
+
+<script>
+// ======================
+// KONFIGURASI REPO GITHUB
+// ======================
+const GITHUB_USER = "gussno";
+const GITHUB_REPO = "ujian-online";
+const GITHUB_BRANCH = "main"; // ganti ke "master" kalau branch default repo Anda itu
+
+// File yang TIDAK ditampilkan di daftar (halaman pendukung, bukan halaman ujian)
+const KECUALIKAN = ["index.html", "404.html"];
+
+let semuaFile = [];
+
+// ======================
+// UBAH NAMA FILE JADI JUDUL YANG RAPI
+// misal "sejarah_lisan.html" -> "Sejarah Lisan"
+// ======================
+function buatJudul(namaFile){
+  return namaFile
+    .replace(/\.html?$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
+}
+
+// ======================
+// AMBIL DAFTAR FILE DARI GITHUB API
+// ======================
+async function muatDaftar(){
+  const daftarEl = document.getElementById("daftar");
+  daftarEl.innerHTML = '<li class="status-msg">Memuat daftar ujian dari GitHub...</li>';
+
+  try{
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/?ref=${GITHUB_BRANCH}`;
+    const res = await fetch(url);
+
+    if(!res.ok){
+      throw new Error("Status " + res.status);
+    }
+
+    const data = await res.json();
+
+    semuaFile = data
+      .filter(f => f.type === "file" && /\.html?$/i.test(f.name))
+      .filter(f => !KECUALIKAN.includes(f.name.toLowerCase()))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    renderDaftar();
+
+  } catch(err){
+    console.error(err);
+    daftarEl.innerHTML =
+      '<li class="status-msg error">Gagal memuat daftar dari GitHub. ' +
+      'Kemungkinan penyebab: nama repo/branch salah, repo bersifat privat, atau limit API tercapai (coba lagi beberapa menit lagi).</li>';
+  }
+}
+
+// ======================
+// RENDER DAFTAR (dipanggil ulang saat pencarian berubah)
+// ======================
+function renderDaftar(){
+  const daftarEl = document.getElementById("daftar");
+  const kataKunci = document.getElementById("cari").value.trim().toLowerCase();
+
+  const cocok = semuaFile.filter(f =>
+    !kataKunci || buatJudul(f.name).toLowerCase().includes(kataKunci) || f.name.toLowerCase().includes(kataKunci)
+  );
+
+  if(cocok.length === 0){
+    daftarEl.innerHTML = '<li class="status-msg">Tidak ada ujian yang cocok dengan pencarian.</li>';
+    return;
+  }
+
+  daftarEl.innerHTML = cocok.map((f, i) => `
+    <a class="item" href="./${f.name}">
+      <div class="icon">📝</div>
+      <div class="info">
+        <div class="nama">${buatJudul(f.name)}</div>
+        <div class="file">${f.name}</div>
+      </div>
+      <span class="status checking" id="status-${i}">Memeriksa...</span>
+      <div class="arrow">→</div>
+    </a>
+  `).join("");
+
+  cocok.forEach((f, i) => cekStatusFile(f, i));
+}
+
+// ======================
+// KOLOM STATUS: cek apakah ujian ini sudah ada yang mengerjakan
+// Caranya: ambil nama ujian (NAMA_UJIAN) dari isi file HTML mentahnya,
+// lalu tanya ke Code.gs (endpoint rekap) berapa yang sudah/belum.
+// ======================
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+
+async function cekStatusFile(f, i){
+  const badge = document.getElementById(`status-${i}`);
+  if(!badge) return;
+
+  try{
+    // Ambil isi file mentah dari GitHub untuk cari nama ujian (NAMA_UJIAN)
+    const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${f.name}`;
+    const resRaw = await fetch(rawUrl);
+    const teksHtml = await resRaw.text();
+
+    const cocokUjian = teksHtml.match(/NAMA_UJIAN\s*=\s*["'](.*?)["']/);
+
+    if(!cocokUjian){
+      badge.textContent = "Belum terhubung rekap";
+      badge.className = "status nodata";
+      return;
+    }
+
+    const namaUjian = cocokUjian[1];
+    const resRekap = await fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(namaUjian));
+    const jsonRekap = await resRekap.json();
+
+    if(jsonRekap.status !== "success"){
+      badge.textContent = "Gagal cek status";
+      badge.className = "status nodata";
+      return;
+    }
+
+    let total = 0, sudah = 0;
+    Object.values(jsonRekap.data || {}).forEach(list => {
+      total += list.length;
+      sudah += list.filter(s => s.sudah).length;
+    });
+
+    if(total === 0){
+      badge.textContent = "Belum ada data siswa";
+      badge.className = "status nodata";
+    } else if(sudah === 0){
+      badge.textContent = "Belum ada yang mengerjakan";
+      badge.className = "status kosong";
+    } else if(sudah === total){
+      badge.textContent = `Selesai (${sudah}/${total})`;
+      badge.className = "status penuh";
+    } else {
+      badge.textContent = `${sudah}/${total} mengerjakan`;
+      badge.className = "status parsial";
+    }
+
+  } catch(err){
+    console.error(err);
+    badge.textContent = "Gagal cek status";
+    badge.className = "status nodata";
+  }
+}
+
+document.getElementById("cari").addEventListener("input", renderDaftar);
+
+muatDaftar();
+</script>
 
 </body>
 </html>
