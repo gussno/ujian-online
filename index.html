@@ -577,7 +577,7 @@ const KECUALIKAN = ["index.html", "404.html", "rekap.html"];
 // istilah ini, ujian otomatis dikelompokkan sebagai "Informatika". Selain itu, default-nya "IPS".
 const KATA_KUNCI_INFORMATIKA = [
   "informatika","tik","koding","coding","algoritma","komputer","pemrograman",
-  "python","javascript","html","css","jaringan","internet","digital",
+  "python","javascript","jaringan","internet","digital",
   "database","basis data","spreadsheet","hardware","software",
   "sistem operasi","biner","flowchart","robotik","siber","cyber"
 ];
@@ -597,7 +597,8 @@ function buatJudul(namaFile){
 }
 
 function deteksiSubjek(namaFile, judulHtml){
-  const teks = (namaFile + " " + (judulHtml || "")).toLowerCase();
+  const namaTanpaEkstensi = namaFile.replace(/\.html?$/i, "");
+  const teks = (namaTanpaEkstensi + " " + (judulHtml || "")).toLowerCase();
   const cocok = KATA_KUNCI_INFORMATIKA.some(kw => teks.includes(kw));
   return cocok ? "informatika" : "ips";
 }
