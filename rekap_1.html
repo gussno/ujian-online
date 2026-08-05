@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekap Pengerjaan Tugas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1e3a8a;
+    --blue:#2563eb;
+    --bg:#f3f4f6;
+    --card:#ffffff;
+    --sudah:#16a34a;
+    --sudah-bg:#f0fdf4;
+    --belum:#dc2626;
+    --belum-bg:#fef2f2;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    font-family:'Plus Jakarta Sans', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px 16px 60px;
+  }
+
+  .wrap{max-width:960px; margin:0 auto;}
+
+  header{
+    background:linear-gradient(120deg, var(--blue), var(--navy));
+    border-radius:16px;
+    padding:26px 28px;
+    color:white;
+    box-shadow:0 8px 24px rgba(30,58,138,0.25);
+    margin-bottom:20px;
+  }
+
+  header h1{
+    margin:0 0 4px;
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+
+  header p{
+    margin:0;
+    font-size:14px;
+    opacity:0.85;
+    font-weight:500;
+  }
+
+  .panel{
+    background:var(--card);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom:18px;
+  }
+
+  .controls{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+
+  .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:160px;}
+
+  .field label{font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;}
+
+  select, input[type=text]{
+    padding:10px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    background:white;
+  }
+
+  select:focus, input[type=text]:focus{outline:none; border-color:var(--blue);}
+
+  button.refresh{
+    padding:10px 18px;
+    border:none;
+    border-radius:9px;
+    background:var(--navy);
+    color:white;
+    font-family:inherit;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    transition:0.2s;
+  }
+  button.refresh:hover{background:#16296b;}
+  button.refresh:disabled{background:#9ca3af; cursor:not-allowed;}
+
+  .summary{
+    display:flex;
+    gap:20px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .ring{
+    position:relative;
+    width:96px; height:96px;
+    border-radius:50%;
+    background:conic-gradient(var(--sudah) calc(var(--pct,0) * 1%), var(--line) 0);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .ring::before{
+    content:"";
+    position:absolute;
+    width:72px; height:72px;
+    border-radius:50%;
+    background:white;
+  }
+  .ring span{
+    position:relative;
+    font-size:19px;
+    font-weight:800;
+    color:var(--navy);
+  }
+
+  .stats{display:flex; gap:24px; flex-wrap:wrap;}
+  .stat .num{font-size:26px; font-weight:800; line-height:1;}
+  .stat .lbl{font-size:12px; color:var(--muted); font-weight:600; margin-top:4px;}
+  .stat.sudah .num{color:var(--sudah);}
+  .stat.belum .num{color:var(--belum);}
+
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:640px){ .cols{grid-template-columns:1fr;} }
+
+  .col-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:12px;
+  }
+  .col-title .label{display:flex; align-items:center; gap:8px;}
+  .dot{width:10px; height:10px; border-radius:50%; flex-shrink:0;}
+  .dot.sudah{background:var(--sudah);}
+  .dot.belum{background:var(--belum);}
+
+  .btn-copy{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:6px 11px;
+    border-radius:7px;
+    border:1.5px solid var(--line);
+    background:white;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.15s;
+    white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:var(--blue); color:var(--blue);}
+  .btn-copy:disabled{cursor:default;}
+  .btn-copy.copied{border-color:var(--sudah); color:var(--sudah); background:var(--sudah-bg);}
+
+  .list{
+    list-style:none;
+    margin:0; padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:480px;
+    overflow-y:auto;
+  }
+
+  .item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:9px;
+    font-size:14px;
+    font-weight:600;
+  }
+  .item.sudah{background:var(--sudah-bg); color:#166534;}
+  .item.belum{background:var(--belum-bg); color:#991b1b;}
+  .item .nilai{font-weight:800; font-size:13px;}
+
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:600;
+    padding:30px 10px;
+  }
+
+  .status-msg{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--muted);
+    font-weight:600;
+  }
+
+  .kelas-heading{
+    font-size:13px;
+    font-weight:800;
+    color:var(--navy);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    margin:16px 0 8px;
+  }
+  .kelas-heading:first-child{margin-top:0;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>📋 Rekap Pengerjaan Tugas</h1>
+    <p>Pantau siswa yang sudah dan belum mengerjakan tiap asesmen, langsung dari data ujian.</p>
+  </header>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="field">
+        <label for="ujian">Pilih Ujian</label>
+        <select id="ujian">
+          <option value="">-- Memuat daftar ujian... --</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="kelas">Kelas</label>
+        <select id="kelas">
+          <option value="SEMUA">Semua Kelas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cari">Cari nama</label>
+        <input type="text" id="cari" placeholder="Ketik nama siswa...">
+      </div>
+      <button class="refresh" id="btnRefresh" onclick="muatRekap()">Muat Ulang</button>
+    </div>
+  </div>
+
+  <div class="panel" id="panelSummary" style="display:none;">
+    <div class="summary">
+      <div class="ring" id="ring"><span id="ringPct">0%</span></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="num" id="statTotal">0</div>
+          <div class="lbl">Total Siswa</div>
+        </div>
+        <div class="stat sudah">
+          <div class="num" id="statSudah">0</div>
+          <div class="lbl">Sudah Mengerjakan</div>
+        </div>
+        <div class="stat belum">
+          <div class="num" id="statBelum">0</div>
+          <div class="lbl">Belum Mengerjakan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="areaHasil">
+    <div class="status-msg">Pilih ujian di atas untuk melihat rekapnya.</div>
+  </div>
+
+</div>
+
+<script>
+// ======================
+// GOOGLE SCRIPT (Web App URL dari Code.gs — sama dengan file asesmen)
+// ======================
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+
+let rekapTerakhir = null; // simpan hasil fetch terakhir supaya filter kelas/cari tidak perlu fetch ulang
+
+const selUjian = document.getElementById("ujian");
+const selKelas = document.getElementById("kelas");
+const inputCari = document.getElementById("cari");
+const btnRefresh = document.getElementById("btnRefresh");
+const areaHasil = document.getElementById("areaHasil");
+const panelSummary = document.getElementById("panelSummary");
+
+// ======================
+// MUAT DAFTAR UJIAN (dropdown)
+// ======================
+async function muatDaftarUjian(){
+  try{
+    const res = await fetch(scriptURL + "?action=daftarUjian");
+    const json = await res.json();
+
+    selUjian.innerHTML = "";
+
+    if(json.status !== "success" || !json.data || json.data.length === 0){
+      selUjian.innerHTML = '<option value="">-- Belum ada ujian tercatat --</option>';
+      return;
+    }
+
+    const optDefault = document.createElement("option");
+    optDefault.value = "";
+    optDefault.textContent = "-- Pilih Ujian --";
+    selUjian.appendChild(optDefault);
+
+    json.data.forEach(nama => {
+      const opt = document.createElement("option");
+      opt.value = nama;
+      opt.textContent = nama;
+      selUjian.appendChild(opt);
+    });
+
+  } catch(err){
+    console.error(err);
+    selUjian.innerHTML = '<option value="">-- Gagal memuat, coba lagi --</option>';
+  }
+}
+
+// ======================
+// AMBIL REKAP DARI SERVER
+// ======================
+async function muatRekap(){
+  const ujian = selUjian.value;
+  if(!ujian){
+    areaHasil.innerHTML = '<div class="status-msg">Pilih ujian di atas untuk melihat rekapnya.</div>';
+    panelSummary.style.display = "none";
+    return;
+  }
+
+  btnRefresh.disabled = true;
+  btnRefresh.textContent = "Memuat...";
+  areaHasil.innerHTML = '<div class="status-msg">Memuat data rekap...</div>';
+
+  try{
+    const url = scriptURL + "?action=rekap&ujian=" + encodeURIComponent(ujian);
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if(json.status !== "success"){
+      areaHasil.innerHTML = '<div class="status-msg">Gagal memuat rekap: ' + (json.message || "") + '</div>';
+      panelSummary.style.display = "none";
+      return;
+    }
+
+    rekapTerakhir = json.data;
+
+    // Isi dropdown kelas dari hasil rekap (kalau belum terisi)
+    const kelasSekarang = Object.keys(rekapTerakhir).sort();
+    const kelasTerpilihLama = selKelas.value;
+    selKelas.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+    kelasSekarang.forEach(k => {
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      selKelas.appendChild(opt);
+    });
+    if(kelasSekarang.includes(kelasTerpilihLama)) selKelas.value = kelasTerpilihLama;
+
+    renderHasil();
+
+  } catch(err){
+    console.error(err);
+    areaHasil.innerHTML = '<div class="status-msg">Gagal terhubung ke server. Periksa koneksi internet.</div>';
+    panelSummary.style.display = "none";
+  } finally {
+    btnRefresh.disabled = false;
+    btnRefresh.textContent = "Muat Ulang";
+  }
+}
+
+// ======================
+// RENDER TAMPILAN (dipanggil ulang saat filter kelas/cari berubah)
+// ======================
+function renderHasil(){
+  if(!rekapTerakhir) return;
+
+  const kelasFilter = selKelas.value;
+  const kataKunci = inputCari.value.trim().toUpperCase();
+
+  const kelasList = kelasFilter === "SEMUA"
+    ? Object.keys(rekapTerakhir).sort()
+    : [kelasFilter];
+
+  let totalSemua = 0, sudahSemua = 0;
+  let htmlSudah = "";
+  let htmlBelum = "";
+  let teksSudah = "Kelas\tNama\tNilai\n";
+  let teksBelum = "Kelas\tNama\n";
+
+  kelasList.forEach(kelas => {
+    const siswaKelas = rekapTerakhir[kelas] || [];
+    const cocok = siswaKelas.filter(s => !kataKunci || s.nama.toUpperCase().includes(kataKunci));
+    if(cocok.length === 0) return;
+
+    const sudahList = cocok.filter(s => s.sudah);
+    const belumList = cocok.filter(s => !s.sudah);
+
+    totalSemua += cocok.length;
+    sudahSemua += sudahList.length;
+
+    if(sudahList.length > 0){
+      htmlSudah += '<li class="kelas-heading">' + kelas + '</li>';
+      sudahList.forEach(s => {
+        htmlSudah += '<li class="item sudah"><span>' + s.nama + '</span><span class="nilai">' + (s.nilai ?? "-") + '</span></li>';
+        teksSudah += kelas + "\t" + s.nama + "\t" + (s.nilai ?? "-") + "\n";
+      });
+    }
+    if(belumList.length > 0){
+      htmlBelum += '<li class="kelas-heading">' + kelas + '</li>';
+      belumList.forEach(s => {
+        htmlBelum += '<li class="item belum"><span>' + s.nama + '</span><span>Belum</span></li>';
+        teksBelum += kelas + "\t" + s.nama + "\n";
+      });
+    }
+  });
+
+  teksUntukCopy.sudah = sudahSemua > 0 ? teksSudah.trim() : "";
+  teksUntukCopy.belum = (totalSemua - sudahSemua) > 0 ? teksBelum.trim() : "";
+
+  const belumSemua = totalSemua - sudahSemua;
+  const pct = totalSemua > 0 ? Math.round((sudahSemua / totalSemua) * 100) : 0;
+
+  document.getElementById("statTotal").textContent = totalSemua;
+  document.getElementById("statSudah").textContent = sudahSemua;
+  document.getElementById("statBelum").textContent = belumSemua;
+  document.getElementById("ringPct").textContent = pct + "%";
+  document.getElementById("ring").style.setProperty("--pct", pct);
+  panelSummary.style.display = "block";
+
+  areaHasil.innerHTML =
+    '<div class="cols">' +
+      '<div class="panel">' +
+        '<div class="col-title">' +
+          '<span class="label"><span class="dot sudah"></span>Sudah Mengerjakan (' + sudahSemua + ')</span>' +
+          '<button class="btn-copy" id="btnCopySudah" onclick="copyDaftar(\'sudah\', this)"' + (sudahSemua === 0 ? ' disabled' : '') + '>📋 Salin</button>' +
+        '</div>' +
+        '<ul class="list">' + (htmlSudah || '<div class="empty">Belum ada yang mengerjakan.</div>') + '</ul>' +
+      '</div>' +
+      '<div class="panel">' +
+        '<div class="col-title">' +
+          '<span class="label"><span class="dot belum"></span>Belum Mengerjakan (' + belumSemua + ')</span>' +
+          '<button class="btn-copy" id="btnCopyBelum" onclick="copyDaftar(\'belum\', this)"' + (belumSemua === 0 ? ' disabled' : '') + '>📋 Salin</button>' +
+        '</div>' +
+        '<ul class="list">' + (htmlBelum || '<div class="empty">Semua siswa sudah mengerjakan 🎉</div>') + '</ul>' +
+      '</div>' +
+    '</div>';
+}
+
+// ======================
+// SALIN KE CLIPBOARD (format tab-separated -> tinggal tempel langsung ke Excel/Sheets)
+// ======================
+const teksUntukCopy = { sudah: "", belum: "" };
+
+function copyDaftar(jenis, tombol){
+  const teks = teksUntukCopy[jenis];
+  if(!teks) return;
+
+  const selesai = () => {
+    const labelAsli = tombol.innerHTML;
+    tombol.innerHTML = "✅ Tersalin!";
+    tombol.classList.add("copied");
+    setTimeout(() => {
+      tombol.innerHTML = labelAsli;
+      tombol.classList.remove("copied");
+    }, 1500);
+  };
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(teks).then(selesai).catch(() => salinFallback(teks, selesai));
+  } else {
+    salinFallback(teks, selesai);
+  }
+}
+
+function salinFallback(teks, callback){
+  const area = document.createElement("textarea");
+  area.value = teks;
+  area.style.position = "fixed";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  try{
+    document.execCommand("copy");
+    callback();
+  } catch(err){
+    alert("Gagal menyalin otomatis. Silakan salin manual.");
+  }
+  document.body.removeChild(area);
+}
+
+selUjian.addEventListener("change", muatRekap);
+selKelas.addEventListener("change", renderHasil);
+inputCari.addEventListener("input", renderHasil);
+
+muatDaftarUjian();
+</script>
+
+</body>
+</html>
