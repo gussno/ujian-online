@@ -3,70 +3,246 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asesmen IPS</title>
+<title>Portal Pak Agus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#1e3a8a;
-    --blue:#2563eb;
-    --bg:#f3f4f6;
+    --bg:#f1f5f9;
     --card:#ffffff;
     --ink:#1f2937;
     --muted:#6b7280;
     --line:#e5e7eb;
   }
+
+  body[data-theme="biru"]{
+    --primary:#2563eb;
+    --primary-dark:#1e3a8a;
+    --primary-light:#eff6ff;
+  }
+  body[data-theme="hijau"]{
+    --primary:#16a34a;
+    --primary-dark:#14532d;
+    --primary-light:#f0fdf4;
+  }
+  body[data-theme="coklat"]{
+    --primary:#b45309;
+    --primary-dark:#78350f;
+    --primary-light:#fffbeb;
+  }
+
   *{box-sizing:border-box;}
+
   body{
     margin:0;
     font-family:'Plus Jakarta Sans', Arial, sans-serif;
     background:var(--bg);
     color:var(--ink);
-    padding:24px 16px 60px;
-  }
-  .wrap{max-width:760px; margin:0 auto;}
-
-  header{
-    background:linear-gradient(120deg, var(--blue), var(--navy));
-    border-radius:16px;
-    padding:28px;
-    color:white;
-    box-shadow:0 8px 24px rgba(30,58,138,0.25);
-    margin-bottom:20px;
-  }
-  header h1{margin:0 0 4px; font-size:24px; font-weight:800; letter-spacing:-0.02em;}
-  header p{margin:0; font-size:14px; opacity:0.85; font-weight:500;}
-
-  .toolbar{
     display:flex;
-    gap:10px;
-    margin-bottom:16px;
+    min-height:100vh;
   }
-  input[type=text]{
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    width:270px;
+    flex-shrink:0;
+    background:linear-gradient(180deg, var(--primary-dark), #0f172a);
+    color:white;
+    padding:24px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    position:fixed;
+    top:0; left:0; bottom:0;
+    overflow-y:auto;
+    transition:transform 0.25s ease;
+    z-index:100;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .brand .emoji{
+    width:44px; height:44px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.12);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+    flex-shrink:0;
+  }
+  .brand h1{
+    margin:0;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  .brand p{
+    margin:2px 0 0;
+    font-size:11.5px;
+    color:rgba(255,255,255,0.55);
+    font-weight:600;
+  }
+
+  .clockbox{
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;
+    padding:16px;
+    text-align:center;
+  }
+  .clockbox .jam{
+    font-family:'Space Mono', monospace;
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:0.02em;
+  }
+  .clockbox .tgl{
+    margin-top:4px;
+    font-size:12px;
+    color:rgba(255,255,255,0.65);
+    font-weight:600;
+  }
+
+  nav{display:flex; flex-direction:column; gap:4px;}
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 12px;
+    border-radius:10px;
+    color:rgba(255,255,255,0.75);
+    text-decoration:none;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+    background:none;
+    font-family:inherit;
+    text-align:left;
+    width:100%;
+  }
+  .nav-item .ic{font-size:16px; width:20px; text-align:center; flex-shrink:0;}
+  .nav-item:hover{background:rgba(255,255,255,0.08); color:white;}
+  .nav-item.active{background:var(--primary); color:white; box-shadow:0 4px 12px rgba(0,0,0,0.25);}
+
+  .sidebar-footer{margin-top:auto; display:flex; flex-direction:column; gap:10px;}
+  .theme-label{font-size:11px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.06em;}
+  .theme-picker{display:flex; gap:10px;}
+  .theme-dot{
+    width:30px; height:30px;
+    border-radius:50%;
+    cursor:pointer;
+    border:2.5px solid rgba(255,255,255,0.25);
+    transition:0.15s;
+  }
+  .theme-dot.biru{background:#2563eb;}
+  .theme-dot.hijau{background:#16a34a;}
+  .theme-dot.coklat{background:#b45309;}
+  .theme-dot.active{border-color:white; transform:scale(1.12);}
+
+  /* ============ MAIN ============ */
+  .main{
     flex:1;
+    margin-left:270px;
+    padding:26px 30px 60px;
+    max-width:900px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+  }
+  .menu-toggle{
+    display:none;
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    width:40px; height:40px;
+    font-size:18px;
+    cursor:pointer;
+  }
+  .page-title{
+    font-size:23px;
+    font-weight:800;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .page-sub{
+    font-size:13.5px;
+    color:var(--muted);
+    font-weight:500;
+    margin-top:2px;
+  }
+
+  .section{display:none;}
+  .section.active{display:block;}
+
+  /* ---- toolbar & tabs (Beranda) ---- */
+  .tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+  .tab{
+    padding:8px 16px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    color:var(--muted);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .tab.active{background:var(--primary); border-color:var(--primary); color:white;}
+
+  .toolbar{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .toolbar input[type=text]{
+    flex:1;
+    min-width:160px;
     padding:11px 14px;
     border-radius:10px;
     border:1.5px solid var(--line);
     font-family:inherit;
     font-size:14px;
     font-weight:600;
-    background:white;
+    background:var(--card);
   }
-  input[type=text]:focus{outline:none; border-color:var(--blue);}
+  .toolbar input[type=text]:focus{outline:none; border-color:var(--primary);}
 
-  button.reload{
+  .btn{
     padding:11px 16px;
-    border:none;
     border-radius:10px;
-    background:var(--navy);
-    color:white;
+    border:none;
     font-family:inherit;
     font-weight:700;
     font-size:13px;
     cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
   }
-  button.reload:hover{background:#16296b;}
+  .btn-primary{background:var(--primary-dark); color:white;}
+  .btn-primary:hover{opacity:0.9;}
+  .btn-outline{background:var(--card); color:var(--primary-dark); border:1.5px solid var(--line);}
+  .btn-outline:hover{border-color:var(--primary);}
+
+  .rekap-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:var(--primary-light);
+    border:1.5px solid var(--primary);
+    border-radius:12px;
+    padding:14px 18px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .rekap-banner .txt b{display:block; font-size:14px; color:var(--ink);}
+  .rekap-banner .txt span{font-size:12.5px; color:var(--muted); font-weight:600;}
 
   .list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
 
@@ -76,19 +252,18 @@
     gap:14px;
     background:var(--card);
     border-radius:12px;
-    padding:16px 18px;
+    padding:15px 17px;
     text-decoration:none;
     color:var(--ink);
     box-shadow:0 2px 8px rgba(0,0,0,0.05);
-    transition:0.15s;
     border:1.5px solid transparent;
   }
-  .item:hover{border-color:var(--blue); transform:translateX(2px);}
+  .item:hover{border-color:var(--primary); transform:translateX(2px);}
 
   .icon{
     width:38px; height:38px;
     border-radius:9px;
-    background:linear-gradient(135deg, var(--blue), var(--navy));
+    background:linear-gradient(135deg, var(--primary), var(--primary-dark));
     color:white;
     display:flex; align-items:center; justify-content:center;
     font-size:17px;
@@ -97,9 +272,16 @@
 
   .info{flex:1; min-width:0;}
   .info .nama{font-weight:700; font-size:15px; margin-bottom:2px;}
-  .info .file{font-size:12px; color:var(--muted); font-weight:500;}
-
-  .arrow{color:var(--muted); font-size:18px; flex-shrink:0;}
+  .info .meta{font-size:11.5px; color:var(--muted); font-weight:600; display:flex; gap:8px; align-items:center;}
+  .subjek-tag{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:999px;
+    background:var(--primary-light);
+    color:var(--primary-dark);
+    font-weight:700;
+    font-size:10.5px;
+  }
 
   .status{
     flex-shrink:0;
@@ -115,14 +297,35 @@
   .status.penuh{background:#f0fdf4; color:#166534;}
   .status.nodata{background:#f3f4f6; color:#9ca3af;}
 
-  .status-msg{
-    text-align:center;
-    padding:40px 20px;
-    color:var(--muted);
-    font-weight:600;
-    font-size:14px;
-  }
+  .arrow{color:var(--muted); font-size:18px; flex-shrink:0;}
+
+  .status-msg{text-align:center; padding:40px 20px; color:var(--muted); font-weight:600; font-size:14px;}
   .status-msg.error{color:#dc2626;}
+
+  /* ---- link cards (Website IPS, GitHub, Administrasi, dst) ---- */
+  .cards{display:flex; flex-direction:column; gap:10px;}
+  .card-link{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--card);
+    border-radius:12px;
+    padding:16px 18px;
+    text-decoration:none;
+    color:var(--ink);
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    border:1.5px solid transparent;
+  }
+  .card-link:hover{border-color:var(--primary); transform:translateX(2px);}
+  .card-link .nama{font-weight:700; font-size:15px;}
+  .card-link .url{font-size:11.5px; color:var(--muted); font-weight:500; word-break:break-all;}
+
+  @media (max-width:860px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0; padding:20px 16px 60px;}
+    .menu-toggle{display:block;}
+  }
 
   @media (max-width:480px){
     .item{flex-wrap:wrap;}
@@ -132,43 +335,258 @@
   }
 </style>
 </head>
-<body>
+<body data-theme="biru">
 
-<div class="wrap">
-
-  <header>
-    <h1>📚 Asesmen IPS</h1>
-    <p>Daftar ini otomatis mengikuti file yang ada di repository GitHub — tidak perlu diedit manual saat ada ujian baru.</p>
-  </header>
-
-  <div class="toolbar">
-    <input type="text" id="cari" placeholder="Cari nama ujian...">
-    <button class="reload" onclick="muatDaftar()">↻ Muat Ulang</button>
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="emoji">🎓</div>
+    <div>
+      <h1>Portal Pak Agus</h1>
+      <p>Pusat asesmen & administrasi</p>
+    </div>
   </div>
 
-  <ul class="list" id="daftar">
-    <li class="status-msg">Memuat daftar ujian dari GitHub...</li>
-  </ul>
+  <div class="clockbox">
+    <div class="jam" id="jam">00:00:00</div>
+    <div class="tgl" id="tgl">Memuat tanggal...</div>
+  </div>
 
-</div>
+  <nav>
+    <button class="nav-item active" data-target="beranda">
+      <span class="ic">📝</span> Asesmen / Ujian
+    </button>
+    <button class="nav-item" data-target="ips">
+      <span class="ic">🌐</span> Website IPS
+    </button>
+    <button class="nav-item" data-target="github">
+      <span class="ic">💻</span> GitHub
+    </button>
+    <button class="nav-item" data-target="administrasi">
+      <span class="ic">🏫</span> Administrasi Sekolah
+    </button>
+    <button class="nav-item" data-target="gas">
+      <span class="ic">⚙️</span> Google Apps Script
+    </button>
+    <button class="nav-item" data-target="medsos">
+      <span class="ic">📱</span> Media Sosial
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="theme-label">Tema Warna</div>
+    <div class="theme-picker">
+      <div class="theme-dot biru active" data-theme="biru" title="Biru"></div>
+      <div class="theme-dot hijau" data-theme="hijau" title="Hijau"></div>
+      <div class="theme-dot coklat" data-theme="coklat" title="Coklat"></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="pageTitle">Asesmen / Ujian</div>
+      <div class="page-sub" id="pageSub">Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru.</div>
+    </div>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+  </div>
+
+  <!-- ================= SECTION: BERANDA / UJIAN ================= -->
+  <section class="section active" id="section-beranda">
+
+    <div class="rekap-banner">
+      <div class="txt">
+        <b>📊 Rekap Pengerjaan Siswa</b>
+        <span>Lihat siapa saja yang sudah & belum mengerjakan tiap ujian</span>
+      </div>
+      <a class="btn btn-primary" href="./rekap.html" target="_blank">Buka Rekap →</a>
+    </div>
+
+    <div class="tabs" id="tabsSubjek">
+      <button class="tab active" data-subjek="semua">Semua</button>
+      <button class="tab" data-subjek="ips">IPS</button>
+      <button class="tab" data-subjek="informatika">Informatika</button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="cari" placeholder="Cari nama ujian...">
+      <button class="btn btn-outline" onclick="muatDaftar()">↻ Muat Ulang</button>
+    </div>
+
+    <ul class="list" id="daftar">
+      <li class="status-msg">Memuat daftar ujian dari GitHub...</li>
+    </ul>
+  </section>
+
+  <!-- ================= SECTION: WEBSITE IPS ================= -->
+  <section class="section" id="section-ips">
+    <div class="cards">
+      <a class="card-link" href="https://sites.google.com/view/ips-7" target="_blank">
+        <div class="icon">🌐</div>
+        <div><div class="nama">IPS Kelas 7</div><div class="url">sites.google.com/view/ips-7</div></div>
+      </a>
+      <a class="card-link" href="https://sites.google.com/view/ips-8" target="_blank">
+        <div class="icon">🌐</div>
+        <div><div class="nama">IPS Kelas 8</div><div class="url">sites.google.com/view/ips-8</div></div>
+      </a>
+      <a class="card-link" href="https://sites.google.com/view/ips-9-" target="_blank">
+        <div class="icon">🌐</div>
+        <div><div class="nama">IPS Kelas 9</div><div class="url">sites.google.com/view/ips-9-</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: GITHUB ================= -->
+  <section class="section" id="section-github">
+    <div class="cards">
+      <a class="card-link" href="https://github.com/gussno-edu" target="_blank">
+        <div class="icon">💻</div>
+        <div><div class="nama">Profil GitHub — gussno-edu</div><div class="url">github.com/gussno-edu</div></div>
+      </a>
+      <a class="card-link" href="https://github.com/gussno/ujian-online" target="_blank">
+        <div class="icon">📦</div>
+        <div><div class="nama">Repository ujian-online</div><div class="url">github.com/gussno/ujian-online — PH IPS Online</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: ADMINISTRASI SEKOLAH ================= -->
+  <section class="section" id="section-administrasi">
+    <div class="cards">
+      <a class="card-link" href="https://gussno-edu.github.io/adm-wali/" target="_blank">
+        <div class="icon">🏫</div>
+        <div><div class="nama">Administrasi Wali Kelas</div><div class="url">gussno-edu.github.io/adm-wali/</div></div>
+      </a>
+      <a class="card-link" href="https://gussno-edu.github.io/adm-guru/" target="_blank">
+        <div class="icon">🏫</div>
+        <div><div class="nama">Administrasi Guru</div><div class="url">gussno-edu.github.io/adm-guru/</div></div>
+      </a>
+      <a class="card-link" href="https://www.smpn4semin.sch.id/" target="_blank">
+        <div class="icon">🏛️</div>
+        <div><div class="nama">Website SMPN 4 Semin</div><div class="url">smpn4semin.sch.id</div></div>
+      </a>
+      <a class="card-link" href="https://gussno.github.io/portal-sch/" target="_blank">
+        <div class="icon">🏛️</div>
+        <div><div class="nama">Portal Sekolah</div><div class="url">gussno.github.io/portal-sch/</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: GOOGLE APPS SCRIPT ================= -->
+  <section class="section" id="section-gas">
+    <div class="cards">
+      <a class="card-link" href="https://script.google.com/home" target="_blank">
+        <div class="icon">⚙️</div>
+        <div><div class="nama">Google Apps Script</div><div class="url">script.google.com/home</div></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: MEDIA SOSIAL ================= -->
+  <section class="section" id="section-medsos">
+    <div class="cards">
+      <a class="card-link" href="https://www.youtube.com/@gussnoedu" target="_blank">
+        <div class="icon">▶️</div>
+        <div><div class="nama">YouTube — Gussno Edu</div><div class="url">youtube.com/@gussnoedu</div></div>
+      </a>
+      <a class="card-link" href="https://www.instagram.com/gussnoedu/" target="_blank">
+        <div class="icon">📷</div>
+        <div><div class="nama">Instagram — gussnoedu</div><div class="url">instagram.com/gussnoedu</div></div>
+      </a>
+      <a class="card-link" href="https://www.threads.com/@gussnoedu" target="_blank">
+        <div class="icon">🧵</div>
+        <div><div class="nama">Threads — @gussnoedu</div><div class="url">threads.com/@gussnoedu</div></div>
+      </a>
+    </div>
+  </section>
+
+</main>
 
 <script>
-// ======================
-// KONFIGURASI REPO GITHUB
-// ======================
+// ======================================================
+// JAM & TANGGAL DIGITAL REAL-TIME
+// ======================================================
+function updateJam(){
+  const now = new Date();
+  document.getElementById("jam").textContent = now.toLocaleTimeString("id-ID", { hour12:false });
+  document.getElementById("tgl").textContent = now.toLocaleDateString("id-ID", {
+    weekday:"long", day:"numeric", month:"long", year:"numeric"
+  });
+}
+updateJam();
+setInterval(updateJam, 1000);
+
+// ======================================================
+// GANTI TEMA WARNA (tersimpan di browser)
+// ======================================================
+const KEY_THEME = "portal_tema";
+function terapkanTema(tema){
+  document.body.setAttribute("data-theme", tema);
+  document.querySelectorAll(".theme-dot").forEach(d => d.classList.toggle("active", d.dataset.theme === tema));
+  try{ localStorage.setItem(KEY_THEME, tema); }catch(e){}
+}
+document.querySelectorAll(".theme-dot").forEach(d => {
+  d.addEventListener("click", () => terapkanTema(d.dataset.theme));
+});
+terapkanTema(localStorage.getItem(KEY_THEME) || "biru");
+
+// ======================================================
+// NAVIGASI SIDEBAR (single page, tukar section)
+// ======================================================
+const JUDUL_HALAMAN = {
+  beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
+  ips: { title:"Website IPS", sub:"Materi & tugas per jenjang kelas, dikelola lewat Google Sites." },
+  github: { title:"GitHub", sub:"Repository dan profil yang menampung source code portal & ujian." },
+  administrasi: { title:"Administrasi Sekolah", sub:"Akses cepat ke sistem administrasi wali kelas, guru, dan sekolah." },
+  gas: { title:"Google Apps Script", sub:"Backend yang mengelola pengiriman & rekap jawaban ujian." },
+  medsos: { title:"Media Sosial", sub:"Kanal media sosial Gussno Edu — video pembelajaran & update terbaru." }
+};
+
+document.querySelectorAll(".nav-item").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const target = btn.dataset.target;
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById("section-" + target).classList.add("active");
+
+    document.getElementById("pageTitle").textContent = JUDUL_HALAMAN[target].title;
+    document.getElementById("pageSub").textContent = JUDUL_HALAMAN[target].sub;
+
+    document.getElementById("sidebar").classList.remove("open");
+  });
+});
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("open");
+});
+
+// ======================================================
+// KONFIGURASI REPO GITHUB (daftar ujian)
+// ======================================================
 const GITHUB_USER = "gussno";
 const GITHUB_REPO = "ujian-online";
 const GITHUB_BRANCH = "main"; // ganti ke "master" kalau branch default repo Anda itu
 
-// File yang TIDAK ditampilkan di daftar (halaman pendukung, bukan halaman ujian)
-const KECUALIKAN = ["index.html", "404.html"];
+// File yang TIDAK ditampilkan di daftar ujian (halaman pendukung / rekap)
+const KECUALIKAN = ["index.html", "404.html", "rekap.html"];
+
+// Kata kunci penanda mapel Informatika. Kalau nama file / judul mengandung salah satu
+// istilah ini, ujian otomatis dikelompokkan sebagai "Informatika". Selain itu, default-nya "IPS".
+const KATA_KUNCI_INFORMATIKA = [
+  "informatika","tik","koding","coding","algoritma","komputer","pemrograman",
+  "python","javascript","html","css","jaringan","internet","digital",
+  "database","basis data","spreadsheet","hardware","software",
+  "sistem operasi","biner","flowchart","robotik","siber","cyber"
+];
+
+const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
 
 let semuaFile = [];
+let subjekAktif = "semua";
 
-// ======================
-// UBAH NAMA FILE JADI JUDUL YANG RAPI
-// misal "sejarah_lisan.html" -> "Sejarah Lisan"
-// ======================
 function buatJudul(namaFile){
   return namaFile
     .replace(/\.html?$/i, "")
@@ -178,9 +596,15 @@ function buatJudul(namaFile){
     .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
 }
 
-// ======================
-// AMBIL DAFTAR FILE DARI GITHUB API
-// ======================
+function deteksiSubjek(namaFile, judulHtml){
+  const teks = (namaFile + " " + (judulHtml || "")).toLowerCase();
+  const cocok = KATA_KUNCI_INFORMATIKA.some(kw => teks.includes(kw));
+  return cocok ? "informatika" : "ips";
+}
+
+// ======================================================
+// AMBIL DAFTAR FILE DARI GITHUB API + DETEKSI MAPEL
+// ======================================================
 async function muatDaftar(){
   const daftarEl = document.getElementById("daftar");
   daftarEl.innerHTML = '<li class="status-msg">Memuat daftar ujian dari GitHub...</li>';
@@ -188,17 +612,34 @@ async function muatDaftar(){
   try{
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/?ref=${GITHUB_BRANCH}`;
     const res = await fetch(url);
-
-    if(!res.ok){
-      throw new Error("Status " + res.status);
-    }
-
+    if(!res.ok) throw new Error("Status " + res.status);
     const data = await res.json();
 
-    semuaFile = data
+    const fileHtml = data
       .filter(f => f.type === "file" && /\.html?$/i.test(f.name))
       .filter(f => !KECUALIKAN.includes(f.name.toLowerCase()))
       .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Ambil isi mentah tiap file sekali saja: dipakai untuk deteksi mapel & cek NAMA_UJIAN
+    semuaFile = await Promise.all(fileHtml.map(async f => {
+      let teksHtml = "";
+      try{
+        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${f.name}`;
+        const resRaw = await fetch(rawUrl);
+        teksHtml = await resRaw.text();
+      }catch(e){ /* biarkan kosong, fallback default */ }
+
+      const judulTagMatch = teksHtml.match(/<title>(.*?)<\/title>/i);
+      const judulHtml = judulTagMatch ? judulTagMatch[1] : "";
+      const ujianMatch = teksHtml.match(/NAMA_UJIAN\s*=\s*["'](.*?)["']/);
+
+      return {
+        name: f.name,
+        judul: buatJudul(f.name),
+        subjek: deteksiSubjek(f.name, judulHtml),
+        namaUjian: ujianMatch ? ujianMatch[1] : null
+      };
+    }));
 
     renderDaftar();
 
@@ -210,28 +651,30 @@ async function muatDaftar(){
   }
 }
 
-// ======================
-// RENDER DAFTAR (dipanggil ulang saat pencarian berubah)
-// ======================
 function renderDaftar(){
   const daftarEl = document.getElementById("daftar");
   const kataKunci = document.getElementById("cari").value.trim().toLowerCase();
 
-  const cocok = semuaFile.filter(f =>
-    !kataKunci || buatJudul(f.name).toLowerCase().includes(kataKunci) || f.name.toLowerCase().includes(kataKunci)
-  );
+  const cocok = semuaFile.filter(f => {
+    const lolosSubjek = subjekAktif === "semua" || f.subjek === subjekAktif;
+    const lolosCari = !kataKunci || f.judul.toLowerCase().includes(kataKunci) || f.name.toLowerCase().includes(kataKunci);
+    return lolosSubjek && lolosCari;
+  });
 
   if(cocok.length === 0){
-    daftarEl.innerHTML = '<li class="status-msg">Tidak ada ujian yang cocok dengan pencarian.</li>';
+    daftarEl.innerHTML = '<li class="status-msg">Tidak ada ujian yang cocok.</li>';
     return;
   }
 
   daftarEl.innerHTML = cocok.map((f, i) => `
     <a class="item" href="./${f.name}">
-      <div class="icon">📝</div>
+      <div class="icon">${f.subjek === "informatika" ? "💻" : "📝"}</div>
       <div class="info">
-        <div class="nama">${buatJudul(f.name)}</div>
-        <div class="file">${f.name}</div>
+        <div class="nama">${f.judul}</div>
+        <div class="meta">
+          <span class="subjek-tag">${f.subjek === "informatika" ? "Informatika" : "IPS"}</span>
+          <span>${f.name}</span>
+        </div>
       </div>
       <span class="status checking" id="status-${i}">Memeriksa...</span>
       <div class="arrow">→</div>
@@ -241,33 +684,18 @@ function renderDaftar(){
   cocok.forEach((f, i) => cekStatusFile(f, i));
 }
 
-// ======================
-// KOLOM STATUS: cek apakah ujian ini sudah ada yang mengerjakan
-// Caranya: ambil nama ujian (NAMA_UJIAN) dari isi file HTML mentahnya,
-// lalu tanya ke Code.gs (endpoint rekap) berapa yang sudah/belum.
-// ======================
-const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
-
 async function cekStatusFile(f, i){
   const badge = document.getElementById(`status-${i}`);
   if(!badge) return;
 
+  if(!f.namaUjian){
+    badge.textContent = "Belum terhubung rekap";
+    badge.className = "status nodata";
+    return;
+  }
+
   try{
-    // Ambil isi file mentah dari GitHub untuk cari nama ujian (NAMA_UJIAN)
-    const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${f.name}`;
-    const resRaw = await fetch(rawUrl);
-    const teksHtml = await resRaw.text();
-
-    const cocokUjian = teksHtml.match(/NAMA_UJIAN\s*=\s*["'](.*?)["']/);
-
-    if(!cocokUjian){
-      badge.textContent = "Belum terhubung rekap";
-      badge.className = "status nodata";
-      return;
-    }
-
-    const namaUjian = cocokUjian[1];
-    const resRekap = await fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(namaUjian));
+    const resRekap = await fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(f.namaUjian));
     const jsonRekap = await resRekap.json();
 
     if(jsonRekap.status !== "success"){
@@ -304,6 +732,14 @@ async function cekStatusFile(f, i){
 }
 
 document.getElementById("cari").addEventListener("input", renderDaftar);
+document.querySelectorAll("#tabsSubjek .tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll("#tabsSubjek .tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    subjekAktif = tab.dataset.subjek;
+    renderDaftar();
+  });
+});
 
 muatDaftar();
 </script>
