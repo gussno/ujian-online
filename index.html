@@ -516,7 +516,7 @@
       <span class="ic">🔗</span> Generator Link Berbagi
     </button>
     <button class="nav-item" data-target="template">
-      <span class="ic">📁</span> Template Ujian
+      <span class="ic">🧾</span> Generator Soal
     </button>
     <button class="nav-item" data-target="checklist">
       <span class="ic">✅</span> Checklist Deploy Ujian
@@ -756,8 +756,11 @@
   <section class="section" id="section-genlink">
 
     <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">1. Pilih ujian yang boleh dilihat</div>
-      <div class="gen-row hint" style="margin-bottom:8px;">Kosongkan semua (tidak centang) kalau mau penerima link bebas pilih ujian apa saja.</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <div style="font-weight:800; font-size:15px;">1. Pilih ujian yang boleh dilihat</div>
+        <button class="btn btn-outline" onclick="muatGeneratorLink()">↻ Muat Ulang Daftar</button>
+      </div>
+      <div class="gen-row hint" style="margin-bottom:8px;">Kosongkan semua (tidak centang) kalau mau penerima link bebas pilih ujian apa saja. <b>Catatan:</b> ujian baru muncul di sini setelah ada minimal 1 siswa yang mengumpulkan jawaban — kalau baru upload file & belum ada yang mengerjakan, klik "Muat Ulang Daftar" setelah itu terjadi.</div>
       <div class="checkbox-list" id="glUjianList">
         <div class="status-msg">Memuat daftar ujian...</div>
       </div>
@@ -787,26 +790,111 @@
 
   </section>
 
-  <!-- ================= SECTION: TEMPLATE UJIAN ================= -->
+  <!-- ================= SECTION: GENERATOR SOAL UJIAN ================= -->
   <section class="section" id="section-template">
 
     <div class="panel">
-      <div style="font-weight:800; font-size:16px; margin-bottom:6px;">📁 Template Siap Pakai</div>
+      <div style="font-weight:800; font-size:16px; margin-bottom:6px;">🧾 Data Ujian</div>
       <div style="color:var(--muted); font-size:13.5px; font-weight:500; margin-bottom:16px;">
-        Salin kode ini, tempel jadi file <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">.html</code> baru, lalu sesuaikan soal & <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">NAMA_UJIAN</code>-nya (lihat menu Panduan untuk format penamaan).
+        Isi data ini, tambahkan soal di bawah, lalu klik "Buat Kode HTML" — hasilnya tinggal disalin jadi file .html baru.
       </div>
-      <button class="btn btn-primary" id="tplBtnSalin" onclick="salinTemplate()" style="margin-bottom:14px;">📋 Salin Kode Template</button>
-      <textarea class="gen-output" id="tplOutput" rows="16" readonly></textarea>
+
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="tplJudul">Judul Asesmen</label>
+          <input type="text" id="tplJudul" placeholder="Contoh: Sejarah Lisan">
+        </div>
+        <div class="gen-row">
+          <label for="tplTimer">Durasi Timer (menit)</label>
+          <input type="number" id="tplTimer" value="30">
+        </div>
+      </div>
+
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="tplTahunAwal">Tahun Ajaran Mulai</label>
+          <input type="number" id="tplTahunAwal" placeholder="Contoh: 2026">
+        </div>
+        <div class="gen-row">
+          <label for="tplSemester">Semester</label>
+          <select id="tplSemester">
+            <option value="1">1 (Ganjil)</option>
+            <option value="2">2 (Genap)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="tplKelas">Kelas</label>
+          <select id="tplKelas">
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+        <div class="gen-row">
+          <label for="tplMapel">Mapel</label>
+          <select id="tplMapel">
+            <option value="IPS">IPS</option>
+            <option value="Informatika">Informatika</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="gen-row">
+        <label>Nama Ujian (otomatis tersusun, ini yang tersimpan sebagai NAMA_UJIAN)</label>
+        <input type="text" id="tplNamaUjianPreview" readonly style="background:var(--bg); font-family:'Space Mono',monospace; font-weight:700;">
+      </div>
     </div>
 
     <div class="panel">
-      <div style="font-weight:800; font-size:14px; margin-bottom:10px;">Yang perlu disesuaikan di template</div>
-      <ul style="margin:0; padding-left:20px; font-size:13.5px; line-height:1.9; color:var(--ink);">
-        <li>Bagian <code>&lt;title&gt;</code> dan <code>&lt;h1&gt;</code> — ganti dengan judul asesmen Anda</li>
-        <li><code>const NAMA_UJIAN</code> — isi mengikuti format penamaan (contoh: <code>2627.1-7-IPS-Sejarah Lisan</code>)</li>
-        <li>Blok <code>&lt;div class="soal"&gt;</code> — duplikat sesuai jumlah soal, sesuaikan pertanyaan & pilihan jawaban</li>
-        <li>Object <code>kunci</code> di JavaScript — isi kunci jawaban yang cocok dengan nomor soal (q1, q2, dst)</li>
-      </ul>
+      <div style="font-weight:800; font-size:15px; margin-bottom:6px;">📋 Impor Massal dari Teks</div>
+      <div class="gen-row hint" style="margin-bottom:12px;">
+        Tempel banyak soal sekaligus (dari Word/Google Docs). Pisahkan tiap soal dengan <b>baris kosong</b>, pilihan diawali <code>A.</code> <code>B.</code> <code>C.</code> <code>D.</code>
+      </div>
+      <div class="gen-row">
+        <label for="importSoalText">Tempel Soal + Pilihan di sini</label>
+        <textarea id="importSoalText" rows="8" placeholder="1. Pertanyaan pertama...
+A. Pilihan A
+B. Pilihan B
+C. Pilihan C
+D. Pilihan D
+
+2. Pertanyaan kedua...
+A. Pilihan A
+B. Pilihan B
+C. Pilihan C
+D. Pilihan D"></textarea>
+      </div>
+      <div class="gen-row">
+        <label for="importKunciText">Tempel Kunci Jawaban di sini</label>
+        <textarea id="importKunciText" rows="4" placeholder="1. A
+2. C
+3. B
+...atau ringkas: 1A 2C 3B 4D"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="importSoalMassal()">📥 Impor dari Teks</button>
+      <div class="gen-row hint" style="margin-top:10px;">Hasil impor akan MENGGANTI isi "Daftar Soal" di bawah — cek dulu sebelum klik "Buat Kode HTML".</div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="font-weight:800; font-size:15px;">Daftar Soal</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline" onclick="kosongkanSoalBuilder()">🗑️ Kosongkan Semua</button>
+          <button class="btn btn-primary" onclick="tambahSoalBuilder()">+ Tambah Soal</button>
+        </div>
+      </div>
+      <div id="soalBuilderList"></div>
+      <button class="btn btn-outline" onclick="tambahSoalBuilder()">+ Tambah Soal Lagi</button>
+    </div>
+
+    <div class="panel">
+      <button class="btn btn-primary" onclick="generateKodeSoal()" style="margin-bottom:14px;">🧾 Buat Kode HTML</button>
+      <textarea class="gen-output" id="tplOutput" rows="16" readonly placeholder="Kode akan muncul di sini setelah klik Buat Kode HTML..."></textarea>
+      <button class="btn btn-outline" id="tplBtnSalin" onclick="salinOutput('tplOutput', this)" style="margin-top:10px;">📋 Salin Kode</button>
+      <div class="gen-row hint" style="margin-top:10px;">Setelah disalin, tempel jadi file .html baru, upload ke repo GitHub — otomatis muncul di menu Asesmen/Ujian setelah ada yang mengerjakan.</div>
     </div>
 
   </section>
@@ -1057,7 +1145,7 @@ const JUDUL_HALAMAN = {
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
   genlink: { title:"Generator Link Berbagi", sub:"Buat link Rekap Pengerjaan yang dibatasi hanya ke ujian & kelas tertentu." },
-  template: { title:"Template Ujian", sub:"Salin kerangka kode siap-pakai untuk membuat asesmen baru." },
+  template: { title:"Generator Soal", sub:"Isi data ujian & soal, langsung dapat kode HTML siap disalin — tanpa perlu utak-atik kode manual." },
   checklist: { title:"Checklist Deploy Ujian Baru", sub:"Langkah-langkah supaya tidak ada yang terlewat saat menerbitkan ujian baru." },
   genembed: { title:"Generator Embed Google Sites", sub:"Buat kode instruksi pengerjaan soal untuk ditempel di halaman Google Sites." },
   genwa: { title:"Generator Pesan WhatsApp", sub:"Buat pesan pengumuman tugas untuk dikirim ke grup kelas." },
@@ -1694,237 +1782,432 @@ function buatLinkBerbagi(){
 muatGeneratorLink();
 
 // ======================================================
-// TEMPLATE UJIAN (kode siap-pakai, disalin oleh guru)
+// GENERATOR SOAL UJIAN (form -> kode HTML lengkap siap pakai)
 // ======================================================
-const TEMPLATE_UJIAN_LINES = [
-'<!DOCTYPE html>',
-'<html lang="id">',
-'<head>',
-'<meta charset="UTF-8">',
-'<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-'<title>GANTI JUDUL ASESMEN DI SINI</title>',
-'<style>',
-'body{font-family:Arial, sans-serif; max-width:800px; margin:auto; padding:70px 20px 20px 20px; line-height:1.6; background:#f3f4f6; user-select:none;}',
-'.soal{background:white; border-radius:10px; padding:15px; margin-bottom:20px; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.05);}',
-'h1{text-align:center; color:white; background:linear-gradient(90deg,#2563eb,#1e3a8a); padding:15px; border-radius:10px;}',
-'input[type=text]{width:100%; padding:8px; box-sizing:border-box;}',
-'select{width:100%; padding:8px; box-sizing:border-box;}',
-'#timerBox{position:fixed; top:10px; right:10px; z-index:9999; background:#d32f2f; color:white; padding:10px 15px; border-radius:10px; font-size:20px; font-weight:bold; box-shadow:0 3px 8px rgba(0,0,0,0.3);}',
-'#btnKirim{background:#16a34a; color:white; border:none; padding:12px 25px; font-size:16px; border-radius:8px; cursor:pointer; width:100%; max-width:300px; display:block; margin:20px auto;}',
-'#btnKirim:disabled{background:#9ca3af; cursor:not-allowed;}',
-'#hasil{margin-top:20px; font-size:20px; font-weight:bold; text-align:center;}',
-'#peringatanSudah{display:none; background:#fef2f2; border:1.5px solid #dc2626; color:#991b1b; padding:15px; border-radius:10px; text-align:center; font-weight:bold;}',
-'</style>',
-'</head>',
-'<body>',
-'',
-'<div id="timerBox">\u23f0 <span id="timer">30:00</span></div>',
-'',
-'<h1>GANTI JUDUL ASESMEN DI SINI</h1>',
-'',
-'<p>Kelas:<br>',
-'<select id="kelas" onchange="updateNama()">',
-'  <option value="">-- Pilih Kelas --</option>',
-'</select></p>',
-'',
-'<p>Nama:<br>',
-'<select id="nama" onchange="cekSudahMengerjakan()">',
-'  <option value="">-- Pilih Nama --</option>',
-'</select></p>',
-'',
-'<div id="peringatanSudah">\u26a0\ufe0f Anda sudah pernah mengerjakan asesmen ini sebelumnya. Tidak bisa mengerjakan ulang.</div>',
-'',
-'<!-- ===== CONTOH SOAL - DUPLIKAT & SESUAIKAN SESUAI KEBUTUHAN ===== -->',
-'<div class="soal">',
-'<p>1. Contoh pertanyaan nomor 1 ...</p>',
-'<label><input type="radio" name="q1" value="A"> Pilihan A</label><br>',
-'<label><input type="radio" name="q1" value="B"> Pilihan B</label><br>',
-'<label><input type="radio" name="q1" value="C"> Pilihan C</label><br>',
-'<label><input type="radio" name="q1" value="D"> Pilihan D</label>',
-'</div>',
-'',
-'<div class="soal">',
-'<p>2. Contoh pertanyaan nomor 2 ...</p>',
-'<label><input type="radio" name="q2" value="A"> Pilihan A</label><br>',
-'<label><input type="radio" name="q2" value="B"> Pilihan B</label><br>',
-'<label><input type="radio" name="q2" value="C"> Pilihan C</label><br>',
-'<label><input type="radio" name="q2" value="D"> Pilihan D</label>',
-'</div>',
-'',
-'<div class="soal">',
-'<p>3. Contoh pertanyaan nomor 3 ...</p>',
-'<label><input type="radio" name="q3" value="A"> Pilihan A</label><br>',
-'<label><input type="radio" name="q3" value="B"> Pilihan B</label><br>',
-'<label><input type="radio" name="q3" value="C"> Pilihan C</label><br>',
-'<label><input type="radio" name="q3" value="D"> Pilihan D</label>',
-'</div>',
-'<!-- ===== TAMBAH BLOK .soal DI ATAS SESUAI JUMLAH SOAL, LALU LANJUTKAN NOMOR & q4, q5, DST ===== -->',
-'',
-'<button id="btnKirim" onclick="kirim()" disabled>Pilih kelas & nama dahulu</button>',
-'<div id="hasil"></div>',
-'',
-'<script>',
-'// ======================',
-'// GANTI SESUAI FORMAT PENAMAAN (lihat menu Panduan Buat Ujian)',
-'// contoh: "2627.1-7-IPS-Sejarah Lisan"',
-'// ======================',
-'const NAMA_UJIAN = "GANTI-TahunAjaran.Semester-Kelas-Mapel-Judul Ujian";',
-'',
-'// ======================',
-'// KUNCI JAWABAN - sesuaikan jumlah & isinya dengan soal di atas',
-'// ======================',
-'const kunci = { q1:"A", q2:"B", q3:"C" };',
-'',
-'// ======================',
-'// BACKEND GOOGLE APPS SCRIPT (samakan dengan file ujian lain)',
-'// ======================',
-'const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";',
-'',
-'let dataSiswa = {};',
-'let waktuMulai = Date.now();',
-'',
-'async function muatSiswa(){',
-'  try{',
-'    const res = await fetch(scriptURL + "?action=siswa");',
-'    const json = await res.json();',
-'    if(json.status === "success"){',
-'      dataSiswa = json.data;',
-'      const selKelas = document.getElementById("kelas");',
-'      Object.keys(dataSiswa).sort().forEach(k => {',
-'        const opt = document.createElement("option");',
-'        opt.value = k; opt.textContent = k;',
-'        selKelas.appendChild(opt);',
-'      });',
-'    }',
-'  } catch(e){ console.error(e); }',
-'}',
-'muatSiswa();',
-'',
-'function updateNama(){',
-'  const kelas = document.getElementById("kelas").value;',
-'  const selNama = document.getElementById("nama");',
-'  selNama.innerHTML = \'<option value="">-- Pilih Nama --</option>\';',
-'  document.getElementById("peringatanSudah").style.display = "none";',
-'  document.getElementById("btnKirim").disabled = true;',
-'  document.getElementById("btnKirim").textContent = "Pilih kelas & nama dahulu";',
-'  if(!kelas || !dataSiswa[kelas]) return;',
-'  dataSiswa[kelas].forEach(nama => {',
-'    const opt = document.createElement("option");',
-'    opt.value = nama; opt.textContent = nama;',
-'    selNama.appendChild(opt);',
-'  });',
-'}',
-'',
-'async function cekSudahMengerjakan(){',
-'  const kelas = document.getElementById("kelas").value;',
-'  const nama = document.getElementById("nama").value;',
-'  const btn = document.getElementById("btnKirim");',
-'  const peringatan = document.getElementById("peringatanSudah");',
-'',
-'  if(!kelas || !nama){ peringatan.style.display = "none"; btn.disabled = true; return; }',
-'',
-'  btn.disabled = true;',
-'  btn.textContent = "Memeriksa status...";',
-'',
-'  try{',
-'    const url = scriptURL + "?action=cekStatus&ujian=" + encodeURIComponent(NAMA_UJIAN) + "&nama=" + encodeURIComponent(nama) + "&kelas=" + encodeURIComponent(kelas);',
-'    const res = await fetch(url);',
-'    const json = await res.json();',
-'',
-'    if(json.status === "success" && json.sudahMengerjakan){',
-'      peringatan.style.display = "block";',
-'      btn.textContent = "Sudah Pernah Mengerjakan";',
-'      btn.disabled = true;',
-'    } else {',
-'      peringatan.style.display = "none";',
-'      btn.textContent = "Kirim Jawaban";',
-'      btn.disabled = false;',
-'      waktuMulai = Date.now();',
-'    }',
-'  } catch(e){',
-'    console.error(e);',
-'    btn.textContent = "Kirim Jawaban";',
-'    btn.disabled = false;',
-'  }',
-'}',
-'',
-'// ======================',
-'// TIMER - sesuaikan DURATION (detik) kalau bukan 30 menit',
-'// ======================',
-'const DURATION = 30 * 60;',
-'const KEY_START = "ujian_mulai_" + NAMA_UJIAN;',
-'let startTime = localStorage.getItem(KEY_START);',
-'if(!startTime){ startTime = Date.now(); localStorage.setItem(KEY_START, startTime); }',
-'',
-'const timerEl = document.getElementById("timer");',
-'function updateTimer(){',
-'  const elapsed = Math.floor((Date.now() - startTime) / 1000);',
-'  let remaining = DURATION - elapsed;',
-'  if(remaining <= 0){ remaining = 0; clearInterval(timerInterval); kirim(); return; }',
-'  const m = Math.floor(remaining / 60), d = remaining % 60;',
-'  if(timerEl) timerEl.textContent = String(m).padStart(2,"0") + ":" + String(d).padStart(2,"0");',
-'}',
-'let timerInterval = setInterval(updateTimer, 1000);',
-'updateTimer();',
-'',
-'// ======================',
-'// KIRIM JAWABAN',
-'// ======================',
-'window.kirim = function(){',
-'  const nama = document.getElementById("nama").value.trim();',
-'  const kelas = document.getElementById("kelas").value.trim();',
-'  if(!nama || !kelas){ alert("Nama dan kelas harus diisi!"); return; }',
-'',
-'  const tombol = document.getElementById("btnKirim");',
-'  if(tombol.disabled && tombol.textContent !== "Kirim Jawaban") return;',
-'  tombol.disabled = true;',
-'  tombol.textContent = "Mengirim...";',
-'  clearInterval(timerInterval);',
-'',
-'  let benar = 0;',
-'  const totalSoal = Object.keys(kunci).length;',
-'  for(const q in kunci){',
-'    const jawab = document.querySelector(\'input[name="\' + q + \'"]:checked\');',
-'    if(jawab && jawab.value === kunci[q]) benar++;',
-'  }',
-'  const salah = totalSoal - benar;',
-'  const nilai = Math.round((benar / totalSoal) * 100);',
-'',
-'  document.getElementById("hasil").innerHTML = "Nilai Anda: " + nilai;',
-'',
-'  fetch(scriptURL, {',
-'    method: "POST",',
-'    body: JSON.stringify({',
-'      nama, kelas, benar, salah, nilai,',
-'      ujian: NAMA_UJIAN,',
-'      waktuMulai: waktuMulai,',
-'      waktuSelesai: Date.now()',
-'    })',
-'  }).then(() => {',
-'    localStorage.removeItem(KEY_START);',
-'    tombol.textContent = "Ujian Selesai";',
-'    alert("Jawaban berhasil dikirim!");',
-'  }).catch(err => {',
-'    console.error(err);',
-'    alert("Gagal kirim, coba lagi.");',
-'    tombol.disabled = false;',
-'    tombol.textContent = "Kirim Jawaban";',
-'  });',
-'};',
-'</' + 'script>',
-'',
-'</body>',
-'</html>'
-];
 
-function salinTemplate(){
-  const kode = TEMPLATE_UJIAN_LINES.join("\n");
-  document.getElementById("tplOutput").value = kode;
-  salinOutput("tplOutput", document.getElementById("tplBtnSalin"));
+// ---- Preview NAMA_UJIAN otomatis dari data yang diisi ----
+function updateNamaUjianPreview(){
+  const tahunAwal = parseInt(document.getElementById("tplTahunAwal").value) || 0;
+  const semester = document.getElementById("tplSemester").value;
+  const kelas = document.getElementById("tplKelas").value;
+  const mapel = document.getElementById("tplMapel").value;
+  const judul = document.getElementById("tplJudul").value.trim() || "Judul Ujian";
+
+  let kodeTahun = "____";
+  if(tahunAwal > 2000 && tahunAwal < 2100){
+    const yy1 = String(tahunAwal).slice(-2);
+    const yy2 = String(tahunAwal + 1).slice(-2);
+    kodeTahun = yy1 + yy2;
+  }
+
+  document.getElementById("tplNamaUjianPreview").value = kodeTahun + "." + semester + "-" + kelas + "-" + mapel + "-" + judul;
 }
 
-// Isi textarea preview begitu section dibuka pertama kali
-document.getElementById("tplOutput").value = TEMPLATE_UJIAN_LINES.join("\n");
+["tplJudul","tplTahunAwal","tplSemester","tplKelas","tplMapel"].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener("input", updateNamaUjianPreview);
+  el.addEventListener("change", updateNamaUjianPreview);
+});
+updateNamaUjianPreview();
+
+// ---- Builder daftar soal (dinamis, tambah/hapus) ----
+let soalBuilderCounter = 0;
+
+function tambahSoalBuilder(prefill){
+  const idx = soalBuilderCounter++;
+  const container = document.getElementById("soalBuilderList");
+  const div = document.createElement("div");
+  div.className = "soal-builder-item";
+  div.dataset.idx = idx;
+  div.style.cssText = "border:1.5px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:12px;";
+  div.innerHTML =
+    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+      '<b class="soal-nomor-label" style="font-size:13.5px;">Soal</b>' +
+      '<button class="btn-copy" onclick="hapusSoalBuilder(' + idx + ')">\ud83d\uddd1\ufe0f Hapus</button>' +
+    '</div>' +
+    '<div class="gen-row"><label>Pertanyaan</label><textarea rows="2" id="soalP_' + idx + '" placeholder="Tulis pertanyaan di sini..."></textarea></div>' +
+    '<div class="gen-2col">' +
+      '<div class="gen-row"><label>Pilihan A</label><input type="text" id="soalA_' + idx + '"></div>' +
+      '<div class="gen-row"><label>Pilihan B</label><input type="text" id="soalB_' + idx + '"></div>' +
+    '</div>' +
+    '<div class="gen-2col">' +
+      '<div class="gen-row"><label>Pilihan C</label><input type="text" id="soalC_' + idx + '"></div>' +
+      '<div class="gen-row"><label>Pilihan D</label><input type="text" id="soalD_' + idx + '"></div>' +
+    '</div>' +
+    '<div class="gen-row">' +
+      '<label>Kunci Jawaban Benar</label>' +
+      '<div style="display:flex; gap:16px;">' +
+        '<label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px;cursor:pointer;"><input type="radio" name="soalKunci_' + idx + '" value="A" checked> A</label>' +
+        '<label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px;cursor:pointer;"><input type="radio" name="soalKunci_' + idx + '" value="B"> B</label>' +
+        '<label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px;cursor:pointer;"><input type="radio" name="soalKunci_' + idx + '" value="C"> C</label>' +
+        '<label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:13.5px;cursor:pointer;"><input type="radio" name="soalKunci_' + idx + '" value="D"> D</label>' +
+      '</div>' +
+    '</div>';
+  container.appendChild(div);
+
+  if(prefill){
+    document.getElementById("soalP_" + idx).value = prefill.p;
+    document.getElementById("soalA_" + idx).value = prefill.a;
+    document.getElementById("soalB_" + idx).value = prefill.b;
+    document.getElementById("soalC_" + idx).value = prefill.c;
+    document.getElementById("soalD_" + idx).value = prefill.d;
+    const radio = document.querySelector('input[name="soalKunci_' + idx + '"][value="' + prefill.kunci + '"]');
+    if(radio) radio.checked = true;
+  }
+
+  renomorSoalBuilder();
+}
+
+function hapusSoalBuilder(idx){
+  const el = document.querySelector('.soal-builder-item[data-idx="' + idx + '"]');
+  if(el) el.remove();
+  renomorSoalBuilder();
+}
+
+function kosongkanSoalBuilder(){
+  if(document.querySelectorAll("#soalBuilderList .soal-builder-item").length === 0) return;
+  if(!confirm("Hapus semua soal yang sudah diisi?")) return;
+  document.getElementById("soalBuilderList").innerHTML = "";
+}
+
+function renomorSoalBuilder(){
+  document.querySelectorAll("#soalBuilderList .soal-builder-item").forEach((el, i) => {
+    el.querySelector(".soal-nomor-label").textContent = "Soal #" + (i + 1);
+  });
+}
+
+function escapeHtmlSoal(teks){
+  return (teks || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ---- Impor massal: parse teks bebas jadi daftar soal & kunci ----
+function parseSoalMassal(teks){
+  const blok = teks.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  const hasil = [];
+
+  blok.forEach(b => {
+    const baris = b.split("\n").map(l => l.trim()).filter(Boolean);
+    const pertanyaanParts = [];
+    const opsi = { A:"", B:"", C:"", D:"" };
+    let mulaiOpsi = false;
+
+    baris.forEach(l => {
+      const m = l.match(/^([A-Da-d])[\.\)]\s*(.*)$/);
+      if(m){
+        mulaiOpsi = true;
+        const huruf = m[1].toUpperCase();
+        if(opsi.hasOwnProperty(huruf)) opsi[huruf] = m[2].trim();
+      } else if(!mulaiOpsi){
+        pertanyaanParts.push(l);
+      }
+    });
+
+    const pertanyaan = pertanyaanParts.join(" ").replace(/^\d+[\.\)]\s*/, "").trim();
+
+    if(pertanyaan || opsi.A || opsi.B || opsi.C || opsi.D){
+      hasil.push({ p: pertanyaan, a: opsi.A, b: opsi.B, c: opsi.C, d: opsi.D });
+    }
+  });
+
+  return hasil;
+}
+
+function parseKunciMassal(teks){
+  const hasil = [];
+  const regex = /\d+\s*[\.\):]?\s*([A-Da-d])\b/g;
+  let m;
+  while((m = regex.exec(teks)) !== null){
+    hasil.push(m[1].toUpperCase());
+  }
+  return hasil;
+}
+
+function importSoalMassal(){
+  const teksSoal = document.getElementById("importSoalText").value;
+  const teksKunci = document.getElementById("importKunciText").value;
+
+  if(!teksSoal.trim()){ alert("Tempel teks soal dulu di kotak Soal."); return; }
+
+  const daftarSoal = parseSoalMassal(teksSoal);
+  if(daftarSoal.length === 0){
+    alert("Tidak ada soal yang terbaca. Cek lagi formatnya: pisahkan tiap soal dengan baris kosong, dan pilihan diawali A. B. C. D.");
+    return;
+  }
+
+  const daftarKunci = parseKunciMassal(teksKunci);
+
+  const existing = document.querySelectorAll("#soalBuilderList .soal-builder-item").length;
+  if(existing > 0){
+    const lanjut = confirm(daftarSoal.length + " soal terbaca dari teks.\nIni akan MENGGANTI " + existing + " soal yang sudah ada di form Daftar Soal.\n\nLanjutkan?");
+    if(!lanjut) return;
+  }
+
+  document.getElementById("soalBuilderList").innerHTML = "";
+
+  let kurangKunci = 0;
+  daftarSoal.forEach((s, i) => {
+    const kunci = daftarKunci[i] || "A";
+    if(!daftarKunci[i]) kurangKunci++;
+    tambahSoalBuilder({ p: s.p, a: s.a, b: s.b, c: s.c, d: s.d, kunci: kunci });
+  });
+
+  let pesan = "\u2705 Berhasil impor " + daftarSoal.length + " soal ke form Daftar Soal.";
+  if(kurangKunci > 0){
+    pesan += "\n\n\u26a0\ufe0f " + kurangKunci + " soal tidak dapat kunci jawaban dari teks kunci (otomatis diisi \"A\") \u2014 tolong cek & perbaiki manual di form sebelum generate.";
+  }
+  alert(pesan);
+}
+
+// Isi 3 contoh soal begitu halaman dimuat, supaya kelihatan polanya
+tambahSoalBuilder({ p:"Contoh pertanyaan nomor 1 ...", a:"Pilihan A", b:"Pilihan B", c:"Pilihan C", d:"Pilihan D", kunci:"A" });
+tambahSoalBuilder({ p:"Contoh pertanyaan nomor 2 ...", a:"Pilihan A", b:"Pilihan B", c:"Pilihan C", d:"Pilihan D", kunci:"B" });
+tambahSoalBuilder({ p:"Contoh pertanyaan nomor 3 ...", a:"Pilihan A", b:"Pilihan B", c:"Pilihan C", d:"Pilihan D", kunci:"C" });
+
+// ---- Rangkai kode HTML lengkap dari data + soal ----
+function bangunKodeSoalLengkap(judul, namaUjian, timerMenit, soalHtml, kunciObjLiteral){
+  const durasiDetik = timerMenit * 60;
+  const namaUjianAman = namaUjian.replace(/"/g, '\\"');
+
+  const lines = [
+    '<!DOCTYPE html>',
+    '<html lang="id">',
+    '<head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+    '<title>' + judul + '</title>',
+    '<style>',
+    'body{font-family:Arial, sans-serif; max-width:800px; margin:auto; padding:70px 20px 20px 20px; line-height:1.6; background:#f3f4f6; user-select:none;}',
+    '.soal{background:white; border-radius:10px; padding:15px; margin-bottom:20px; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.05);}',
+    'h1{text-align:center; color:white; background:linear-gradient(90deg,#2563eb,#1e3a8a); padding:15px; border-radius:10px;}',
+    'input[type=text]{width:100%; padding:8px; box-sizing:border-box;}',
+    'select{width:100%; padding:8px; box-sizing:border-box;}',
+    '#timerBox{position:fixed; top:10px; right:10px; z-index:9999; background:#d32f2f; color:white; padding:10px 15px; border-radius:10px; font-size:20px; font-weight:bold; box-shadow:0 3px 8px rgba(0,0,0,0.3);}',
+    '#btnKirim{background:#16a34a; color:white; border:none; padding:12px 25px; font-size:16px; border-radius:8px; cursor:pointer; width:100%; max-width:300px; display:block; margin:20px auto;}',
+    '#btnKirim:disabled{background:#9ca3af; cursor:not-allowed;}',
+    '#hasil{margin-top:20px; font-size:20px; font-weight:bold; text-align:center;}',
+    '#peringatanSudah{display:none; background:#fef2f2; border:1.5px solid #dc2626; color:#991b1b; padding:15px; border-radius:10px; text-align:center; font-weight:bold;}',
+    '</style>',
+    '</head>',
+    '<body>',
+    '',
+    '<div id="timerBox">\u23f0 <span id="timer">' + String(timerMenit).padStart(2,"0") + ':00</span></div>',
+    '',
+    '<h1>' + judul + '</h1>',
+    '',
+    '<p>Kelas:<br>',
+    '<select id="kelas" onchange="updateNama()">',
+    '  <option value="">-- Pilih Kelas --</option>',
+    '</select></p>',
+    '',
+    '<p>Nama:<br>',
+    '<select id="nama" onchange="cekSudahMengerjakan()">',
+    '  <option value="">-- Pilih Nama --</option>',
+    '</select></p>',
+    '',
+    '<div id="peringatanSudah">\u26a0\ufe0f Anda sudah pernah mengerjakan asesmen ini sebelumnya. Tidak bisa mengerjakan ulang.</div>',
+    '',
+    soalHtml,
+    '',
+    '<button id="btnKirim" onclick="kirim()" disabled>Pilih kelas & nama dahulu</button>',
+    '<div id="hasil"></div>',
+    '',
+    '<script>',
+    'const NAMA_UJIAN = "' + namaUjianAman + '";',
+    '',
+    'const kunci = ' + kunciObjLiteral + ';',
+    '',
+    'const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";',
+    '',
+    'let dataSiswa = {};',
+    'let waktuMulai = Date.now();',
+    '',
+    'async function muatSiswa(){',
+    '  try{',
+    '    const res = await fetch(scriptURL + "?action=siswa");',
+    '    const json = await res.json();',
+    '    if(json.status === "success"){',
+    '      dataSiswa = json.data;',
+    '      const selKelas = document.getElementById("kelas");',
+    '      Object.keys(dataSiswa).sort().forEach(k => {',
+    '        const opt = document.createElement("option");',
+    '        opt.value = k; opt.textContent = k;',
+    '        selKelas.appendChild(opt);',
+    '      });',
+    '    }',
+    '  } catch(e){ console.error(e); }',
+    '}',
+    'muatSiswa();',
+    '',
+    'function updateNama(){',
+    '  const kelas = document.getElementById("kelas").value;',
+    '  const selNama = document.getElementById("nama");',
+    '  selNama.innerHTML = \'<option value="">-- Pilih Nama --</option>\';',
+    '  document.getElementById("peringatanSudah").style.display = "none";',
+    '  document.getElementById("btnKirim").disabled = true;',
+    '  document.getElementById("btnKirim").textContent = "Pilih kelas & nama dahulu";',
+    '  if(!kelas || !dataSiswa[kelas]) return;',
+    '  dataSiswa[kelas].forEach(nama => {',
+    '    const opt = document.createElement("option");',
+    '    opt.value = nama; opt.textContent = nama;',
+    '    selNama.appendChild(opt);',
+    '  });',
+    '}',
+    '',
+    'async function cekSudahMengerjakan(){',
+    '  const kelas = document.getElementById("kelas").value;',
+    '  const nama = document.getElementById("nama").value;',
+    '  const btn = document.getElementById("btnKirim");',
+    '  const peringatan = document.getElementById("peringatanSudah");',
+    '',
+    '  if(!kelas || !nama){ peringatan.style.display = "none"; btn.disabled = true; return; }',
+    '',
+    '  btn.disabled = true;',
+    '  btn.textContent = "Memeriksa status...";',
+    '',
+    '  try{',
+    '    const url = scriptURL + "?action=cekStatus&ujian=" + encodeURIComponent(NAMA_UJIAN) + "&nama=" + encodeURIComponent(nama) + "&kelas=" + encodeURIComponent(kelas);',
+    '    const res = await fetch(url);',
+    '    const json = await res.json();',
+    '',
+    '    if(json.status === "success" && json.sudahMengerjakan){',
+    '      peringatan.style.display = "block";',
+    '      btn.textContent = "Sudah Pernah Mengerjakan";',
+    '      btn.disabled = true;',
+    '    } else {',
+    '      peringatan.style.display = "none";',
+    '      btn.textContent = "Kirim Jawaban";',
+    '      btn.disabled = false;',
+    '      waktuMulai = Date.now();',
+    '    }',
+    '  } catch(e){',
+    '    console.error(e);',
+    '    btn.textContent = "Kirim Jawaban";',
+    '    btn.disabled = false;',
+    '  }',
+    '}',
+    '',
+    'const DURATION = ' + durasiDetik + ';',
+    'const KEY_START = "ujian_mulai_" + NAMA_UJIAN;',
+    'let startTime = localStorage.getItem(KEY_START);',
+    'if(!startTime){ startTime = Date.now(); localStorage.setItem(KEY_START, startTime); }',
+    '',
+    'const timerEl = document.getElementById("timer");',
+    'function updateTimer(){',
+    '  const elapsed = Math.floor((Date.now() - startTime) / 1000);',
+    '  let remaining = DURATION - elapsed;',
+    '  if(remaining <= 0){ remaining = 0; clearInterval(timerInterval); kirim(); return; }',
+    '  const m = Math.floor(remaining / 60), d = remaining % 60;',
+    '  if(timerEl) timerEl.textContent = String(m).padStart(2,"0") + ":" + String(d).padStart(2,"0");',
+    '}',
+    'let timerInterval = setInterval(updateTimer, 1000);',
+    'updateTimer();',
+    '',
+    'window.kirim = function(){',
+    '  const nama = document.getElementById("nama").value.trim();',
+    '  const kelas = document.getElementById("kelas").value.trim();',
+    '  if(!nama || !kelas){ alert("Nama dan kelas harus diisi!"); return; }',
+    '',
+    '  const tombol = document.getElementById("btnKirim");',
+    '  if(tombol.disabled && tombol.textContent !== "Kirim Jawaban") return;',
+    '  tombol.disabled = true;',
+    '  tombol.textContent = "Mengirim...";',
+    '  clearInterval(timerInterval);',
+    '',
+    '  let benar = 0;',
+    '  const totalSoal = Object.keys(kunci).length;',
+    '  for(const q in kunci){',
+    '    const jawab = document.querySelector(\'input[name="\' + q + \'"]:checked\');',
+    '    if(jawab && jawab.value === kunci[q]) benar++;',
+    '  }',
+    '  const salah = totalSoal - benar;',
+    '  const nilai = Math.round((benar / totalSoal) * 100);',
+    '',
+    '  document.getElementById("hasil").innerHTML = "Nilai Anda: " + nilai;',
+    '',
+    '  fetch(scriptURL, {',
+    '    method: "POST",',
+    '    body: JSON.stringify({',
+    '      nama, kelas, benar, salah, nilai,',
+    '      ujian: NAMA_UJIAN,',
+    '      waktuMulai: waktuMulai,',
+    '      waktuSelesai: Date.now()',
+    '    })',
+    '  }).then(() => {',
+    '    localStorage.removeItem(KEY_START);',
+    '    tombol.textContent = "Ujian Selesai";',
+    '    alert("Jawaban berhasil dikirim!");',
+    '  }).catch(err => {',
+    '    console.error(err);',
+    '    alert("Gagal kirim, coba lagi.");',
+    '    tombol.disabled = false;',
+    '    tombol.textContent = "Kirim Jawaban";',
+    '  });',
+    '};',
+    '<' + '/script>',
+    '',
+    '</body>',
+    '</html>'
+  ];
+
+  return lines.join("\n");
+}
+
+// ---- Tombol utama: kumpulkan data form + soal, generate kode ----
+function generateKodeSoal(){
+  const judul = document.getElementById("tplJudul").value.trim();
+  if(!judul){ alert("Isi Judul Asesmen dulu."); return; }
+
+  const tahunAwal = parseInt(document.getElementById("tplTahunAwal").value);
+  if(!tahunAwal){ alert("Isi Tahun Ajaran Mulai dulu (contoh: 2026)."); return; }
+
+  const timer = parseInt(document.getElementById("tplTimer").value) || 30;
+  const namaUjian = document.getElementById("tplNamaUjianPreview").value;
+
+  const items = document.querySelectorAll("#soalBuilderList .soal-builder-item");
+  if(items.length === 0){ alert("Tambahkan minimal 1 soal dulu."); return; }
+
+  let soalHtmlParts = [];
+  let kunciParts = [];
+  let nomor = 0;
+
+  items.forEach(el => {
+    const idx = el.dataset.idx;
+    const p = document.getElementById("soalP_" + idx).value.trim();
+    const a = document.getElementById("soalA_" + idx).value.trim();
+    const b = document.getElementById("soalB_" + idx).value.trim();
+    const c = document.getElementById("soalC_" + idx).value.trim();
+    const d = document.getElementById("soalD_" + idx).value.trim();
+    const kunciRadio = document.querySelector('input[name="soalKunci_' + idx + '"]:checked');
+    const kunci = kunciRadio ? kunciRadio.value : "A";
+
+    if(!p) return;
+    nomor++;
+    const qn = "q" + nomor;
+
+    soalHtmlParts.push(
+      '<div class="soal">\n' +
+      '<p>' + nomor + '. ' + escapeHtmlSoal(p) + '</p>\n' +
+      '<label><input type="radio" name="' + qn + '" value="A"> ' + escapeHtmlSoal(a) + '</label><br>\n' +
+      '<label><input type="radio" name="' + qn + '" value="B"> ' + escapeHtmlSoal(b) + '</label><br>\n' +
+      '<label><input type="radio" name="' + qn + '" value="C"> ' + escapeHtmlSoal(c) + '</label><br>\n' +
+      '<label><input type="radio" name="' + qn + '" value="D"> ' + escapeHtmlSoal(d) + '</label>\n' +
+      '</div>'
+    );
+    kunciParts.push(qn + ':"' + kunci + '"');
+  });
+
+  if(nomor === 0){ alert("Semua soal masih kosong, isi pertanyaannya dulu."); return; }
+
+  const kode = bangunKodeSoalLengkap(
+    judul,
+    namaUjian,
+    timer,
+    soalHtmlParts.join("\n\n"),
+    "{ " + kunciParts.join(", ") + " }"
+  );
+
+  document.getElementById("tplOutput").value = kode;
+}
 
 // ======================================================
 // CHECKLIST DEPLOY UJIAN BARU
@@ -2071,7 +2354,7 @@ function buatPesanWA(){
   pesan += "- Waktu tetap berjalan walau halaman ditutup/direfresh." + catatanTambahan + "\n";
   pesan += "- Pastikan kalian sudah membaca/menyimak materi terlebih dahulu sebelum mulai mengerjakan, supaya waktu tidak terbuang untuk mencari jawaban.\n";
   pesan += "- Isi nama dan kelas dengan benar sebelum mengerjakan.\n\n";
-  pesan += "Tugas dikerjakan hari ini juga. Kalau ada kendala, silakan hubungi pak guru.\n\n";
+  pesan += "Tugas dikerjakan hari ini juga. Kalau ada kendala akses, silakan hubungi bapak/ibu guru.\n\n";
   pesan += "Selamat belajar, semoga lancar dan paham materinya \ud83d\udcaa";
   if(salam) pesan += "\n\nWassalamualaikum Wr. Wb.";
 
