@@ -211,6 +211,52 @@
   }
   .toolbar input[type=text]:focus{outline:none; border-color:var(--primary);}
 
+  /* ---- kontrol form gaya field (dipakai di Hasil Penilaian) ---- */
+  .controls{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px;}
+  .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:150px;}
+  .field label{font-size:11.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;}
+  .field select, .field input[type=text]{
+    padding:10px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--card);
+  }
+  .field select:focus, .field input[type=text]:focus{outline:none; border-color:var(--primary);}
+
+  /* ---- ringkasan statistik ---- */
+  .stats{display:flex; gap:24px; flex-wrap:wrap;}
+  .stat .num{font-size:24px; font-weight:800; line-height:1; color:var(--primary-dark);}
+  .stat .lbl{font-size:12px; color:var(--muted); font-weight:600; margin-top:4px;}
+
+  /* ---- tabel hasil penilaian ---- */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  thead th{
+    text-align:left;
+    padding:10px 12px;
+    background:var(--bg);
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    font-weight:700;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+  }
+  thead th:hover{color:var(--primary);}
+  thead th.sorted{color:var(--primary);}
+  tbody td{padding:10px 12px; border-top:1px solid var(--line); font-weight:600;}
+  tbody tr:hover{background:var(--bg);}
+  td.nilai{font-weight:800;}
+  td.nilai.tinggi{color:#16a34a;}
+  td.nilai.rendah{color:#dc2626;}
+  td.center{text-align:center;}
+
   .btn{
     padding:11px 16px;
     border-radius:10px;
@@ -228,21 +274,53 @@
   .btn-primary:hover{opacity:0.9;}
   .btn-outline{background:var(--card); color:var(--primary-dark); border:1.5px solid var(--line);}
   .btn-outline:hover{border-color:var(--primary);}
+  .btn-outline:disabled{color:#9ca3af; cursor:not-allowed;}
+  .btn-outline.copied{border-color:#16a34a; color:#16a34a; background:#f0fdf4;}
 
-  .rekap-banner{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    background:var(--primary-light);
-    border:1.5px solid var(--primary);
-    border-radius:12px;
-    padding:14px 18px;
-    margin-bottom:18px;
-    flex-wrap:wrap;
+  .summary{display:flex; gap:20px; align-items:center; flex-wrap:wrap;}
+
+  .ring{
+    position:relative;
+    width:90px; height:90px;
+    border-radius:50%;
+    background:conic-gradient(#16a34a calc(var(--pct,0) * 1%), var(--line) 0);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
   }
-  .rekap-banner .txt b{display:block; font-size:14px; color:var(--ink);}
-  .rekap-banner .txt span{font-size:12.5px; color:var(--muted); font-weight:600;}
+  .ring::before{content:""; position:absolute; width:68px; height:68px; border-radius:50%; background:var(--card);}
+  .ring span{position:relative; font-size:18px; font-weight:800; color:var(--primary-dark);}
+
+  .stat.sudah .num{color:#16a34a;}
+  .stat.belum .num{color:#dc2626;}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:640px){ .cols{grid-template-columns:1fr;} }
+
+  .col-title{display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:800; font-size:15px; margin-bottom:12px;}
+  .col-title .label{display:flex; align-items:center; gap:8px;}
+  .dot{width:10px; height:10px; border-radius:50%; flex-shrink:0;}
+  .dot.sudah{background:#16a34a;}
+  .dot.belum{background:#dc2626;}
+
+  .btn-copy{
+    display:flex; align-items:center; gap:5px;
+    padding:6px 11px; border-radius:7px;
+    border:1.5px solid var(--line);
+    background:var(--card); color:var(--muted);
+    font-family:inherit; font-size:12px; font-weight:700;
+    cursor:pointer; transition:0.15s; white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:var(--primary); color:var(--primary);}
+  .btn-copy.copied{border-color:#16a34a; color:#16a34a; background:#f0fdf4;}
+
+  .lap-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;}
+  .lap-item{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:9px; font-size:14px; font-weight:600;}
+  .lap-item.sudah{background:#f0fdf4; color:#166534;}
+  .lap-item.belum{background:#fef2f2; color:#991b1b;}
+  .lap-item .nilai{font-weight:800; font-size:13px;}
+  .lap-kelas-heading{font-size:13px; font-weight:800; color:var(--primary-dark); text-transform:uppercase; letter-spacing:0.04em; margin:14px 0 8px;}
+  .lap-kelas-heading:first-child{margin-top:0;}
+  .lap-empty{text-align:center; color:var(--muted); font-size:13px; font-weight:600; padding:24px 10px;}
 
   .list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
 
@@ -355,6 +433,9 @@
     <button class="nav-item active" data-target="beranda">
       <span class="ic">📝</span> Asesmen / Ujian
     </button>
+    <button class="nav-item" data-target="laporan">
+      <span class="ic">📊</span> Laporan Ujian
+    </button>
     <button class="nav-item" data-target="ips">
       <span class="ic">🌐</span> Website IPS
     </button>
@@ -395,14 +476,6 @@
   <!-- ================= SECTION: BERANDA / UJIAN ================= -->
   <section class="section active" id="section-beranda">
 
-    <div class="rekap-banner">
-      <div class="txt">
-        <b>📊 Rekap Pengerjaan Siswa</b>
-        <span>Lihat siapa saja yang sudah & belum mengerjakan tiap ujian</span>
-      </div>
-      <a class="btn btn-primary" href="./rekap_1.html" target="_blank">Buka Rekap →</a>
-    </div>
-
     <div class="tabs" id="tabsSubjek">
       <button class="tab active" data-subjek="semua">Semua</button>
       <button class="tab" data-subjek="ips">IPS</button>
@@ -417,6 +490,109 @@
     <ul class="list" id="daftar">
       <li class="status-msg">Memuat daftar ujian dari GitHub...</li>
     </ul>
+  </section>
+
+  <!-- ================= SECTION: LAPORAN UJIAN (Status Pengerjaan + Nilai Lengkap) ================= -->
+  <section class="section" id="section-laporan">
+
+    <div class="panel">
+      <div class="controls">
+        <div class="field">
+          <label for="lapUjian">Pilih Ujian</label>
+          <select id="lapUjian">
+            <option value="">-- Memuat daftar ujian... --</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="lapKelas">Kelas</label>
+          <select id="lapKelas">
+            <option value="SEMUA">Semua Kelas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="lapCari">Cari nama</label>
+          <input type="text" id="lapCari" placeholder="Ketik nama siswa...">
+        </div>
+        <button class="btn btn-primary" id="lapBtnMuat" onclick="muatLaporan()">Muat Ulang</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabsLaporan">
+      <button class="tab active" data-lap="status">📋 Status Pengerjaan</button>
+      <button class="tab" data-lap="nilai">📈 Nilai Lengkap</button>
+    </div>
+
+    <div id="lapAreaKosong">
+      <div class="status-msg">Pilih ujian di atas untuk melihat laporannya.</div>
+    </div>
+
+    <!-- ---- TAB: STATUS PENGERJAAN (sudah / belum) ---- -->
+    <div id="lapTabStatus" class="lap-tab-content" style="display:none;">
+
+      <div class="panel" id="lapPanelSummaryStatus">
+        <div class="summary">
+          <div class="ring" id="lapRing"><span id="lapRingPct">0%</span></div>
+          <div class="stats">
+            <div class="stat"><div class="num" id="lapStatTotal">0</div><div class="lbl">Total Siswa</div></div>
+            <div class="stat sudah"><div class="num" id="lapStatSudah">0</div><div class="lbl">Sudah Mengerjakan</div></div>
+            <div class="stat belum"><div class="num" id="lapStatBelum">0</div><div class="lbl">Belum Mengerjakan</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="panel">
+          <div class="col-title">
+            <span class="label"><span class="dot sudah"></span>Sudah Mengerjakan (<span id="lapCountSudah">0</span>)</span>
+            <button class="btn-copy" id="lapBtnCopySudah" onclick="salinLaporanStatus('sudah', this)">📋 Salin</button>
+          </div>
+          <ul class="lap-list" id="lapListSudah"></ul>
+        </div>
+        <div class="panel">
+          <div class="col-title">
+            <span class="label"><span class="dot belum"></span>Belum Mengerjakan (<span id="lapCountBelum">0</span>)</span>
+            <button class="btn-copy" id="lapBtnCopyBelum" onclick="salinLaporanStatus('belum', this)">📋 Salin</button>
+          </div>
+          <ul class="lap-list" id="lapListBelum"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- TAB: NILAI LENGKAP ---- -->
+    <div id="lapTabNilai" class="lap-tab-content" style="display:none;">
+
+      <div class="panel">
+        <div class="stats">
+          <div class="stat"><div class="num" id="lapStatJumlah">0</div><div class="lbl">Peserta</div></div>
+          <div class="stat"><div class="num" id="lapStatRata">0</div><div class="lbl">Rata-rata</div></div>
+          <div class="stat"><div class="num" id="lapStatTertinggi">0</div><div class="lbl">Nilai Tertinggi</div></div>
+          <div class="stat"><div class="num" id="lapStatTerendah">0</div><div class="lbl">Nilai Terendah</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+          <button class="btn btn-outline" id="lapBtnSalinNilai" onclick="salinLaporanNilai()">📋 Salin Tabel</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="center" data-key="no">No</th>
+                <th data-key="nama">Nama</th>
+                <th data-key="kelas">Kelas</th>
+                <th class="center" data-key="benar">Benar</th>
+                <th class="center" data-key="salah">Salah</th>
+                <th class="center sorted" data-key="nilai">Nilai</th>
+                <th data-key="waktu">Waktu Kirim</th>
+              </tr>
+            </thead>
+            <tbody id="lapTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- ================= SECTION: WEBSITE IPS ================= -->
@@ -536,6 +712,7 @@ terapkanTema(localStorage.getItem(KEY_THEME) || "biru");
 // ======================================================
 const JUDUL_HALAMAN = {
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
+  laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   ips: { title:"Website IPS", sub:"Materi & tugas per jenjang kelas, dikelola lewat Google Sites." },
   github: { title:"GitHub", sub:"Repository dan profil yang menampung source code portal & ujian." },
   administrasi: { title:"Administrasi Sekolah", sub:"Akses cepat ke sistem administrasi wali kelas, guru, dan sekolah." },
@@ -743,6 +920,340 @@ document.querySelectorAll("#tabsSubjek .tab").forEach(tab => {
 });
 
 muatDaftar();
+
+// ======================================================
+// SECTION: LAPORAN UJIAN (Status Pengerjaan + Nilai Lengkap, 1 selector bersama)
+// ======================================================
+const selLapUjian = document.getElementById("lapUjian");
+const selLapKelas = document.getElementById("lapKelas");
+const inputLapCari = document.getElementById("lapCari");
+const btnLapMuat = document.getElementById("lapBtnMuat");
+const lapAreaKosong = document.getElementById("lapAreaKosong");
+const lapTabStatus = document.getElementById("lapTabStatus");
+const lapTabNilai = document.getElementById("lapTabNilai");
+
+let lapTabAktif = "status";
+let lapDataRekap = null;   // { "7A":[{nama,sudah,nilai}], ... }
+let lapDataHasil = [];     // [{nama,kelas,benar,salah,nilai,timestamp}, ...]
+let lapSortKey = "nilai";
+let lapSortArah = "desc";
+let lapCocokNilaiTerakhir = [];
+const lapTeksSalin = { sudah: "", belum: "" };
+
+async function muatDaftarUjianLaporan(){
+  try{
+    const res = await fetch(scriptURL + "?action=daftarUjian");
+    const json = await res.json();
+    selLapUjian.innerHTML = "";
+    if(json.status !== "success" || !json.data || json.data.length === 0){
+      selLapUjian.innerHTML = '<option value="">-- Belum ada ujian tercatat --</option>';
+      return;
+    }
+    const optDefault = document.createElement("option");
+    optDefault.value = "";
+    optDefault.textContent = "-- Pilih Ujian --";
+    selLapUjian.appendChild(optDefault);
+    json.data.forEach(nama => {
+      const opt = document.createElement("option");
+      opt.value = nama;
+      opt.textContent = nama;
+      selLapUjian.appendChild(opt);
+    });
+  } catch(err){
+    console.error(err);
+    selLapUjian.innerHTML = '<option value="">-- Gagal memuat, coba lagi --</option>';
+  }
+}
+
+async function muatLaporan(){
+  const ujian = selLapUjian.value;
+  if(!ujian){
+    tampilkanKosongLaporan("Pilih ujian di atas untuk melihat laporannya.");
+    return;
+  }
+
+  btnLapMuat.disabled = true;
+  btnLapMuat.textContent = "Memuat...";
+  tampilkanKosongLaporan("Memuat data laporan...");
+
+  try{
+    const [resRekap, resHasil] = await Promise.all([
+      fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(ujian)),
+      fetch(scriptURL + "?action=hasil&ujian=" + encodeURIComponent(ujian))
+    ]);
+    const jsonRekap = await resRekap.json();
+    const jsonHasil = await resHasil.json();
+
+    if(jsonRekap.status !== "success" || jsonHasil.status !== "success"){
+      tampilkanKosongLaporan("Gagal memuat laporan: " + (jsonRekap.message || jsonHasil.message || ""), true);
+      return;
+    }
+
+    lapDataRekap = jsonRekap.data || {};
+    lapDataHasil = jsonHasil.data || [];
+
+    // Isi dropdown kelas dari roster rekap (lebih lengkap daripada dari hasil saja)
+    const kelasSet = Object.keys(lapDataRekap).sort();
+    const kelasTerpilihLama = selLapKelas.value;
+    selLapKelas.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+    kelasSet.forEach(k => {
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      selLapKelas.appendChild(opt);
+    });
+    if(kelasSet.includes(kelasTerpilihLama)) selLapKelas.value = kelasTerpilihLama;
+
+    lapAreaKosong.style.display = "none";
+    renderLaporan();
+
+  } catch(err){
+    console.error(err);
+    tampilkanKosongLaporan("Gagal terhubung ke server. Periksa koneksi internet.", true);
+  } finally {
+    btnLapMuat.disabled = false;
+    btnLapMuat.textContent = "Muat Ulang";
+  }
+}
+
+function tampilkanKosongLaporan(pesan, error){
+  lapTabStatus.style.display = "none";
+  lapTabNilai.style.display = "none";
+  lapAreaKosong.style.display = "block";
+  lapAreaKosong.innerHTML = '<div class="status-msg' + (error ? ' error' : '') + '">' + pesan + '</div>';
+}
+
+function renderLaporan(){
+  if(!lapDataRekap) return;
+  renderLaporanStatus();
+  renderLaporanNilai();
+  lapTabStatus.style.display = lapTabAktif === "status" ? "block" : "none";
+  lapTabNilai.style.display = lapTabAktif === "nilai" ? "block" : "none";
+}
+
+// ---- TAB: STATUS PENGERJAAN ----
+function renderLaporanStatus(){
+  const kelasFilter = selLapKelas.value;
+  const kataKunci = inputLapCari.value.trim().toUpperCase();
+
+  const kelasList = kelasFilter === "SEMUA" ? Object.keys(lapDataRekap).sort() : [kelasFilter];
+
+  let totalSemua = 0, sudahSemua = 0;
+  let htmlSudah = "", htmlBelum = "";
+  let teksSudah = "Kelas\tNama\tNilai\n";
+  let teksBelum = "Kelas\tNama\n";
+
+  kelasList.forEach(kelas => {
+    const siswaKelas = lapDataRekap[kelas] || [];
+    const cocok = siswaKelas.filter(s => !kataKunci || s.nama.toUpperCase().includes(kataKunci));
+    if(cocok.length === 0) return;
+
+    const sudahList = cocok.filter(s => s.sudah);
+    const belumList = cocok.filter(s => !s.sudah);
+    totalSemua += cocok.length;
+    sudahSemua += sudahList.length;
+
+    if(sudahList.length > 0){
+      htmlSudah += '<li class="lap-kelas-heading">' + kelas + '</li>';
+      sudahList.forEach(s => {
+        htmlSudah += '<li class="lap-item sudah"><span>' + s.nama + '</span><span class="nilai">' + (s.nilai ?? "-") + '</span></li>';
+        teksSudah += kelas + "\t" + s.nama + "\t" + (s.nilai ?? "-") + "\n";
+      });
+    }
+    if(belumList.length > 0){
+      htmlBelum += '<li class="lap-kelas-heading">' + kelas + '</li>';
+      belumList.forEach(s => {
+        htmlBelum += '<li class="lap-item belum"><span>' + s.nama + '</span><span>Belum</span></li>';
+        teksBelum += kelas + "\t" + s.nama + "\n";
+      });
+    }
+  });
+
+  const belumSemua = totalSemua - sudahSemua;
+  const pct = totalSemua > 0 ? Math.round((sudahSemua / totalSemua) * 100) : 0;
+
+  document.getElementById("lapStatTotal").textContent = totalSemua;
+  document.getElementById("lapStatSudah").textContent = sudahSemua;
+  document.getElementById("lapStatBelum").textContent = belumSemua;
+  document.getElementById("lapRingPct").textContent = pct + "%";
+  document.getElementById("lapRing").style.setProperty("--pct", pct);
+  document.getElementById("lapCountSudah").textContent = sudahSemua;
+  document.getElementById("lapCountBelum").textContent = belumSemua;
+
+  document.getElementById("lapListSudah").innerHTML = htmlSudah || '<div class="lap-empty">Belum ada yang mengerjakan.</div>';
+  document.getElementById("lapListBelum").innerHTML = htmlBelum || '<div class="lap-empty">Semua siswa sudah mengerjakan 🎉</div>';
+
+  lapTeksSalin.sudah = sudahSemua > 0 ? teksSudah.trim() : "";
+  lapTeksSalin.belum = belumSemua > 0 ? teksBelum.trim() : "";
+  document.getElementById("lapBtnCopySudah").disabled = sudahSemua === 0;
+  document.getElementById("lapBtnCopyBelum").disabled = belumSemua === 0;
+}
+
+function salinLaporanStatus(jenis, tombol){
+  const teks = lapTeksSalin[jenis];
+  if(!teks) return;
+  const selesai = () => {
+    const labelAsli = tombol.innerHTML;
+    tombol.innerHTML = "✅ Tersalin!";
+    tombol.classList.add("copied");
+    setTimeout(() => { tombol.innerHTML = labelAsli; tombol.classList.remove("copied"); }, 1500);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(teks).then(selesai).catch(() => salinFallbackLaporan(teks, selesai));
+  } else {
+    salinFallbackLaporan(teks, selesai);
+  }
+}
+
+// ---- TAB: NILAI LENGKAP ----
+function formatWaktuLaporan(iso){
+  if(!iso) return "-";
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleString("id-ID", { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+function renderLaporanNilai(){
+  const kelasFilter = selLapKelas.value;
+  const kataKunci = inputLapCari.value.trim().toUpperCase();
+
+  let cocok = lapDataHasil.filter(d =>
+    (kelasFilter === "SEMUA" || d.kelas === kelasFilter) &&
+    (!kataKunci || d.nama.toString().toUpperCase().includes(kataKunci))
+  );
+
+  const tbody = document.getElementById("lapTbody");
+
+  if(lapDataHasil.length === 0){
+    document.getElementById("lapStatJumlah").textContent = 0;
+    document.getElementById("lapStatRata").textContent = 0;
+    document.getElementById("lapStatTertinggi").textContent = 0;
+    document.getElementById("lapStatTerendah").textContent = 0;
+    tbody.innerHTML = '<tr><td colspan="7" class="lap-empty">Belum ada siswa yang mengerjakan ujian ini.</td></tr>';
+    lapCocokNilaiTerakhir = [];
+    return;
+  }
+
+  cocok.sort((a, b) => {
+    let va = a[lapSortKey], vb = b[lapSortKey];
+    if(lapSortKey === "nama" || lapSortKey === "kelas"){
+      va = (va || "").toString().toUpperCase();
+      vb = (vb || "").toString().toUpperCase();
+      return lapSortArah === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
+    }
+    va = Number(va) || 0;
+    vb = Number(vb) || 0;
+    return lapSortArah === "asc" ? va - vb : vb - va;
+  });
+
+  const nilaiList = lapDataHasil.map(d => Number(d.nilai) || 0);
+  const rata = (nilaiList.reduce((a,b) => a+b, 0) / nilaiList.length).toFixed(1);
+
+  document.getElementById("lapStatJumlah").textContent = lapDataHasil.length;
+  document.getElementById("lapStatRata").textContent = rata;
+  document.getElementById("lapStatTertinggi").textContent = Math.max(...nilaiList);
+  document.getElementById("lapStatTerendah").textContent = Math.min(...nilaiList);
+
+  if(cocok.length === 0){
+    tbody.innerHTML = '<tr><td colspan="7" class="lap-empty">Tidak ada data yang cocok dengan filter/pencarian.</td></tr>';
+    lapCocokNilaiTerakhir = [];
+    return;
+  }
+
+  tbody.innerHTML = cocok.map((d, i) => {
+    const nilai = Number(d.nilai) || 0;
+    const kelasNilai = nilai >= 75 ? "tinggi" : (nilai < 60 ? "rendah" : "");
+    return `
+      <tr>
+        <td class="center">${i + 1}</td>
+        <td>${d.nama}</td>
+        <td>${d.kelas}</td>
+        <td class="center">${d.benar}</td>
+        <td class="center">${d.salah}</td>
+        <td class="center nilai ${kelasNilai}">${d.nilai}</td>
+        <td>${formatWaktuLaporan(d.timestamp)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  document.querySelectorAll("#lapTabNilai thead th").forEach(th => {
+    th.classList.toggle("sorted", th.dataset.key === lapSortKey);
+  });
+
+  lapCocokNilaiTerakhir = cocok;
+}
+
+function salinLaporanNilai(){
+  if(lapCocokNilaiTerakhir.length === 0) return;
+  const tombol = document.getElementById("lapBtnSalinNilai");
+
+  let teks = "No\tNama\tKelas\tBenar\tSalah\tNilai\tWaktu Kirim\n";
+  lapCocokNilaiTerakhir.forEach((d, i) => {
+    teks += `${i+1}\t${d.nama}\t${d.kelas}\t${d.benar}\t${d.salah}\t${d.nilai}\t${formatWaktuLaporan(d.timestamp)}\n`;
+  });
+  teks = teks.trim();
+
+  const selesai = () => {
+    const labelAsli = tombol.innerHTML;
+    tombol.innerHTML = "✅ Tersalin!";
+    tombol.classList.add("copied");
+    setTimeout(() => { tombol.innerHTML = labelAsli; tombol.classList.remove("copied"); }, 1500);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(teks).then(selesai).catch(() => salinFallbackLaporan(teks, selesai));
+  } else {
+    salinFallbackLaporan(teks, selesai);
+  }
+}
+
+function salinFallbackLaporan(teks, callback){
+  const area = document.createElement("textarea");
+  area.value = teks;
+  area.style.position = "fixed";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  try{
+    document.execCommand("copy");
+    callback();
+  } catch(err){
+    alert("Gagal menyalin otomatis. Silakan salin manual.");
+  }
+  document.body.removeChild(area);
+}
+
+document.querySelectorAll("#lapTabNilai thead th").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    if(key === "no") return;
+    if(lapSortKey === key){
+      lapSortArah = lapSortArah === "asc" ? "desc" : "asc";
+    } else {
+      lapSortKey = key;
+      lapSortArah = key === "nama" || key === "kelas" ? "asc" : "desc";
+    }
+    renderLaporanNilai();
+  });
+});
+
+document.querySelectorAll("#tabsLaporan .tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll("#tabsLaporan .tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    lapTabAktif = tab.dataset.lap;
+    if(lapDataRekap){
+      lapTabStatus.style.display = lapTabAktif === "status" ? "block" : "none";
+      lapTabNilai.style.display = lapTabAktif === "nilai" ? "block" : "none";
+    }
+  });
+});
+
+selLapUjian.addEventListener("change", muatLaporan);
+selLapKelas.addEventListener("change", renderLaporan);
+inputLapCari.addEventListener("input", renderLaporan);
+
+muatDaftarUjianLaporan();
 </script>
 
 </body>
