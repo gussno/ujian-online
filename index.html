@@ -107,6 +107,11 @@
   }
 
   nav{display:flex; flex-direction:column; gap:4px;}
+  .nav-group-label{
+    font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em;
+    color:rgba(255,255,255,0.38); padding:14px 12px 4px;
+  }
+  .nav-group-label:first-child{padding-top:2px;}
   .nav-item{
     display:flex;
     align-items:center;
@@ -398,6 +403,71 @@
   .card-link .nama{font-weight:700; font-size:15px;}
   .card-link .url{font-size:11.5px; color:var(--muted); font-weight:500; word-break:break-all;}
 
+  /* ---- komponen generator (link berbagi, embed, WA, template) ---- */
+  textarea.gen-output{
+    width:100%;
+    min-height:160px;
+    padding:14px 16px;
+    border-radius:10px;
+    border:1.5px solid var(--line);
+    font-family:'Space Mono', monospace;
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--ink);
+    background:var(--bg);
+    resize:vertical;
+  }
+  textarea.gen-output:focus{outline:none; border-color:var(--primary);}
+
+  .gen-row{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+  .gen-row label{font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;}
+  .gen-row input[type=text], .gen-row input[type=number], .gen-row textarea, .gen-row select{
+    padding:10px 12px;
+    border-radius:9px;
+    border:1.5px solid var(--line);
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--card);
+  }
+  .gen-row textarea{font-weight:500; resize:vertical; min-height:80px; line-height:1.5;}
+  .gen-row input:focus, .gen-row textarea:focus, .gen-row select:focus{outline:none; border-color:var(--primary);}
+  .gen-row .hint{font-size:11.5px; color:var(--muted); font-weight:500;}
+  .gen-2col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:640px){ .gen-2col{grid-template-columns:1fr;} }
+
+  .checkbox-list{
+    display:flex; flex-direction:column; gap:2px;
+    max-height:220px; overflow-y:auto;
+    border:1.5px solid var(--line); border-radius:10px; padding:6px;
+  }
+  .checkbox-list label{
+    display:flex; align-items:center; gap:9px;
+    padding:8px 10px; border-radius:7px;
+    font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .checkbox-list label:hover{background:var(--bg);}
+  .checkbox-list input[type=checkbox]{width:16px; height:16px; accent-color:var(--primary); flex-shrink:0;}
+
+  .toggle-row{display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--bg); border-radius:10px; margin-bottom:16px;}
+  .toggle-row input[type=checkbox]{width:17px; height:17px; margin-top:1px; accent-color:var(--primary); flex-shrink:0;}
+  .toggle-row .txt b{display:block; font-size:13.5px;}
+  .toggle-row .txt span{font-size:12px; color:var(--muted); font-weight:500;}
+
+  .checklist-steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .checklist-steps li{
+    display:flex; align-items:flex-start; gap:12px;
+    background:var(--card); border-radius:12px; padding:14px 16px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  }
+  .checklist-steps input[type=checkbox]{width:19px; height:19px; margin-top:1px; accent-color:var(--primary); flex-shrink:0; cursor:pointer;}
+  .checklist-steps .txt{flex:1;}
+  .checklist-steps .txt b{display:block; font-size:14px; margin-bottom:2px;}
+  .checklist-steps .txt span{font-size:12.5px; color:var(--muted); font-weight:500;}
+  .checklist-steps li.done{opacity:0.55;}
+  .checklist-steps li.done .txt b{text-decoration:line-through;}
+
   @media (max-width:860px){
     .sidebar{transform:translateX(-100%);}
     .sidebar.open{transform:translateX(0);}
@@ -430,12 +500,35 @@
   </div>
 
   <nav>
+    <div class="nav-group-label">Ujian</div>
     <button class="nav-item active" data-target="beranda">
       <span class="ic">📝</span> Asesmen / Ujian
     </button>
     <button class="nav-item" data-target="laporan">
       <span class="ic">📊</span> Laporan Ujian
     </button>
+    <button class="nav-item" data-target="panduan">
+      <span class="ic">📖</span> Panduan Buat Ujian
+    </button>
+
+    <div class="nav-group-label">Alat Bantu</div>
+    <button class="nav-item" data-target="genlink">
+      <span class="ic">🔗</span> Generator Link Berbagi
+    </button>
+    <button class="nav-item" data-target="template">
+      <span class="ic">📁</span> Template Ujian
+    </button>
+    <button class="nav-item" data-target="checklist">
+      <span class="ic">✅</span> Checklist Deploy Ujian
+    </button>
+    <button class="nav-item" data-target="genembed">
+      <span class="ic">🌐</span> Generator Embed Sites
+    </button>
+    <button class="nav-item" data-target="genwa">
+      <span class="ic">💬</span> Generator Pesan WA
+    </button>
+
+    <div class="nav-group-label">Tautan Lain</div>
     <button class="nav-item" data-target="ips">
       <span class="ic">🌐</span> Website IPS
     </button>
@@ -595,6 +688,255 @@
 
   </section>
 
+  <!-- ================= SECTION: PANDUAN BUAT UJIAN ================= -->
+  <section class="section" id="section-panduan">
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:16px; margin-bottom:6px;">🏷️ Format Penamaan Ujian</div>
+      <div style="color:var(--muted); font-size:13.5px; font-weight:500; margin-bottom:16px;">
+        Isi ini sebagai nilai <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">NAMA_UJIAN</code> di file HTML soal, setiap kali membuat ujian baru.
+      </div>
+
+      <div style="background:var(--primary-light); border:1.5px solid var(--primary); border-radius:10px; padding:16px 18px; font-family:'Space Mono', monospace; font-size:15px; font-weight:700; color:var(--primary-dark); overflow-x:auto; white-space:nowrap;">
+        TahunAjaran.Semester-Kelas-Mapel-Judul Ujian
+      </div>
+
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span class="subjek-tag" style="flex-shrink:0; margin-top:2px;">1</span>
+          <div><b>TahunAjaran.Semester</b> — 4 digit gabungan 2 tahun ajaran, titik, lalu semester. <br><span style="color:var(--muted); font-size:12.5px;">Contoh: <code>2627.1</code> = tahun ajaran 2026/2027, semester 1 (ganjil). Semester 2 = genap.</span></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span class="subjek-tag" style="flex-shrink:0; margin-top:2px;">2</span>
+          <div><b>Kelas</b> — tingkat kelas saja (bukan rombel). <br><span style="color:var(--muted); font-size:12.5px;">Contoh: <code>7</code>, <code>8</code>, atau <code>9</code>. Rombel A/B sudah tercatat otomatis di data jawaban siswa.</span></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span class="subjek-tag" style="flex-shrink:0; margin-top:2px;">3</span>
+          <div><b>Mapel</b> — ditulis lengkap, tidak disingkat. <br><span style="color:var(--muted); font-size:12.5px;">Gunakan persis: <code>IPS</code> atau <code>Informatika</code>.</span></div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span class="subjek-tag" style="flex-shrink:0; margin-top:2px;">4</span>
+          <div><b>Judul Ujian</b> — bebas pakai spasi, ini bagian yang dibaca manusia. <br><span style="color:var(--muted); font-size:12.5px;">Sebisa mungkin hindari tanda "-" di dalam judul. Kalau perlu, pakai tanda kurung atau "•", misal: <code>Sejarah Lisan (Bagian 1)</code>.</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; padding-top:16px; border-top:1.5px solid var(--line);">
+        <div style="font-weight:800; font-size:13.5px; margin-bottom:8px;">✅ Contoh Lengkap</div>
+        <div class="cards">
+          <div class="card-link" style="cursor:default;">
+            <div class="icon">📝</div>
+            <div><div class="nama">2627.1-7-IPS-Sejarah Lisan</div><div class="url">Kelas 7 · IPS · Tahun ajaran 2026/2027 · Semester 1</div></div>
+          </div>
+          <div class="card-link" style="cursor:default;">
+            <div class="icon">📝</div>
+            <div><div class="nama">2627.1-8-Informatika-Algoritma Dasar</div><div class="url">Kelas 8 · Informatika · Tahun ajaran 2026/2027 · Semester 1</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:16px; margin-bottom:6px;">🔗 Membagikan Rekap ke Pihak Lain</div>
+      <div style="color:var(--muted); font-size:13.5px; font-weight:500; margin-bottom:14px;">
+        Untuk membagikan rekap pengerjaan HANYA untuk ujian & kelas tertentu (tanpa membuka seluruh portal), gunakan halaman <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">rekap-bagikan.html</code> dengan parameter di URL:
+      </div>
+      <div style="background:var(--bg); border-radius:10px; padding:14px 16px; font-family:'Space Mono', monospace; font-size:12.5px; font-weight:700; color:var(--ink); overflow-x:auto; white-space:nowrap;">
+        rekap-bagikan.html?ujian=2627.1-7-IPS-Sejarah Lisan&kelas=7A,7B
+      </div>
+      <div style="margin-top:10px; font-size:12.5px; color:var(--muted); font-weight:600;">
+        • <code>ujian</code> = nama ujian persis seperti di sheet (boleh lebih dari satu, pisah koma)<br>
+        • <code>kelas</code> = rombel yang boleh dilihat (boleh lebih dari satu, pisah koma)<br>
+        • Tanpa parameter sama sekali → halaman tampil lengkap seperti biasa (mode untuk Anda sendiri)
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= SECTION: GENERATOR LINK BERBAGI ================= -->
+  <section class="section" id="section-genlink">
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">1. Pilih ujian yang boleh dilihat</div>
+      <div class="gen-row hint" style="margin-bottom:8px;">Kosongkan semua (tidak centang) kalau mau penerima link bebas pilih ujian apa saja.</div>
+      <div class="checkbox-list" id="glUjianList">
+        <div class="status-msg">Memuat daftar ujian...</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">2. Pilih kelas yang boleh dilihat</div>
+      <div class="gen-row hint" style="margin-bottom:8px;">Kosongkan semua kalau mau semua kelas terlihat.</div>
+      <div class="checkbox-list" id="glKelasList">
+        <div class="status-msg">Memuat daftar kelas...</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">3. Link hasil</div>
+      <div class="gen-row">
+        <label for="glBaseUrl">Alamat halaman rekap-bagikan.html</label>
+        <input type="text" id="glBaseUrl" value="https://gussno.github.io/ujian-online/rekap-bagikan.html">
+      </div>
+      <button class="btn btn-primary" onclick="buatLinkBerbagi()">🔗 Buat Link</button>
+      <div class="gen-row" style="margin-top:16px;">
+        <label>Link Jadi</label>
+        <textarea class="gen-output" id="glOutput" rows="3" readonly placeholder="Link akan muncul di sini..."></textarea>
+      </div>
+      <button class="btn btn-outline" id="glBtnSalin" onclick="salinOutput('glOutput', this)">📋 Salin Link</button>
+    </div>
+
+  </section>
+
+  <!-- ================= SECTION: TEMPLATE UJIAN ================= -->
+  <section class="section" id="section-template">
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:16px; margin-bottom:6px;">📁 Template Siap Pakai</div>
+      <div style="color:var(--muted); font-size:13.5px; font-weight:500; margin-bottom:16px;">
+        Salin kode ini, tempel jadi file <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">.html</code> baru, lalu sesuaikan soal & <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">NAMA_UJIAN</code>-nya (lihat menu Panduan untuk format penamaan).
+      </div>
+      <button class="btn btn-primary" id="tplBtnSalin" onclick="salinTemplate()" style="margin-bottom:14px;">📋 Salin Kode Template</button>
+      <textarea class="gen-output" id="tplOutput" rows="16" readonly></textarea>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:14px; margin-bottom:10px;">Yang perlu disesuaikan di template</div>
+      <ul style="margin:0; padding-left:20px; font-size:13.5px; line-height:1.9; color:var(--ink);">
+        <li>Bagian <code>&lt;title&gt;</code> dan <code>&lt;h1&gt;</code> — ganti dengan judul asesmen Anda</li>
+        <li><code>const NAMA_UJIAN</code> — isi mengikuti format penamaan (contoh: <code>2627.1-7-IPS-Sejarah Lisan</code>)</li>
+        <li>Blok <code>&lt;div class="soal"&gt;</code> — duplikat sesuai jumlah soal, sesuaikan pertanyaan & pilihan jawaban</li>
+        <li>Object <code>kunci</code> di JavaScript — isi kunci jawaban yang cocok dengan nomor soal (q1, q2, dst)</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ================= SECTION: CHECKLIST DEPLOY UJIAN ================= -->
+  <section class="section" id="section-checklist">
+    <div class="panel">
+      <ul class="checklist-steps" id="checklistSteps"></ul>
+      <button class="btn btn-outline" onclick="resetChecklist()" style="margin-top:16px;">↺ Reset Checklist</button>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: GENERATOR EMBED GOOGLE SITES ================= -->
+  <section class="section" id="section-genembed">
+
+    <div class="panel">
+      <div class="gen-row">
+        <label for="geJudul">Judul Asesmen</label>
+        <input type="text" id="geJudul" placeholder="Contoh: Asesmen Pemahaman Lokasi Melalui Peta">
+      </div>
+      <div class="gen-row">
+        <label for="geEmoji">Ikon/Emoji Judul</label>
+        <input type="text" id="geEmoji" value="📝" style="max-width:100px;">
+      </div>
+      <div class="gen-row">
+        <label for="geLinkPilih">Pilih dari daftar ujian (opsional, isi otomatis link di bawah)</label>
+        <select id="geLinkPilih">
+          <option value="">-- Pilih file ujian --</option>
+        </select>
+      </div>
+      <div class="gen-row">
+        <label for="geLink">Link Ujian</label>
+        <input type="text" id="geLink" placeholder="https://gussno.github.io/ujian-online/nama-file.html">
+      </div>
+      <div class="gen-row">
+        <label for="geChecklist">Langkah sebelum mengerjakan (1 baris = 1 langkah)</label>
+        <textarea id="geChecklist" rows="4">📖 Membaca materi di halaman ini sampai selesai
+🖼️ Mencermati infografis yang ditampilkan
+🎥 Menyimak tayangan video pembelajaran dengan saksama
+✅ Benar-benar memahami isi materinya, bukan sekadar membaca sekilas</textarea>
+      </div>
+      <div class="gen-row">
+        <label for="geTimer">Durasi Timer (menit)</label>
+        <input type="number" id="geTimer" value="30" style="max-width:120px;">
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="geAntiDuplikat">
+        <div class="txt">
+          <b>Sertakan catatan "hanya bisa dikerjakan 1x"</b>
+          <span>Centang HANYA kalau file ujian ini benar-benar sudah pakai fitur cek status (anti-duplikat) dari Code.gs. Kalau belum yakin, biarkan tidak dicentang.</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="buatEmbedSites()">🌐 Buat Kode Embed</button>
+
+      <div class="gen-row" style="margin-top:16px;">
+        <label>Kode HTML untuk Google Sites</label>
+        <textarea class="gen-output" id="geOutput" rows="14" readonly placeholder="Kode akan muncul di sini..."></textarea>
+      </div>
+      <button class="btn btn-outline" id="geBtnSalin" onclick="salinOutput('geOutput', this)">📋 Salin Kode</button>
+      <div class="gen-row hint" style="margin-top:10px;">Tempel di Google Sites lewat <b>Insert &gt; Embed &gt; Embed code</b> (bukan Embed URL).</div>
+    </div>
+
+  </section>
+
+  <!-- ================= SECTION: GENERATOR PESAN WA ================= -->
+  <section class="section" id="section-genwa">
+
+    <div class="panel">
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="waKelas">Kelas Tujuan</label>
+          <input type="text" id="waKelas" placeholder="Contoh: 7A dan 7B">
+        </div>
+        <div class="gen-row">
+          <label for="waMapel">Mata Pelajaran</label>
+          <input type="text" id="waMapel" value="IPS">
+        </div>
+      </div>
+      <div class="gen-row">
+        <label for="waTanggal">Hari, Tanggal</label>
+        <input type="text" id="waTanggal" placeholder="Contoh: Selasa, 4 Agustus 2026">
+      </div>
+      <div class="gen-row">
+        <label for="waMateri">Judul Materi</label>
+        <input type="text" id="waMateri" placeholder="Contoh: Pemahaman Lokasi Melalui Peta">
+      </div>
+      <div class="gen-row">
+        <label for="waLink">Link Materi (Google Sites)</label>
+        <input type="text" id="waLink" placeholder="https://sites.google.com/view/ips-7/...">
+      </div>
+      <div class="gen-row">
+        <label for="waLangkah">Langkah yang harus dilakukan (1 baris = 1 langkah)</label>
+        <textarea id="waLangkah" rows="3">Buka link materi di bawah ini, baca dan pahami isinya sampai selesai.
+Simak juga video pembelajaran yang ada di halaman tersebut sampai tuntas.
+Setelah benar-benar paham, kerjakan soal asesmen yang linknya tersedia di bagian bawah halaman materi.</textarea>
+      </div>
+      <div class="gen-row">
+        <label for="waTimer">Durasi Timer (menit)</label>
+        <input type="number" id="waTimer" value="30" style="max-width:120px;">
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="waAntiDuplikat">
+        <div class="txt">
+          <b>Sertakan catatan "tidak bisa diulang"</b>
+          <span>Centang HANYA kalau file ujian ini benar-benar sudah pakai fitur cek status (anti-duplikat) dari Code.gs. Salah mencentang ini pernah membuat pesan WA jadi tidak akurat.</span>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="waSalam" checked>
+        <div class="txt">
+          <b>Sertakan salam pembuka & penutup</b>
+          <span>Assalamualaikum di awal, Wassalamualaikum di akhir pesan.</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="buatPesanWA()">💬 Buat Pesan</button>
+
+      <div class="gen-row" style="margin-top:16px;">
+        <label>Pesan WA</label>
+        <textarea class="gen-output" id="waOutput" rows="16" readonly placeholder="Pesan akan muncul di sini..."></textarea>
+      </div>
+      <button class="btn btn-outline" id="waBtnSalin" onclick="salinOutput('waOutput', this)">📋 Salin Pesan</button>
+    </div>
+
+  </section>
+
   <!-- ================= SECTION: WEBSITE IPS ================= -->
   <section class="section" id="section-ips">
     <div class="cards">
@@ -713,6 +1055,12 @@ terapkanTema(localStorage.getItem(KEY_THEME) || "biru");
 const JUDUL_HALAMAN = {
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
+  panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
+  genlink: { title:"Generator Link Berbagi", sub:"Buat link Rekap Pengerjaan yang dibatasi hanya ke ujian & kelas tertentu." },
+  template: { title:"Template Ujian", sub:"Salin kerangka kode siap-pakai untuk membuat asesmen baru." },
+  checklist: { title:"Checklist Deploy Ujian Baru", sub:"Langkah-langkah supaya tidak ada yang terlewat saat menerbitkan ujian baru." },
+  genembed: { title:"Generator Embed Google Sites", sub:"Buat kode instruksi pengerjaan soal untuk ditempel di halaman Google Sites." },
+  genwa: { title:"Generator Pesan WhatsApp", sub:"Buat pesan pengumuman tugas untuk dikirim ke grup kelas." },
   ips: { title:"Website IPS", sub:"Materi & tugas per jenjang kelas, dikelola lewat Google Sites." },
   github: { title:"GitHub", sub:"Repository dan profil yang menampung source code portal & ujian." },
   administrasi: { title:"Administrasi Sekolah", sub:"Akses cepat ke sistem administrasi wali kelas, guru, dan sekolah." },
@@ -820,6 +1168,7 @@ async function muatDaftar(){
     }));
 
     renderDaftar();
+    populateGeLinkPilih();
 
   } catch(err){
     console.error(err);
@@ -1254,6 +1603,481 @@ selLapKelas.addEventListener("change", renderLaporan);
 inputLapCari.addEventListener("input", renderLaporan);
 
 muatDaftarUjianLaporan();
+
+// ======================================================
+// UTILITAS SALIN UMUM (dipakai semua generator di bawah)
+// ======================================================
+function salinOutput(idTextarea, tombol){
+  const el = document.getElementById(idTextarea);
+  const teks = el.value.trim();
+  if(!teks) return;
+
+  const selesai = () => {
+    const labelAsli = tombol.innerHTML;
+    tombol.innerHTML = "✅ Tersalin!";
+    tombol.classList.add("copied");
+    setTimeout(() => { tombol.innerHTML = labelAsli; tombol.classList.remove("copied"); }, 1500);
+  };
+
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(teks).then(selesai).catch(() => salinFallbackUmum(teks, selesai));
+  } else {
+    salinFallbackUmum(teks, selesai);
+  }
+}
+
+function salinFallbackUmum(teks, callback){
+  const area = document.createElement("textarea");
+  area.value = teks;
+  area.style.position = "fixed";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  try{ document.execCommand("copy"); callback(); }
+  catch(err){ alert("Gagal menyalin otomatis. Silakan salin manual."); }
+  document.body.removeChild(area);
+}
+
+// ======================================================
+// GENERATOR LINK BERBAGI
+// ======================================================
+async function muatGeneratorLink(){
+  const elUjian = document.getElementById("glUjianList");
+  const elKelas = document.getElementById("glKelasList");
+
+  try{
+    const [resUjian, resSiswa] = await Promise.all([
+      fetch(scriptURL + "?action=daftarUjian"),
+      fetch(scriptURL + "?action=siswa")
+    ]);
+    const jsonUjian = await resUjian.json();
+    const jsonSiswa = await resSiswa.json();
+
+    if(jsonUjian.status === "success" && jsonUjian.data && jsonUjian.data.length > 0){
+      elUjian.innerHTML = jsonUjian.data.map(nama =>
+        '<label><input type="checkbox" value="' + nama.replace(/"/g,"&quot;") + '"> ' + nama + '</label>'
+      ).join("");
+    } else {
+      elUjian.innerHTML = '<div class="status-msg">Belum ada ujian tercatat.</div>';
+    }
+
+    if(jsonSiswa.status === "success" && jsonSiswa.data){
+      const kelasList = Object.keys(jsonSiswa.data).sort();
+      elKelas.innerHTML = kelasList.map(k =>
+        '<label><input type="checkbox" value="' + k + '"> ' + k + '</label>'
+      ).join("");
+    } else {
+      elKelas.innerHTML = '<div class="status-msg">Belum ada data kelas.</div>';
+    }
+
+  } catch(err){
+    console.error(err);
+    elUjian.innerHTML = '<div class="status-msg error">Gagal memuat, coba lagi.</div>';
+    elKelas.innerHTML = '<div class="status-msg error">Gagal memuat, coba lagi.</div>';
+  }
+}
+
+function buatLinkBerbagi(){
+  const ujianTerpilih = [...document.querySelectorAll("#glUjianList input:checked")].map(c => c.value);
+  const kelasTerpilih = [...document.querySelectorAll("#glKelasList input:checked")].map(c => c.value);
+  const base = document.getElementById("glBaseUrl").value.trim() || "rekap-bagikan.html";
+
+  const params = [];
+  if(ujianTerpilih.length > 0) params.push("ujian=" + encodeURIComponent(ujianTerpilih.join(",")));
+  if(kelasTerpilih.length > 0) params.push("kelas=" + encodeURIComponent(kelasTerpilih.join(",")));
+
+  const url = base + (params.length > 0 ? "?" + params.join("&") : "");
+  document.getElementById("glOutput").value = url;
+}
+
+muatGeneratorLink();
+
+// ======================================================
+// TEMPLATE UJIAN (kode siap-pakai, disalin oleh guru)
+// ======================================================
+const TEMPLATE_UJIAN_LINES = [
+'<!DOCTYPE html>',
+'<html lang="id">',
+'<head>',
+'<meta charset="UTF-8">',
+'<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+'<title>GANTI JUDUL ASESMEN DI SINI</title>',
+'<style>',
+'body{font-family:Arial, sans-serif; max-width:800px; margin:auto; padding:70px 20px 20px 20px; line-height:1.6; background:#f3f4f6; user-select:none;}',
+'.soal{background:white; border-radius:10px; padding:15px; margin-bottom:20px; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.05);}',
+'h1{text-align:center; color:white; background:linear-gradient(90deg,#2563eb,#1e3a8a); padding:15px; border-radius:10px;}',
+'input[type=text]{width:100%; padding:8px; box-sizing:border-box;}',
+'select{width:100%; padding:8px; box-sizing:border-box;}',
+'#timerBox{position:fixed; top:10px; right:10px; z-index:9999; background:#d32f2f; color:white; padding:10px 15px; border-radius:10px; font-size:20px; font-weight:bold; box-shadow:0 3px 8px rgba(0,0,0,0.3);}',
+'#btnKirim{background:#16a34a; color:white; border:none; padding:12px 25px; font-size:16px; border-radius:8px; cursor:pointer; width:100%; max-width:300px; display:block; margin:20px auto;}',
+'#btnKirim:disabled{background:#9ca3af; cursor:not-allowed;}',
+'#hasil{margin-top:20px; font-size:20px; font-weight:bold; text-align:center;}',
+'#peringatanSudah{display:none; background:#fef2f2; border:1.5px solid #dc2626; color:#991b1b; padding:15px; border-radius:10px; text-align:center; font-weight:bold;}',
+'</style>',
+'</head>',
+'<body>',
+'',
+'<div id="timerBox">\u23f0 <span id="timer">30:00</span></div>',
+'',
+'<h1>GANTI JUDUL ASESMEN DI SINI</h1>',
+'',
+'<p>Kelas:<br>',
+'<select id="kelas" onchange="updateNama()">',
+'  <option value="">-- Pilih Kelas --</option>',
+'</select></p>',
+'',
+'<p>Nama:<br>',
+'<select id="nama" onchange="cekSudahMengerjakan()">',
+'  <option value="">-- Pilih Nama --</option>',
+'</select></p>',
+'',
+'<div id="peringatanSudah">\u26a0\ufe0f Anda sudah pernah mengerjakan asesmen ini sebelumnya. Tidak bisa mengerjakan ulang.</div>',
+'',
+'<!-- ===== CONTOH SOAL - DUPLIKAT & SESUAIKAN SESUAI KEBUTUHAN ===== -->',
+'<div class="soal">',
+'<p>1. Contoh pertanyaan nomor 1 ...</p>',
+'<label><input type="radio" name="q1" value="A"> Pilihan A</label><br>',
+'<label><input type="radio" name="q1" value="B"> Pilihan B</label><br>',
+'<label><input type="radio" name="q1" value="C"> Pilihan C</label><br>',
+'<label><input type="radio" name="q1" value="D"> Pilihan D</label>',
+'</div>',
+'',
+'<div class="soal">',
+'<p>2. Contoh pertanyaan nomor 2 ...</p>',
+'<label><input type="radio" name="q2" value="A"> Pilihan A</label><br>',
+'<label><input type="radio" name="q2" value="B"> Pilihan B</label><br>',
+'<label><input type="radio" name="q2" value="C"> Pilihan C</label><br>',
+'<label><input type="radio" name="q2" value="D"> Pilihan D</label>',
+'</div>',
+'',
+'<div class="soal">',
+'<p>3. Contoh pertanyaan nomor 3 ...</p>',
+'<label><input type="radio" name="q3" value="A"> Pilihan A</label><br>',
+'<label><input type="radio" name="q3" value="B"> Pilihan B</label><br>',
+'<label><input type="radio" name="q3" value="C"> Pilihan C</label><br>',
+'<label><input type="radio" name="q3" value="D"> Pilihan D</label>',
+'</div>',
+'<!-- ===== TAMBAH BLOK .soal DI ATAS SESUAI JUMLAH SOAL, LALU LANJUTKAN NOMOR & q4, q5, DST ===== -->',
+'',
+'<button id="btnKirim" onclick="kirim()" disabled>Pilih kelas & nama dahulu</button>',
+'<div id="hasil"></div>',
+'',
+'<script>',
+'// ======================',
+'// GANTI SESUAI FORMAT PENAMAAN (lihat menu Panduan Buat Ujian)',
+'// contoh: "2627.1-7-IPS-Sejarah Lisan"',
+'// ======================',
+'const NAMA_UJIAN = "GANTI-TahunAjaran.Semester-Kelas-Mapel-Judul Ujian";',
+'',
+'// ======================',
+'// KUNCI JAWABAN - sesuaikan jumlah & isinya dengan soal di atas',
+'// ======================',
+'const kunci = { q1:"A", q2:"B", q3:"C" };',
+'',
+'// ======================',
+'// BACKEND GOOGLE APPS SCRIPT (samakan dengan file ujian lain)',
+'// ======================',
+'const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";',
+'',
+'let dataSiswa = {};',
+'let waktuMulai = Date.now();',
+'',
+'async function muatSiswa(){',
+'  try{',
+'    const res = await fetch(scriptURL + "?action=siswa");',
+'    const json = await res.json();',
+'    if(json.status === "success"){',
+'      dataSiswa = json.data;',
+'      const selKelas = document.getElementById("kelas");',
+'      Object.keys(dataSiswa).sort().forEach(k => {',
+'        const opt = document.createElement("option");',
+'        opt.value = k; opt.textContent = k;',
+'        selKelas.appendChild(opt);',
+'      });',
+'    }',
+'  } catch(e){ console.error(e); }',
+'}',
+'muatSiswa();',
+'',
+'function updateNama(){',
+'  const kelas = document.getElementById("kelas").value;',
+'  const selNama = document.getElementById("nama");',
+'  selNama.innerHTML = \'<option value="">-- Pilih Nama --</option>\';',
+'  document.getElementById("peringatanSudah").style.display = "none";',
+'  document.getElementById("btnKirim").disabled = true;',
+'  document.getElementById("btnKirim").textContent = "Pilih kelas & nama dahulu";',
+'  if(!kelas || !dataSiswa[kelas]) return;',
+'  dataSiswa[kelas].forEach(nama => {',
+'    const opt = document.createElement("option");',
+'    opt.value = nama; opt.textContent = nama;',
+'    selNama.appendChild(opt);',
+'  });',
+'}',
+'',
+'async function cekSudahMengerjakan(){',
+'  const kelas = document.getElementById("kelas").value;',
+'  const nama = document.getElementById("nama").value;',
+'  const btn = document.getElementById("btnKirim");',
+'  const peringatan = document.getElementById("peringatanSudah");',
+'',
+'  if(!kelas || !nama){ peringatan.style.display = "none"; btn.disabled = true; return; }',
+'',
+'  btn.disabled = true;',
+'  btn.textContent = "Memeriksa status...";',
+'',
+'  try{',
+'    const url = scriptURL + "?action=cekStatus&ujian=" + encodeURIComponent(NAMA_UJIAN) + "&nama=" + encodeURIComponent(nama) + "&kelas=" + encodeURIComponent(kelas);',
+'    const res = await fetch(url);',
+'    const json = await res.json();',
+'',
+'    if(json.status === "success" && json.sudahMengerjakan){',
+'      peringatan.style.display = "block";',
+'      btn.textContent = "Sudah Pernah Mengerjakan";',
+'      btn.disabled = true;',
+'    } else {',
+'      peringatan.style.display = "none";',
+'      btn.textContent = "Kirim Jawaban";',
+'      btn.disabled = false;',
+'      waktuMulai = Date.now();',
+'    }',
+'  } catch(e){',
+'    console.error(e);',
+'    btn.textContent = "Kirim Jawaban";',
+'    btn.disabled = false;',
+'  }',
+'}',
+'',
+'// ======================',
+'// TIMER - sesuaikan DURATION (detik) kalau bukan 30 menit',
+'// ======================',
+'const DURATION = 30 * 60;',
+'const KEY_START = "ujian_mulai_" + NAMA_UJIAN;',
+'let startTime = localStorage.getItem(KEY_START);',
+'if(!startTime){ startTime = Date.now(); localStorage.setItem(KEY_START, startTime); }',
+'',
+'const timerEl = document.getElementById("timer");',
+'function updateTimer(){',
+'  const elapsed = Math.floor((Date.now() - startTime) / 1000);',
+'  let remaining = DURATION - elapsed;',
+'  if(remaining <= 0){ remaining = 0; clearInterval(timerInterval); kirim(); return; }',
+'  const m = Math.floor(remaining / 60), d = remaining % 60;',
+'  if(timerEl) timerEl.textContent = String(m).padStart(2,"0") + ":" + String(d).padStart(2,"0");',
+'}',
+'let timerInterval = setInterval(updateTimer, 1000);',
+'updateTimer();',
+'',
+'// ======================',
+'// KIRIM JAWABAN',
+'// ======================',
+'window.kirim = function(){',
+'  const nama = document.getElementById("nama").value.trim();',
+'  const kelas = document.getElementById("kelas").value.trim();',
+'  if(!nama || !kelas){ alert("Nama dan kelas harus diisi!"); return; }',
+'',
+'  const tombol = document.getElementById("btnKirim");',
+'  if(tombol.disabled && tombol.textContent !== "Kirim Jawaban") return;',
+'  tombol.disabled = true;',
+'  tombol.textContent = "Mengirim...";',
+'  clearInterval(timerInterval);',
+'',
+'  let benar = 0;',
+'  const totalSoal = Object.keys(kunci).length;',
+'  for(const q in kunci){',
+'    const jawab = document.querySelector(\'input[name="\' + q + \'"]:checked\');',
+'    if(jawab && jawab.value === kunci[q]) benar++;',
+'  }',
+'  const salah = totalSoal - benar;',
+'  const nilai = Math.round((benar / totalSoal) * 100);',
+'',
+'  document.getElementById("hasil").innerHTML = "Nilai Anda: " + nilai;',
+'',
+'  fetch(scriptURL, {',
+'    method: "POST",',
+'    body: JSON.stringify({',
+'      nama, kelas, benar, salah, nilai,',
+'      ujian: NAMA_UJIAN,',
+'      waktuMulai: waktuMulai,',
+'      waktuSelesai: Date.now()',
+'    })',
+'  }).then(() => {',
+'    localStorage.removeItem(KEY_START);',
+'    tombol.textContent = "Ujian Selesai";',
+'    alert("Jawaban berhasil dikirim!");',
+'  }).catch(err => {',
+'    console.error(err);',
+'    alert("Gagal kirim, coba lagi.");',
+'    tombol.disabled = false;',
+'    tombol.textContent = "Kirim Jawaban";',
+'  });',
+'};',
+'</' + 'script>',
+'',
+'</body>',
+'</html>'
+];
+
+function salinTemplate(){
+  const kode = TEMPLATE_UJIAN_LINES.join("\n");
+  document.getElementById("tplOutput").value = kode;
+  salinOutput("tplOutput", document.getElementById("tplBtnSalin"));
+}
+
+// Isi textarea preview begitu section dibuka pertama kali
+document.getElementById("tplOutput").value = TEMPLATE_UJIAN_LINES.join("\n");
+
+// ======================================================
+// CHECKLIST DEPLOY UJIAN BARU
+// ======================================================
+const CHECKLIST_ITEMS = [
+  { judul:"Salin kode Template Ujian", ket:"Buka menu Template Ujian, salin kodenya, tempel jadi file .html baru." },
+  { judul:"Isi soal & kunci jawaban", ket:"Duplikat blok .soal sesuai jumlah soal, sesuaikan object kunci di JavaScript." },
+  { judul:"Set NAMA_UJIAN sesuai format", ket:"Ikuti format TahunAjaran.Semester-Kelas-Mapel-Judul, lihat menu Panduan Buat Ujian." },
+  { judul:"Upload file ke repo GitHub", ket:"Upload ke repo gussno/ujian-online, commit perubahan." },
+  { judul:"Cek muncul otomatis di Asesmen/Ujian", ket:"Buka menu Asesmen/Ujian di portal ini, refresh, pastikan file baru muncul & kategori mapelnya benar." },
+  { judul:"(Opsional) Buat kode embed Google Sites", ket:"Pakai menu Generator Embed Sites, tempel ke halaman materi terkait." },
+  { judul:"(Opsional) Kirim pesan WA ke grup kelas", ket:"Pakai menu Generator Pesan WA untuk mengumumkan tugas." },
+  { judul:"Pantau pengerjaan & nilai", ket:"Cek menu Laporan Ujian secara berkala untuk lihat siapa yang sudah/belum & nilainya." }
+];
+
+function renderChecklist(){
+  const ul = document.getElementById("checklistSteps");
+  ul.innerHTML = CHECKLIST_ITEMS.map((item, i) => {
+    const done = localStorage.getItem("checklist_deploy_" + i) === "1";
+    return '<li class="' + (done ? "done" : "") + '">' +
+      '<input type="checkbox" ' + (done ? "checked" : "") + ' onchange="toggleChecklistItem(' + i + ', this.checked)">' +
+      '<div class="txt"><b>' + (i+1) + '. ' + item.judul + '</b><span>' + item.ket + '</span></div>' +
+      '</li>';
+  }).join("");
+}
+
+function toggleChecklistItem(i, checked){
+  localStorage.setItem("checklist_deploy_" + i, checked ? "1" : "0");
+  renderChecklist();
+}
+
+function resetChecklist(){
+  CHECKLIST_ITEMS.forEach((_, i) => localStorage.removeItem("checklist_deploy_" + i));
+  renderChecklist();
+}
+
+renderChecklist();
+
+// ======================================================
+// GENERATOR EMBED GOOGLE SITES
+// ======================================================
+function populateGeLinkPilih(){
+  const sel = document.getElementById("geLinkPilih");
+  if(!sel) return;
+  sel.innerHTML = '<option value="">-- Pilih file ujian --</option>';
+  semuaFile.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f.name;
+    opt.textContent = f.judul;
+    sel.appendChild(opt);
+  });
+}
+
+document.getElementById("geLinkPilih").addEventListener("change", function(){
+  if(!this.value) return;
+  const f = semuaFile.find(x => x.name === this.value);
+  if(!f) return;
+  document.getElementById("geLink").value = "https://gussno.github.io/ujian-online/" + f.name;
+  if(!document.getElementById("geJudul").value){
+    document.getElementById("geJudul").value = "Asesmen " + f.judul;
+  }
+});
+
+function buatEmbedSites(){
+  const judul = document.getElementById("geJudul").value.trim() || "Asesmen";
+  const emoji = document.getElementById("geEmoji").value.trim() || "\ud83d\udcdd";
+  const link = document.getElementById("geLink").value.trim() || "#";
+  const langkahList = document.getElementById("geChecklist").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const timer = document.getElementById("geTimer").value.trim() || "30";
+  const antiDuplikat = document.getElementById("geAntiDuplikat").checked;
+
+  const liLangkah = langkahList.map(l => '      <li>' + l + '</li>').join("\n");
+
+  let catatanTambahan = "";
+  if(antiDuplikat){
+    catatanTambahan = ' Jawaban akan otomatis terkirim saat waktu habis, dan ujian hanya bisa dikerjakan <b>satu kali</b> per siswa.';
+  } else {
+    catatanTambahan = ' Jawaban akan otomatis terkirim saat waktu habis.';
+  }
+
+  const kode =
+'<div style="max-width:700px;margin:20px auto;font-family:Arial, sans-serif;">\n\n' +
+'  <div style="background:linear-gradient(90deg,#2563eb,#1e3a8a);color:white;padding:18px 20px;border-radius:12px 12px 0 0;">\n' +
+'    <h2 style="margin:0;font-size:20px;">' + emoji + ' ' + judul + '</h2>\n' +
+'  </div>\n\n' +
+'  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:22px 20px;">\n' +
+'    <p style="font-size:15px;line-height:1.7;color:#1f2937;margin-top:0;">\n' +
+'      Sebelum mengerjakan soal, pastikan kalian sudah:\n' +
+'    </p>\n' +
+'    <ul style="font-size:15px;line-height:1.8;color:#1f2937;">\n' +
+liLangkah + '\n' +
+'    </ul>\n\n' +
+'    <p style="font-size:15px;line-height:1.7;color:#1f2937;">\n' +
+'      Soal akan dilengkapi dengan <b>timer ' + timer + ' menit</b> yang berjalan otomatis sejak halaman dibuka,\n' +
+'      jadi pastikan kalian sudah siap sebelum menekan tombol di bawah ini.\n' +
+'    </p>\n\n' +
+'    <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:12px 15px;margin:15px 0;">\n' +
+'      <p style="margin:0;font-size:14px;color:#9a3412;">\n' +
+'        \u23f0 <b>Perhatian:</b> Waktu tetap berjalan meskipun halaman ditutup atau di-refresh.' + catatanTambahan + '\n' +
+'      </p>\n' +
+'    </div>\n\n' +
+'    <a href="' + link + '" target="_blank"\n' +
+'       style="display:block;text-align:center;background:#16a34a;color:white;text-decoration:none;\n' +
+'              font-size:16px;font-weight:bold;padding:14px 20px;border-radius:8px;margin-top:15px;">\n' +
+'      \ud83d\ude80 Mulai Kerjakan Soal\n' +
+'    </a>\n' +
+'  </div>\n\n' +
+'</div>';
+
+  document.getElementById("geOutput").value = kode;
+}
+
+// ======================================================
+// GENERATOR PESAN WA
+// ======================================================
+function buatPesanWA(){
+  const kelas = document.getElementById("waKelas").value.trim() || "(isi kelas)";
+  const mapel = document.getElementById("waMapel").value.trim() || "IPS";
+  const tanggal = document.getElementById("waTanggal").value.trim() || "(isi hari, tanggal)";
+  const materi = document.getElementById("waMateri").value.trim() || "(isi judul materi)";
+  const link = document.getElementById("waLink").value.trim() || "(isi link materi)";
+  const langkahList = document.getElementById("waLangkah").value.split("\n").map(s => s.trim()).filter(Boolean);
+  const timer = document.getElementById("waTimer").value.trim() || "30";
+  const antiDuplikat = document.getElementById("waAntiDuplikat").checked;
+  const salam = document.getElementById("waSalam").checked;
+
+  const emojiAngka = ["1\u20e3","2\u20e3","3\u20e3","4\u20e3","5\u20e3","6\u20e3","7\u20e3","8\u20e3"];
+  const langkahTeks = langkahList.map((l, i) => (emojiAngka[i] || (i+1)+".") + " " + l).join("\n");
+
+  let catatanTambahan = "";
+  if(antiDuplikat){
+    catatanTambahan = "\n- Soal *tidak bisa diulang* setelah dikirim.";
+  }
+
+  let pesan = "";
+  if(salam) pesan += "Assalamualaikum Wr. Wb.\n\n";
+  pesan += "Selamat pagi anak-anak kelas " + kelas + " \ud83d\ude4f\n\n";
+  pesan += "Sesuai jadwal pelajaran " + mapel + " hari ini, *" + tanggal + "*, kegiatan belajar dilaksanakan secara *BDR (Belajar Dari Rumah)* dengan materi *\"" + materi + "\"*.\n\n";
+  pesan += "Berikut langkah yang harus kalian lakukan:\n\n";
+  pesan += langkahTeks + "\n\n";
+  pesan += "\ud83d\udd17 Link materi:\n" + link + "\n\n";
+  pesan += "\u26a0\ufe0f Catatan penting:\n";
+  pesan += "- Soal memiliki *timer " + timer + " menit* yang berjalan otomatis begitu halaman dibuka.\n";
+  pesan += "- Waktu tetap berjalan walau halaman ditutup/direfresh." + catatanTambahan + "\n";
+  pesan += "- Pastikan kalian sudah membaca/menyimak materi terlebih dahulu sebelum mulai mengerjakan, supaya waktu tidak terbuang untuk mencari jawaban.\n";
+  pesan += "- Isi nama dan kelas dengan benar sebelum mengerjakan.\n\n";
+  pesan += "Tugas dikerjakan hari ini juga. Kalau ada kendala akses, silakan hubungi bapak/ibu guru.\n\n";
+  pesan += "Selamat belajar, semoga lancar dan paham materinya \ud83d\udcaa";
+  if(salam) pesan += "\n\nWassalamualaikum Wr. Wb.";
+
+  document.getElementById("waOutput").value = pesan;
+}
+
 </script>
 
 </body>
