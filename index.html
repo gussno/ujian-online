@@ -488,10 +488,8 @@
     inset:0;
     z-index:9999;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:18px;
     background:linear-gradient(160deg, var(--primary-dark), #0f172a);
     cursor:pointer;
     transition:opacity 0.5s ease, visibility 0.5s ease;
@@ -502,51 +500,31 @@
     pointer-events:none;
   }
   #splash img{
-    width:140px;
-    height:140px;
+    max-width:92vw;
+    max-height:92vh;
+    width:auto;
+    height:auto;
     object-fit:contain;
-    border-radius:24px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.35);
     transition:transform 0.25s ease;
   }
   #splash.pulse img{
-    transform:scale(1.15);
-  }
-  #splash h2{
-    margin:0;
-    color:white;
-    font-size:22px;
-    font-weight:800;
-    letter-spacing:-0.01em;
-    text-align:center;
-  }
-  #splash p{
-    margin:0;
-    color:rgba(255,255,255,0.6);
-    font-size:13px;
-    font-weight:600;
-    text-align:center;
+    transform:scale(1.06);
   }
   #splash .tap-hint{
-    margin-top:8px;
-    color:rgba(255,255,255,0.4);
-    font-size:12px;
+    position:absolute;
+    right:18px;
+    bottom:16px;
+    color:rgba(255,255,255,0.35);
+    font-size:11px;
     font-weight:700;
-    animation:splashBlink 1.6s ease-in-out infinite;
-  }
-  @keyframes splashBlink{
-    0%, 100%{opacity:0.4;}
-    50%{opacity:1;}
   }
 </style>
 </head>
 <body data-theme="biru">
 
 <div id="splash">
-  <img src="splash.png" alt="Logo Portal Pak Agus">
-  <h2>Portal Pak Agus</h2>
-  <p>Pusat asesmen & administrasi</p>
-  <div class="tap-hint">Ketuk di mana saja untuk masuk</div>
+  <img src="splash.png" alt="Portal Pak Agus">
+  <div class="tap-hint">klik untuk masuk</div>
 </div>
 
 <aside class="sidebar" id="sidebar">
