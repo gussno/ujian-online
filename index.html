@@ -492,7 +492,7 @@
     justify-content:center;
     background:linear-gradient(160deg, var(--primary-dark), #0f172a);
     cursor:pointer;
-    transition:opacity 0.5s ease, visibility 0.5s ease;
+    transition:opacity 1s ease, visibility 1s ease;
   }
   #splash.hide{
     opacity:0;
@@ -505,10 +505,10 @@
     width:auto;
     height:auto;
     object-fit:contain;
-    transition:transform 0.25s ease;
+    transition:transform 0.35s ease;
   }
-  #splash.pulse img{
-    transform:scale(1.06);
+  #splash:hover img{
+    transform:scale(1.04);
   }
   #splash .tap-hint{
     position:absolute;
@@ -1160,10 +1160,7 @@ Setelah benar-benar paham, kerjakan soal asesmen yang linknya tersedia di bagian
   if(!splash) return;
 
   splash.addEventListener("click", function handleTap(){
-    splash.classList.add("pulse");
-    setTimeout(function(){
-      splash.classList.add("hide");
-    }, 350);
+    splash.classList.add("hide");
     splash.removeEventListener("click", handleTap);
   }, { once:true });
 })();
