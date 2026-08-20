@@ -459,6 +459,39 @@
   .card-link .url{font-size:11.5px; color:var(--muted); font-weight:500; word-break:break-all;}
 
   /* ---- dashboard ---- */
+  .dash-panel{
+    background:var(--card);
+    border-radius:12px;
+    padding:18px 20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom:20px;
+  }
+  .dash-panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:14px;
+  }
+  .dash-panel-title{font-weight:800; font-size:15px;}
+  .dash-refresh{
+    background:none; border:none; color:var(--muted);
+    font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .dash-refresh:hover{color:var(--primary);}
+  .dash-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));
+    gap:12px;
+  }
+  .dash-stat-card{
+    background:var(--bg);
+    border-radius:10px;
+    padding:14px 12px;
+    text-align:center;
+  }
+  .dash-stat-card .dash-stat-num{font-size:24px; font-weight:800; color:var(--primary-dark); line-height:1;}
+  .dash-stat-card .dash-stat-lbl{font-size:10.5px; color:var(--muted); font-weight:700; margin-top:6px; text-transform:uppercase; letter-spacing:0.03em;}
+  .dash-stat-card.sudah .dash-stat-num{color:#16a34a;}
+  .dash-stat-card.berjalan .dash-stat-num{color:#b45309;}
+  .dash-stat-card.belum .dash-stat-num{color:#dc2626;}
   .dash-group{margin-bottom:22px;}
   .dash-group-title{
     font-size:12.5px; font-weight:800; color:var(--primary-dark);
@@ -678,6 +711,25 @@
 
   <!-- ================= SECTION: DASHBOARD ================= -->
   <section class="section active" id="section-dashboard">
+
+    <div class="dash-panel">
+      <div class="dash-panel-head">
+        <div class="dash-panel-title">📊 Ringkasan Ujian</div>
+        <button class="dash-refresh" onclick="muatDaftar()">↻ Muat Ulang</button>
+      </div>
+      <div class="dash-stats" id="dashStats">
+        <div class="status-msg">Memuat ringkasan...</div>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dash-panel-head">
+        <div class="dash-panel-title">⚠️ Perlu Perhatian</div>
+      </div>
+      <ul class="list" id="dashPerhatian">
+        <li class="status-msg">Memuat data...</li>
+      </ul>
+    </div>
 
     <div class="dash-group">
       <div class="dash-group-title">Ujian</div>
@@ -1520,6 +1572,7 @@ async function muatDaftar(){
 
     renderDaftar();
     populateGeLinkPilih();
+    muatDashboard();
 
   } catch(err){
     console.error(err);
@@ -1562,51 +1615,163 @@ function renderDaftar(){
   cocok.forEach((f, i) => cekStatusFile(f, i));
 }
 
+// ======================================================
+// STATUS UJIAN (dicache supaya badge daftar & dashboard berbagi hasil yang sama)
+// ======================================================
+let statusUjianPromise = {};
+let statusUjianResolved = {};
+
+function ambilStatusUjian(f){
+  if(statusUjianPromise[f.name]) return statusUjianPromise[f.name];
+
+  const p = (async () => {
+    if(!f.namaUjian){
+      return { total:0, sudah:0, belum:0, badgeText:"Belum terhubung rekap", badgeClass:"nodata" };
+    }
+
+    try{
+      const resRekap = await fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(f.namaUjian));
+      const jsonRekap = await resRekap.json();
+
+      if(jsonRekap.status !== "success"){
+        return { total:0, sudah:0, belum:0, badgeText:"Gagal cek status", badgeClass:"nodata" };
+      }
+
+      let total = 0, sudah = 0;
+      Object.values(jsonRekap.data || {}).forEach(list => {
+        total += list.length;
+        sudah += list.filter(s => s.sudah).length;
+      });
+      const belum = total - sudah;
+
+      if(total === 0){
+        return { total, sudah, belum, badgeText:"Belum ada data siswa", badgeClass:"nodata" };
+      } else if(sudah === 0){
+        return { total, sudah, belum, badgeText:"Belum ada yang mengerjakan", badgeClass:"kosong" };
+      } else if(sudah === total){
+        return { total, sudah, belum, badgeText:`Selesai (${sudah}/${total})`, badgeClass:"penuh" };
+      } else {
+        return { total, sudah, belum, badgeText:`${sudah}/${total} mengerjakan`, badgeClass:"parsial" };
+      }
+
+    } catch(err){
+      console.error(err);
+      return { total:0, sudah:0, belum:0, badgeText:"Gagal cek status", badgeClass:"nodata" };
+    }
+  })();
+
+  statusUjianPromise[f.name] = p;
+  p.then(hasil => { statusUjianResolved[f.name] = hasil; });
+  return p;
+}
+
 async function cekStatusFile(f, i){
   const badge = document.getElementById(`status-${i}`);
   if(!badge) return;
 
-  if(!f.namaUjian){
-    badge.textContent = "Belum terhubung rekap";
-    badge.className = "status nodata";
+  const hasil = await ambilStatusUjian(f);
+  badge.textContent = hasil.badgeText;
+  badge.className = "status " + hasil.badgeClass;
+}
+
+// ======================================================
+// DASHBOARD: ringkasan statistik & daftar "perlu perhatian"
+// ======================================================
+async function muatDashboard(){
+  const statBox = document.getElementById("dashStats");
+  const perhatianBox = document.getElementById("dashPerhatian");
+  if(!statBox || !perhatianBox) return;
+
+  if(semuaFile.length === 0){
+    statBox.innerHTML = '<div class="status-msg">Belum ada ujian terdeteksi.</div>';
+    perhatianBox.innerHTML = '<li class="status-msg">Belum ada ujian terdeteksi.</li>';
     return;
   }
 
-  try{
-    const resRekap = await fetch(scriptURL + "?action=rekap&ujian=" + encodeURIComponent(f.namaUjian));
-    const jsonRekap = await resRekap.json();
+  await Promise.all(semuaFile.map(f => ambilStatusUjian(f)));
+  renderDashboardStats();
+}
 
-    if(jsonRekap.status !== "success"){
-      badge.textContent = "Gagal cek status";
-      badge.className = "status nodata";
-      return;
-    }
+function renderDashboardStats(){
+  const statBox = document.getElementById("dashStats");
+  const perhatianBox = document.getElementById("dashPerhatian");
+  if(!statBox || !perhatianBox) return;
 
-    let total = 0, sudah = 0;
-    Object.values(jsonRekap.data || {}).forEach(list => {
-      total += list.length;
-      sudah += list.filter(s => s.sudah).length;
-    });
+  const totalUjian = semuaFile.length;
+  const jumlahIPS = semuaFile.filter(f => f.subjek === "ips").length;
+  const jumlahInformatika = semuaFile.filter(f => f.subjek === "informatika").length;
 
-    if(total === 0){
-      badge.textContent = "Belum ada data siswa";
-      badge.className = "status nodata";
-    } else if(sudah === 0){
-      badge.textContent = "Belum ada yang mengerjakan";
-      badge.className = "status kosong";
-    } else if(sudah === total){
-      badge.textContent = `Selesai (${sudah}/${total})`;
-      badge.className = "status penuh";
-    } else {
-      badge.textContent = `${sudah}/${total} mengerjakan`;
-      badge.className = "status parsial";
-    }
+  let jumlahSelesai = 0, jumlahBerjalan = 0, jumlahBelumMulai = 0;
+  semuaFile.forEach(f => {
+    const s = statusUjianResolved[f.name];
+    if(!s) return;
+    if(s.badgeClass === "penuh") jumlahSelesai++;
+    else if(s.badgeClass === "parsial") jumlahBerjalan++;
+    else if(s.badgeClass === "kosong") jumlahBelumMulai++;
+  });
 
-  } catch(err){
-    console.error(err);
-    badge.textContent = "Gagal cek status";
-    badge.className = "status nodata";
+  statBox.innerHTML = `
+    <div class="dash-stat-card">
+      <div class="dash-stat-num">${totalUjian}</div>
+      <div class="dash-stat-lbl">Total Ujian</div>
+    </div>
+    <div class="dash-stat-card">
+      <div class="dash-stat-num">${jumlahIPS} / ${jumlahInformatika}</div>
+      <div class="dash-stat-lbl">IPS / Informatika</div>
+    </div>
+    <div class="dash-stat-card sudah">
+      <div class="dash-stat-num">${jumlahSelesai}</div>
+      <div class="dash-stat-lbl">Selesai Semua</div>
+    </div>
+    <div class="dash-stat-card berjalan">
+      <div class="dash-stat-num">${jumlahBerjalan}</div>
+      <div class="dash-stat-lbl">Sedang Berjalan</div>
+    </div>
+    <div class="dash-stat-card belum">
+      <div class="dash-stat-num">${jumlahBelumMulai}</div>
+      <div class="dash-stat-lbl">Belum Mulai</div>
+    </div>
+  `;
+
+  const perluPerhatian = semuaFile.filter(f => {
+    const s = statusUjianResolved[f.name];
+    return s && (s.badgeClass === "kosong" || s.badgeClass === "parsial");
+  });
+
+  if(perluPerhatian.length === 0){
+    perhatianBox.innerHTML = '<li class="status-msg">Tidak ada ujian yang perlu perhatian saat ini 🎉</li>';
+    return;
   }
+
+  perhatianBox.innerHTML = perluPerhatian.map(f => {
+    const s = statusUjianResolved[f.name];
+    const namaUjianAman = (f.namaUjian || "").replace(/'/g, "\\'");
+    return `
+      <a class="item" href="#" onclick="bukaLaporanDari('${namaUjianAman}'); return false;">
+        <div class="icon">${f.subjek === "informatika" ? "💻" : "📝"}</div>
+        <div class="info">
+          <div class="nama">${f.judul}</div>
+          <div class="meta">
+            <span class="subjek-tag">${f.subjek === "informatika" ? "Informatika" : "IPS"}</span>
+          </div>
+        </div>
+        <span class="status ${s.badgeClass}">${s.badgeText}</span>
+        <div class="arrow">→</div>
+      </a>
+    `;
+  }).join("");
+}
+
+function bukaLaporanDari(namaUjian){
+  pindahSection("laporan");
+  if(!namaUjian) return;
+  setTimeout(() => {
+    const sel = document.getElementById("lapUjian");
+    if(sel && [...sel.options].some(o => o.value === namaUjian)){
+      sel.value = namaUjian;
+      muatLaporan();
+    }
+  }, 300);
 }
 
 document.getElementById("cari").addEventListener("input", renderDaftar);
