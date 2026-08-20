@@ -32,6 +32,20 @@
     --primary-light:#fffbeb;
   }
 
+  body.dark{
+    --bg:#0b1220;
+    --card:#182234;
+    --ink:#e5e7eb;
+    --muted:#94a3b8;
+    --line:#2b3a52;
+  }
+  body.dark .status.checking,
+  body.dark .status.kosong,
+  body.dark .status.nodata{ background:#1f2b40; }
+  body.dark input[type=text], body.dark textarea, body.dark select{
+    color:var(--ink);
+  }
+
   *{box-sizing:border-box;}
 
   body{
@@ -56,14 +70,41 @@
     position:fixed;
     top:0; left:0; bottom:0;
     overflow-y:auto;
+    transform:translateX(0);
     transition:transform 0.25s ease;
     z-index:100;
   }
+  .sidebar.closed{
+    transform:translateX(-100%);
+  }
+
+  /* ============ TOMBOL BURGER (buka/tutup sidebar) ============ */
+  #sidebarToggle{
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    border:none;
+    background:var(--primary-dark);
+    color:white;
+    font-size:19px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.25);
+    transition:background 0.15s;
+  }
+  #sidebarToggle:hover{ opacity:0.9; }
 
   .brand{
     display:flex;
     align-items:center;
     gap:12px;
+    cursor:pointer;
   }
   .brand .emoji{
     width:44px; height:44px;
@@ -148,12 +189,34 @@
   .theme-dot.coklat{background:#b45309;}
   .theme-dot.active{border-color:white; transform:scale(1.12);}
 
+  .mode-toggle{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1.5px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.07);
+    color:white;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .mode-toggle:hover{background:rgba(255,255,255,0.14);}
+
   /* ============ MAIN ============ */
   .main{
     flex:1;
     margin-left:270px;
     padding:26px 30px 60px;
     max-width:900px;
+    transition:margin-left 0.25s ease;
+  }
+  .main.full{
+    margin-left:0;
   }
 
   .topbar{
@@ -161,15 +224,6 @@
     align-items:center;
     justify-content:space-between;
     margin-bottom:22px;
-  }
-  .menu-toggle{
-    display:none;
-    background:var(--card);
-    border:1.5px solid var(--line);
-    border-radius:9px;
-    width:40px; height:40px;
-    font-size:18px;
-    cursor:pointer;
   }
   .page-title{
     font-size:23px;
@@ -400,8 +454,16 @@
     border:1.5px solid transparent;
   }
   .card-link:hover{border-color:var(--primary); transform:translateX(2px);}
+  .card-link.clickable{cursor:pointer;}
   .card-link .nama{font-weight:700; font-size:15px;}
   .card-link .url{font-size:11.5px; color:var(--muted); font-weight:500; word-break:break-all;}
+
+  /* ---- dashboard ---- */
+  .dash-group{margin-bottom:22px;}
+  .dash-group-title{
+    font-size:12.5px; font-weight:800; color:var(--primary-dark);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;
+  }
 
   /* ---- komponen generator (link berbagi, embed, WA, template) ---- */
   textarea.gen-output{
@@ -469,10 +531,7 @@
   .checklist-steps li.done .txt b{text-decoration:line-through;}
 
   @media (max-width:860px){
-    .sidebar{transform:translateX(-100%);}
-    .sidebar.open{transform:translateX(0);}
-    .main{margin-left:0; padding:20px 16px 60px;}
-    .menu-toggle{display:block;}
+    .main{margin-left:0 !important; padding:20px 16px 60px;}
   }
 
   @media (max-width:480px){
@@ -527,6 +586,8 @@
   <div class="tap-hint">klik untuk masuk</div>
 </div>
 
+<button id="sidebarToggle" title="Buka/tutup menu">☰</button>
+
 <aside class="sidebar" id="sidebar">
   <div class="brand">
     <div class="emoji">🎓</div>
@@ -542,8 +603,12 @@
   </div>
 
   <nav>
+    <button class="nav-item active" data-target="dashboard">
+      <span class="ic">🏠</span> Dashboard
+    </button>
+
     <div class="nav-group-label">Ujian</div>
-    <button class="nav-item active" data-target="beranda">
+    <button class="nav-item" data-target="beranda">
       <span class="ic">📝</span> Asesmen / Ujian
     </button>
     <button class="nav-item" data-target="laporan">
@@ -589,6 +654,10 @@
   </nav>
 
   <div class="sidebar-footer">
+    <button class="mode-toggle" id="modeToggle">
+      <span id="modeIcon">🌙</span> <span id="modeText">Mode Gelap</span>
+    </button>
+
     <div class="theme-label">Tema Warna</div>
     <div class="theme-picker">
       <div class="theme-dot biru active" data-theme="biru" title="Biru"></div>
@@ -602,14 +671,88 @@
 
   <div class="topbar">
     <div>
-      <div class="page-title" id="pageTitle">Asesmen / Ujian</div>
-      <div class="page-sub" id="pageSub">Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru.</div>
+      <div class="page-title" id="pageTitle">Dashboard</div>
+      <div class="page-sub" id="pageSub">Ringkasan seluruh menu yang tersedia di Portal Pak Agus.</div>
     </div>
-    <button class="menu-toggle" id="menuToggle">☰</button>
   </div>
 
+  <!-- ================= SECTION: DASHBOARD ================= -->
+  <section class="section active" id="section-dashboard">
+
+    <div class="dash-group">
+      <div class="dash-group-title">Ujian</div>
+      <div class="cards">
+        <div class="card-link clickable" onclick="pindahSection('beranda')">
+          <div class="icon">📝</div>
+          <div><div class="nama">Asesmen / Ujian</div><div class="url">Daftar semua ujian yang tersedia, otomatis terbaca dari repository GitHub.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('laporan')">
+          <div class="icon">📊</div>
+          <div><div class="nama">Laporan Ujian</div><div class="url">Status pengerjaan (sudah/belum) dan nilai lengkap setiap ujian.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('panduan')">
+          <div class="icon">📖</div>
+          <div><div class="nama">Panduan Buat Ujian</div><div class="url">Format penamaan ujian & cara membagikan rekap secara terbatas.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-group">
+      <div class="dash-group-title">Alat Bantu</div>
+      <div class="cards">
+        <div class="card-link clickable" onclick="pindahSection('genlink')">
+          <div class="icon">🔗</div>
+          <div><div class="nama">Generator Link Berbagi</div><div class="url">Buat link rekap yang dibatasi hanya untuk ujian & kelas tertentu.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('template')">
+          <div class="icon">🧾</div>
+          <div><div class="nama">Generator Soal</div><div class="url">Susun soal & kunci jawaban, langsung dapat kode HTML siap pakai.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('checklist')">
+          <div class="icon">✅</div>
+          <div><div class="nama">Checklist Deploy Ujian</div><div class="url">Langkah demi langkah agar tidak ada yang terlewat saat menerbitkan ujian baru.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('genembed')">
+          <div class="icon">🌐</div>
+          <div><div class="nama">Generator Embed Sites</div><div class="url">Buat kode instruksi pengerjaan soal untuk ditempel di Google Sites.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('genwa')">
+          <div class="icon">💬</div>
+          <div><div class="nama">Generator Pesan WA</div><div class="url">Buat pesan pengumuman tugas untuk dikirim ke grup kelas.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-group">
+      <div class="dash-group-title">Tautan Lain</div>
+      <div class="cards">
+        <div class="card-link clickable" onclick="pindahSection('ips')">
+          <div class="icon">🌐</div>
+          <div><div class="nama">Website IPS</div><div class="url">Materi & tugas IPS per jenjang kelas, dikelola lewat Google Sites.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('github')">
+          <div class="icon">💻</div>
+          <div><div class="nama">GitHub</div><div class="url">Repository dan profil yang menampung source code portal & ujian.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('administrasi')">
+          <div class="icon">🏫</div>
+          <div><div class="nama">Administrasi Sekolah</div><div class="url">Akses cepat ke sistem administrasi wali kelas, guru, dan sekolah.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('gas')">
+          <div class="icon">⚙️</div>
+          <div><div class="nama">Google Apps Script</div><div class="url">Backend yang mengelola pengiriman & rekap jawaban ujian.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('medsos')">
+          <div class="icon">📱</div>
+          <div><div class="nama">Media Sosial</div><div class="url">Kanal media sosial Gussno Edu — video pembelajaran & update terbaru.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
   <!-- ================= SECTION: BERANDA / UJIAN ================= -->
-  <section class="section active" id="section-beranda">
+  <section class="section" id="section-beranda">
 
     <div class="tabs" id="tabsSubjek">
       <button class="tab active" data-subjek="semua">Semua</button>
@@ -1153,17 +1296,25 @@ Setelah benar-benar paham, kerjakan soal asesmen yang linknya tersedia di bagian
 
 <script>
 // ======================================================
-// SPLASH SCREEN
+// SPLASH SCREEN (bisa dibuka lagi lewat klik judul di sidebar)
 // ======================================================
-(function(){
-  const splash = document.getElementById("splash");
-  if(!splash) return;
+const splash = document.getElementById("splash");
 
-  splash.addEventListener("click", function handleTap(){
-    splash.classList.add("hide");
-    splash.removeEventListener("click", handleTap);
-  }, { once:true });
-})();
+function tutupSplash(){
+  if(!splash) return;
+  splash.classList.add("hide");
+}
+function bukaSplash(){
+  if(!splash) return;
+  splash.classList.remove("hide");
+}
+if(splash){
+  splash.addEventListener("click", tutupSplash);
+}
+const brandEl = document.querySelector(".brand");
+if(brandEl){
+  brandEl.addEventListener("click", bukaSplash);
+}
 
 // ======================================================
 // JAM & TANGGAL DIGITAL REAL-TIME
@@ -1193,9 +1344,33 @@ document.querySelectorAll(".theme-dot").forEach(d => {
 terapkanTema(localStorage.getItem(KEY_THEME) || "biru");
 
 // ======================================================
+// MODE GELAP / TERANG (tersimpan di browser)
+// ======================================================
+const KEY_MODE = "portal_mode";
+const modeToggleBtn = document.getElementById("modeToggle");
+const modeIconEl = document.getElementById("modeIcon");
+const modeTextEl = document.getElementById("modeText");
+
+function terapkanMode(gelap){
+  document.body.classList.toggle("dark", gelap);
+  if(modeIconEl) modeIconEl.textContent = gelap ? "☀️" : "🌙";
+  if(modeTextEl) modeTextEl.textContent = gelap ? "Mode Terang" : "Mode Gelap";
+  try{ localStorage.setItem(KEY_MODE, gelap ? "1" : "0"); }catch(e){}
+}
+let modeGelapAktif = (localStorage.getItem(KEY_MODE) || "0") === "1";
+terapkanMode(modeGelapAktif);
+if(modeToggleBtn){
+  modeToggleBtn.addEventListener("click", () => {
+    modeGelapAktif = !modeGelapAktif;
+    terapkanMode(modeGelapAktif);
+  });
+}
+
+// ======================================================
 // NAVIGASI SIDEBAR (single page, tukar section)
 // ======================================================
 const JUDUL_HALAMAN = {
+  dashboard: { title:"Dashboard", sub:"Ringkasan seluruh menu yang tersedia di Portal Pak Agus." },
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
@@ -1211,24 +1386,57 @@ const JUDUL_HALAMAN = {
   medsos: { title:"Media Sosial", sub:"Kanal media sosial Gussno Edu — video pembelajaran & update terbaru." }
 };
 
+function pindahSection(target){
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.target === target));
+
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  const sec = document.getElementById("section-" + target);
+  if(sec) sec.classList.add("active");
+
+  document.getElementById("pageTitle").textContent = JUDUL_HALAMAN[target].title;
+  document.getElementById("pageSub").textContent = JUDUL_HALAMAN[target].sub;
+
+  if(!isDesktop()){ setSidebar(false); }
+}
+
 document.querySelectorAll(".nav-item").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const target = btn.dataset.target;
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById("section-" + target).classList.add("active");
-
-    document.getElementById("pageTitle").textContent = JUDUL_HALAMAN[target].title;
-    document.getElementById("pageSub").textContent = JUDUL_HALAMAN[target].sub;
-
-    document.getElementById("sidebar").classList.remove("open");
-  });
+  btn.addEventListener("click", () => pindahSection(btn.dataset.target));
 });
 
-document.getElementById("menuToggle").addEventListener("click", () => {
-  document.getElementById("sidebar").classList.toggle("open");
+// ======================================================
+// TOMBOL BURGER: BUKA/TUTUP SIDEBAR (desktop & mobile)
+// ======================================================
+const sidebarEl = document.getElementById("sidebar");
+const mainEl = document.querySelector(".main");
+const sidebarToggleBtn = document.getElementById("sidebarToggle");
+const KEY_SIDEBAR = "portal_sidebar";
+
+function isDesktop(){
+  return window.innerWidth > 860;
+}
+
+function setSidebar(open){
+  if(sidebarEl) sidebarEl.classList.toggle("closed", !open);
+  if(mainEl) mainEl.classList.toggle("full", isDesktop() && !open);
+  if(sidebarToggleBtn) sidebarToggleBtn.textContent = open ? "✕" : "☰";
+  if(isDesktop()){
+    try{ localStorage.setItem(KEY_SIDEBAR, open ? "1" : "0"); }catch(e){}
+  }
+}
+
+let sidebarTerbuka = isDesktop() ? (localStorage.getItem(KEY_SIDEBAR) !== "0") : false;
+setSidebar(sidebarTerbuka);
+
+if(sidebarToggleBtn){
+  sidebarToggleBtn.addEventListener("click", () => {
+    sidebarTerbuka = !sidebarTerbuka;
+    setSidebar(sidebarTerbuka);
+  });
+}
+
+window.addEventListener("resize", () => {
+  sidebarTerbuka = isDesktop() ? (localStorage.getItem(KEY_SIDEBAR) !== "0") : false;
+  setSidebar(sidebarTerbuka);
 });
 
 // ======================================================
