@@ -490,7 +490,7 @@
 
   // Tempel URL Web App Google Apps Script yang SAMA dengan yang dipakai
   // portal ujian online Anda (lihat PANDUAN-GABUNG-PORTAL.md).
-  var WEB_APP_URL = "PASTE_URL_WEB_APP_DI_SINI";
+  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
 
   // Daftar siswa TIDAK diketik manual di sini lagi — halaman ini otomatis
   // mengambilnya dari tab "Data_anak" di spreadsheet lewat ?action=siswa,
@@ -514,7 +514,7 @@
   var rosterLoaded = false;
   var submitting = false;
   var savingSettings = false;
-  var configured = WEB_APP_URL.indexOf("https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec") === -1;
+  var configured = WEB_APP_URL.indexOf("PASTE_URL") === -1;
 
   var DUPLICATE_MSG = "Tidak bisa submit. Gunakan jawabanmu sendiri.";
   var DEFAULT_FIELD_ERRORS = {
