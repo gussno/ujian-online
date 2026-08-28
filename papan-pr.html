@@ -258,6 +258,21 @@
   }
   .filter-input:focus { outline: 3px solid var(--turquoise); outline-offset: 1px; }
 
+  .soal-filter-row { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; flex-wrap: wrap; }
+  .soal-filter-row label { font-weight: 800; font-size: 12.5px; color: var(--ink-soft); }
+  .soal-filter-row select {
+    font: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 7px 12px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--ink);
+    max-width: 100%;
+  }
+  .soal-filter-row select:focus { outline: 3px solid var(--turquoise); outline-offset: 1px; }
+
   ul.entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 
   li.entry {
@@ -442,6 +457,13 @@
     <h2>Jawaban yang Sudah Masuk 📋</h2>
     <input type="text" class="filter-input" id="filter" placeholder="Cari nama, kelas, pelajaran..." />
   </div>
+  <div class="soal-filter-row">
+    <label for="soal-filter">Tampilkan untuk:</label>
+    <select id="soal-filter">
+      <option value="current">🟢 Soal aktif sekarang</option>
+      <option value="all">📚 Semua riwayat soal</option>
+    </select>
+  </div>
   <span class="count-chip" id="count-chip"></span>
 
   <div id="entries-container">
@@ -510,6 +532,8 @@
   var currentEntries = [];
   var currentMapel = "";
   var currentSoal = "";
+  var soalFilterMode = "current"; // "current" | "all" | kunci soal lama (lihat soalFilterMap)
+  var soalFilterMap = {};
   var SISWA_DATA = {};
   var rosterLoaded = false;
   var submitting = false;
@@ -640,11 +664,66 @@
     return '<ul class="entries" id="entries-list">' + html.join("") + '</ul>';
   }
 
+  // Kumpulkan soal-soal lama yang berbeda dari currentEntries (soal aktif tidak
+  // dimasukkan di sini karena sudah punya opsi "current" sendiri), urut dari yang
+  // paling baru dipakai.
+  function buildPastSoalList() {
+    var seen = {};
+    var list = [];
+    var sorted = sortedNewestFirst(currentEntries);
+    for (var i = 0; i < sorted.length; i++) {
+      var soal = sorted[i].soal || "";
+      if (!soal || soal === currentSoal || seen[soal]) continue;
+      seen[soal] = true;
+      list.push({ soal: soal, mapel: sorted[i].mapel || "" });
+    }
+    return list;
+  }
+
+  // Bangun ulang isi dropdown "Tampilkan untuk", sambil mempertahankan pilihan
+  // yang sedang aktif kalau masih relevan.
+  function renderSoalFilterOptions() {
+    var sel = document.getElementById("soal-filter");
+    if (!sel) return;
+    var keepValue = soalFilterMode;
+
+    soalFilterMap = {};
+    var html = ['<option value="current">🟢 Soal aktif sekarang</option>'];
+    html.push('<option value="all">📚 Semua riwayat soal</option>');
+
+    var pastList = buildPastSoalList();
+    for (var i = 0; i < pastList.length; i++) {
+      var key = "s" + i;
+      soalFilterMap[key] = pastList[i].soal;
+      var preview = pastList[i].soal.length > 60 ? pastList[i].soal.slice(0, 60) + "…" : pastList[i].soal;
+      var label = (pastList[i].mapel ? pastList[i].mapel + " — " : "") + preview;
+      html.push('<option value="' + key + '">' + escapeHtml(label) + '</option>');
+    }
+
+    sel.innerHTML = html.join("");
+
+    var stillValid = keepValue === "current" || keepValue === "all" || soalFilterMap.hasOwnProperty(keepValue);
+    sel.value = stillValid ? keepValue : "current";
+    soalFilterMode = sel.value;
+  }
+
+  function getFilteredEntries() {
+    if (soalFilterMode === "all") return currentEntries;
+    var targetSoal = soalFilterMode === "current" ? currentSoal : (soalFilterMap[soalFilterMode] || currentSoal);
+    return currentEntries.filter(function (e) { return e.soal === targetSoal; });
+  }
+
   function renderEntries() {
+    renderSoalFilterOptions();
+    var filtered = getFilteredEntries();
     var container = document.getElementById("entries-container");
-    container.innerHTML = renderEntriesMarkup(currentEntries);
+    container.innerHTML = renderEntriesMarkup(filtered);
     var countChip = document.getElementById("count-chip");
-    countChip.textContent = currentEntries.length + (currentEntries.length === 1 ? " jawaban" : " jawaban");
+    var label = filtered.length + (filtered.length === 1 ? " jawaban" : " jawaban");
+    if (soalFilterMode !== "all" && filtered.length !== currentEntries.length) {
+      label += " (dari " + currentEntries.length + " total semua soal)";
+    }
+    countChip.textContent = label;
     applyFilter();
   }
 
@@ -902,6 +981,8 @@
       currentMapel = mapel;
       currentSoal = soal;
       renderMapelSoal();
+      soalFilterMode = "current"; // otomatis pindah ke soal baru, jawaban lama "tersembunyi" dari tampilan utama
+      renderEntries();
       showAdminBanner("success", "Pengaturan tersimpan!");
       setTimeout(closeAdminModal, 900);
     } catch (err) {
@@ -918,6 +999,10 @@
     });
     document.getElementById("pr-form").addEventListener("submit", handleSubmit);
     document.getElementById("filter").addEventListener("input", applyFilter);
+    document.getElementById("soal-filter").addEventListener("change", function () {
+      soalFilterMode = this.value;
+      renderEntries();
+    });
 
     document.getElementById("admin-toggle").addEventListener("click", openAdminModal);
     document.getElementById("admin-cancel").addEventListener("click", closeAdminModal);
