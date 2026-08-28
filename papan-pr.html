@@ -258,21 +258,6 @@
   }
   .filter-input:focus { outline: 3px solid var(--turquoise); outline-offset: 1px; }
 
-  .soal-filter-row { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; flex-wrap: wrap; }
-  .soal-filter-row label { font-weight: 800; font-size: 12.5px; color: var(--ink-soft); }
-  .soal-filter-row select {
-    font: inherit;
-    font-weight: 700;
-    font-size: 13px;
-    padding: 7px 12px;
-    border: 2px solid var(--line);
-    border-radius: 12px;
-    background: var(--card);
-    color: var(--ink);
-    max-width: 100%;
-  }
-  .soal-filter-row select:focus { outline: 3px solid var(--turquoise); outline-offset: 1px; }
-
   ul.entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 
   li.entry {
@@ -345,6 +330,8 @@
     border: none;
     cursor: pointer;
     padding: 6px 10px;
+    text-decoration: none;
+    display: inline-block;
   }
   .admin-toggle:hover { opacity: 1; color: var(--violet); }
 
@@ -366,36 +353,6 @@
     60% { opacity: 1; transform: scale(1) rotate(0deg); }
     100% { opacity: 0; transform: scale(1) rotate(0deg); }
   }
-
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(43,34,80,0.45);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 50;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal-panel {
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: 22px;
-    box-shadow: var(--shadow);
-    padding: 24px;
-    width: 100%;
-    max-width: 420px;
-  }
-  .modal-panel h3 {
-    font-family: "Baloo 2", ui-rounded, sans-serif;
-    font-weight: 700;
-    font-size: 19px;
-    margin: 0 0 4px;
-    color: var(--violet);
-  }
-  .modal-panel .modal-sub { margin: 0 0 16px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
-  .modal-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end; }
 
   @media (max-width: 520px) {
     .field-row { grid-template-columns: 1fr; }
@@ -457,13 +414,6 @@
     <h2>Jawaban yang Sudah Masuk 📋</h2>
     <input type="text" class="filter-input" id="filter" placeholder="Cari nama, kelas, pelajaran..." />
   </div>
-  <div class="soal-filter-row">
-    <label for="soal-filter">Tampilkan untuk:</label>
-    <select id="soal-filter">
-      <option value="current">🟢 Soal aktif sekarang</option>
-      <option value="all">📚 Semua riwayat soal</option>
-    </select>
-  </div>
   <span class="count-chip" id="count-chip"></span>
 
   <div id="entries-container">
@@ -472,35 +422,11 @@
   <p class="no-match" id="no-match">Tidak ada jawaban yang cocok dengan pencarian.</p>
 
   <footer class="note">
-    <button type="button" class="admin-toggle" id="admin-toggle">⚙️ Admin</button>
+    <a class="admin-toggle" id="admin-toggle" href="https://gussno.github.io/ujian-online/">⚙️ Admin</a>
   </footer>
 </div>
 
 <div class="celebrate" id="celebrate">🎉</div>
-
-<div class="modal-overlay" id="admin-modal">
-  <div class="modal-panel">
-    <h3>Panel Admin</h3>
-    <p class="modal-sub">Atur mata pelajaran &amp; soal yang tampil untuk siswa.</p>
-    <div id="admin-banner" class="banner" role="status" aria-live="polite"></div>
-    <div class="field">
-      <label for="admin-pin">Kode admin</label>
-      <input type="password" id="admin-pin" autocomplete="off" placeholder="Masukkan kode admin" />
-    </div>
-    <div class="field" style="margin-top:12px;">
-      <label for="admin-mapel">Mata pelajaran</label>
-      <input type="text" id="admin-mapel" autocomplete="off" maxlength="40" placeholder="mis. IPS" />
-    </div>
-    <div class="field" style="margin-top:12px;">
-      <label for="admin-soal">Soal</label>
-      <textarea id="admin-soal" maxlength="2000" placeholder="Tulis soal PR di sini..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button type="button" class="ghost" id="admin-cancel">Tutup</button>
-      <button type="button" class="submit" id="admin-save">Simpan</button>
-    </div>
-  </div>
-</div>
 
 <script>
 (function () {
@@ -512,7 +438,7 @@
 
   // Tempel URL Web App Google Apps Script yang SAMA dengan yang dipakai
   // portal ujian online Anda (lihat PANDUAN-GABUNG-PORTAL.md).
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+  var WEB_APP_URL = "PASTE_URL_WEB_APP_DI_SINI";
 
   // Daftar siswa TIDAK diketik manual di sini lagi — halaman ini otomatis
   // mengambilnya dari tab "Data_anak" di spreadsheet lewat ?action=siswa,
@@ -532,12 +458,9 @@
   var currentEntries = [];
   var currentMapel = "";
   var currentSoal = "";
-  var soalFilterMode = "current"; // "current" | "all" | kunci soal lama (lihat soalFilterMap)
-  var soalFilterMap = {};
   var SISWA_DATA = {};
   var rosterLoaded = false;
   var submitting = false;
-  var savingSettings = false;
   var configured = WEB_APP_URL.indexOf("PASTE_URL") === -1;
 
   var DUPLICATE_MSG = "Tidak bisa submit. Gunakan jawabanmu sendiri.";
@@ -664,66 +587,16 @@
     return '<ul class="entries" id="entries-list">' + html.join("") + '</ul>';
   }
 
-  // Kumpulkan soal-soal lama yang berbeda dari currentEntries (soal aktif tidak
-  // dimasukkan di sini karena sudah punya opsi "current" sendiri), urut dari yang
-  // paling baru dipakai.
-  function buildPastSoalList() {
-    var seen = {};
-    var list = [];
-    var sorted = sortedNewestFirst(currentEntries);
-    for (var i = 0; i < sorted.length; i++) {
-      var soal = sorted[i].soal || "";
-      if (!soal || soal === currentSoal || seen[soal]) continue;
-      seen[soal] = true;
-      list.push({ soal: soal, mapel: sorted[i].mapel || "" });
-    }
-    return list;
-  }
-
-  // Bangun ulang isi dropdown "Tampilkan untuk", sambil mempertahankan pilihan
-  // yang sedang aktif kalau masih relevan.
-  function renderSoalFilterOptions() {
-    var sel = document.getElementById("soal-filter");
-    if (!sel) return;
-    var keepValue = soalFilterMode;
-
-    soalFilterMap = {};
-    var html = ['<option value="current">🟢 Soal aktif sekarang</option>'];
-    html.push('<option value="all">📚 Semua riwayat soal</option>');
-
-    var pastList = buildPastSoalList();
-    for (var i = 0; i < pastList.length; i++) {
-      var key = "s" + i;
-      soalFilterMap[key] = pastList[i].soal;
-      var preview = pastList[i].soal.length > 60 ? pastList[i].soal.slice(0, 60) + "…" : pastList[i].soal;
-      var label = (pastList[i].mapel ? pastList[i].mapel + " — " : "") + preview;
-      html.push('<option value="' + key + '">' + escapeHtml(label) + '</option>');
-    }
-
-    sel.innerHTML = html.join("");
-
-    var stillValid = keepValue === "current" || keepValue === "all" || soalFilterMap.hasOwnProperty(keepValue);
-    sel.value = stillValid ? keepValue : "current";
-    soalFilterMode = sel.value;
-  }
-
-  function getFilteredEntries() {
-    if (soalFilterMode === "all") return currentEntries;
-    var targetSoal = soalFilterMode === "current" ? currentSoal : (soalFilterMap[soalFilterMode] || currentSoal);
-    return currentEntries.filter(function (e) { return e.soal === targetSoal; });
-  }
-
+  // Daftar jawaban yang ditampilkan SELALU hanya untuk soal PR yang sedang aktif
+  // (diatur oleh admin lewat tab Pengaturan_PR di spreadsheet). Siswa tidak bisa
+  // mengubah tampilan ini ke soal lain — jawaban PR sebelumnya tetap tersimpan
+  // aman di tab Jawaban_PR, hanya tidak ditampilkan di halaman ini lagi.
   function renderEntries() {
-    renderSoalFilterOptions();
-    var filtered = getFilteredEntries();
+    var filtered = currentEntries.filter(function (e) { return e.soal === currentSoal; });
     var container = document.getElementById("entries-container");
     container.innerHTML = renderEntriesMarkup(filtered);
     var countChip = document.getElementById("count-chip");
-    var label = filtered.length + (filtered.length === 1 ? " jawaban" : " jawaban");
-    if (soalFilterMode !== "all" && filtered.length !== currentEntries.length) {
-      label += " (dari " + currentEntries.length + " total semua soal)";
-    }
-    countChip.textContent = label;
+    countChip.textContent = filtered.length + (filtered.length === 1 ? " jawaban" : " jawaban");
     applyFilter();
   }
 
@@ -748,16 +621,6 @@
   }
   function hideBanner() {
     var b = document.getElementById("banner");
-    b.className = "banner";
-    b.textContent = "";
-  }
-  function showAdminBanner(kind, msg) {
-    var b = document.getElementById("admin-banner");
-    b.className = "banner show " + kind;
-    b.textContent = msg;
-  }
-  function hideAdminBanner() {
-    var b = document.getElementById("admin-banner");
     b.className = "banner";
     b.textContent = "";
   }
@@ -829,6 +692,7 @@
       currentMapel = (data.data && data.data.mapel) || "";
       currentSoal = (data.data && data.data.soal) || "";
       renderMapelSoal();
+      renderEntries(); // soal aktif baru diketahui di sini — render ulang supaya daftar jawaban ikut ter-filter dengan benar
     } catch (err) {
       document.getElementById("soal-text").textContent = "Gagal memuat soal. Coba muat ulang halaman.";
     }
@@ -928,88 +792,12 @@
     }
   }
 
-  function openAdminModal() {
-    hideAdminBanner();
-    document.getElementById("admin-pin").value = "";
-    document.getElementById("admin-mapel").value = currentMapel;
-    document.getElementById("admin-soal").value = currentSoal;
-    document.getElementById("admin-modal").classList.add("show");
-    if (!configured) {
-      showAdminBanner("warn", "WEB_APP_URL belum diisi, pengaturan tidak bisa disimpan dari sini.");
-    }
-  }
-  function closeAdminModal() {
-    document.getElementById("admin-modal").classList.remove("show");
-  }
-
-  async function handleAdminSave() {
-    if (savingSettings) return;
-    hideAdminBanner();
-
-    if (!configured) {
-      showAdminBanner("warn", "WEB_APP_URL belum diisi, pengaturan tidak bisa disimpan dari sini.");
-      return;
-    }
-
-    var pin = document.getElementById("admin-pin").value;
-    var mapel = document.getElementById("admin-mapel").value.trim();
-    var soal = document.getElementById("admin-soal").value.trim();
-
-    if (!pin) {
-      showAdminBanner("error", "Masukkan kode admin dulu.");
-      return;
-    }
-    if (!mapel || !soal) {
-      showAdminBanner("error", "Mata pelajaran dan soal wajib diisi.");
-      return;
-    }
-
-    savingSettings = true;
-    var saveBtn = document.getElementById("admin-save");
-    saveBtn.disabled = true;
-    showAdminBanner("info", "Menyimpan...");
-
-    try {
-      var res = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ type: "prSettings", pin: pin, mapel: mapel, soal: soal })
-      });
-      var result = await res.json();
-      if (result.status !== "success") throw new Error(result.message || "Gagal menyimpan pengaturan");
-
-      currentMapel = mapel;
-      currentSoal = soal;
-      renderMapelSoal();
-      soalFilterMode = "current"; // otomatis pindah ke soal baru, jawaban lama "tersembunyi" dari tampilan utama
-      renderEntries();
-      showAdminBanner("success", "Pengaturan tersimpan!");
-      setTimeout(closeAdminModal, 900);
-    } catch (err) {
-      showAdminBanner("error", String(err.message || err));
-    } finally {
-      saveBtn.disabled = false;
-      savingSettings = false;
-    }
-  }
-
   function init() {
     document.getElementById("kelas").addEventListener("change", function () {
       populateNamaOptions(this.value);
     });
     document.getElementById("pr-form").addEventListener("submit", handleSubmit);
     document.getElementById("filter").addEventListener("input", applyFilter);
-    document.getElementById("soal-filter").addEventListener("change", function () {
-      soalFilterMode = this.value;
-      renderEntries();
-    });
-
-    document.getElementById("admin-toggle").addEventListener("click", openAdminModal);
-    document.getElementById("admin-cancel").addEventListener("click", closeAdminModal);
-    document.getElementById("admin-save").addEventListener("click", handleAdminSave);
-    document.getElementById("admin-modal").addEventListener("click", function (evt) {
-      if (evt.target === this) closeAdminModal();
-    });
 
     var entriesContainer = document.getElementById("entries-container");
     entriesContainer.addEventListener("copy", function (evt) {
