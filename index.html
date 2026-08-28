@@ -759,9 +759,12 @@
       <span class="ic">📖</span> Panduan Buat Ujian
     </button>
 
-    <div class="nav-group-label">PR</div>
-    <button class="nav-item" data-target="pr">
-      <span class="ic">📋</span> Papan PR
+    <div class="nav-group-label">Papan PR</div>
+    <button class="nav-item" data-target="prhasil">
+      <span class="ic">📋</span> Hasil PR
+    </button>
+    <button class="nav-item" data-target="prbuat">
+      <span class="ic">📝</span> Buat PR Baru
     </button>
 
     <div class="nav-group-label">Alat Bantu</div>
@@ -870,11 +873,15 @@
     </div>
 
     <div class="dash-group">
-      <div class="dash-group-title">PR</div>
+      <div class="dash-group-title">Papan PR</div>
       <div class="cards">
-        <div class="card-link clickable" onclick="pindahSection('pr')">
+        <div class="card-link clickable" onclick="pindahSection('prhasil')">
           <div class="icon">📋</div>
-          <div><div class="nama">Papan PR</div><div class="url">Pantau siapa sudah/belum submit PR per kelas, dan atur mata pelajaran & soal aktif untuk siswa.</div></div>
+          <div><div class="nama">Hasil PR</div><div class="url">Pantau siapa sudah/belum submit PR per kelas.</div></div>
+        </div>
+        <div class="card-link clickable" onclick="pindahSection('prbuat')">
+          <div class="icon">📝</div>
+          <div><div class="nama">Buat PR Baru</div><div class="url">Buat soal PR baru, atau kelola & aktifkan soal-soal yang sudah pernah dibuat.</div></div>
         </div>
       </div>
     </div>
@@ -1140,8 +1147,8 @@
 
   </section>
 
-  <!-- ================= SECTION: PAPAN PR ================= -->
-  <section class="section" id="section-pr">
+  <!-- ================= SECTION: HASIL PR ================= -->
+  <section class="section" id="section-prhasil">
 
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap;">
@@ -1175,35 +1182,33 @@
       </div>
     </div>
 
-    <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">✅ Sudah Submit</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Kelas</th>
-              <th>Waktu</th>
-              <th>Jawaban</th>
-            </tr>
-          </thead>
-          <tbody id="prTbodySudah">
-            <tr><td colspan="4" class="lap-empty">Memuat data...</td></tr>
-          </tbody>
-        </table>
+    <div class="cols">
+      <div class="panel">
+        <div class="col-title">
+          <span class="label"><span class="dot sudah"></span>Sudah Submit (<span id="prCountSudah">0</span>)</span>
+        </div>
+        <ul class="lap-list" id="prListSudah">
+          <li class="lap-empty">Memuat data...</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="col-title">
+          <span class="label"><span class="dot belum"></span>Belum Submit (<span id="prCountBelum">0</span>)</span>
+        </div>
+        <ul class="lap-list" id="prListBelum">
+          <li class="lap-empty">Memuat data...</li>
+        </ul>
       </div>
     </div>
 
-    <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">❌ Belum Submit</div>
-      <ul class="lap-list" id="prListBelum">
-        <li class="lap-empty">Memuat data...</li>
-      </ul>
-    </div>
+  </section>
 
-    <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:6px;">🔐 Atur Soal Aktif</div>
-      <div class="gen-row hint" style="margin-top:0; margin-bottom:16px;">Isi mata pelajaran & soal baru di sini untuk mengganti soal aktif yang dilihat semua siswa. Perlu kode admin.</div>
+  <!-- ================= SECTION: BUAT PR BARU ================= -->
+  <section class="section" id="section-prbuat">
+
+    <div class="panel" id="prFormSoalPanel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:6px;" id="prFormJudul">📝 Buat Soal Baru</div>
+      <div class="gen-row hint" style="margin-top:0; margin-bottom:16px;">Soal yang dibuat/diaktifkan di sini akan langsung tampil di halaman Papan Jawaban PR untuk siswa. Perlu kode admin untuk setiap perubahan.</div>
 
       <div class="gen-row">
         <label for="prAdminMapel">Mata Pelajaran</label>
@@ -1217,8 +1222,30 @@
         <label for="prAdminPin">Kode Admin</label>
         <input type="text" id="prAdminPin" placeholder="Kode admin" style="max-width:180px;">
       </div>
-      <button class="btn btn-primary" onclick="simpanSoalPR()">💾 Simpan Soal Baru</button>
+
+      <div class="toggle-row" id="prAktifkanRow">
+        <input type="checkbox" id="prAdminAktifkan" checked>
+        <div class="txt">
+          <b>Langsung aktifkan soal ini</b>
+          <span>Kalau dicentang, soal ini langsung ditampilkan ke siswa menggantikan soal aktif sebelumnya.</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary" id="prBtnSimpanSoal" onclick="simpanSoalPR()">💾 Simpan Soal Baru</button>
+        <button class="btn btn-outline" id="prBtnBatalEdit" onclick="batalEditSoalPR()" style="display:none;">✕ Batal Edit</button>
+      </div>
       <div class="gen-row hint" id="prAdminPesan" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="font-weight:800; font-size:15px;">🗂️ Daftar Soal</div>
+        <button class="btn btn-outline" onclick="muatDaftarSoalPR()">↻ Muat Ulang</button>
+      </div>
+      <div class="cards" id="prDaftarSoalBox">
+        <div class="status-msg">Memuat daftar soal...</div>
+      </div>
     </div>
 
   </section>
@@ -1745,7 +1772,8 @@ const JUDUL_HALAMAN = {
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
-  pr: { title:"Papan PR", sub:"Pantau siapa sudah/belum submit PR per kelas, dan atur mata pelajaran & soal aktif untuk siswa." },
+  prhasil: { title:"Hasil PR", sub:"Pantau siapa sudah/belum submit PR per kelas." },
+  prbuat: { title:"Buat PR Baru", sub:"Buat soal PR baru, atau kelola & aktifkan soal-soal yang sudah pernah dibuat." },
   genlink: { title:"Generator Link Berbagi", sub:"Buat link Rekap Pengerjaan yang dibatasi hanya ke ujian & kelas tertentu." },
   template: { title:"Generator Soal", sub:"Isi data ujian & soal, langsung dapat kode HTML siap disalin — tanpa perlu utak-atik kode manual." },
   checklist: { title:"Checklist Deploy Ujian Baru", sub:"Langkah-langkah supaya tidak ada yang terlewat saat menerbitkan ujian baru." },
@@ -2495,7 +2523,7 @@ inputLapCari.addEventListener("input", renderLaporan);
 muatDaftarUjianLaporan();
 
 // ======================================================
-// PAPAN PR — tampilan GURU: siapa sudah/belum submit + atur soal aktif
+// HASIL PR — tampilan GURU: siapa sudah/belum submit (2 kolom, hemat tempat)
 // (siswa mengisi jawaban lewat halaman terpisah papan-pr.html)
 // ======================================================
 let prSoalAktifSaatIni = { mapel:"", soal:"" };
@@ -2539,7 +2567,7 @@ async function muatSoalAktifPR(){
         '<div style="font-size:14.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; margin-top:8px;">' + escapeHtmlSoal(json.data.soal) + '</div>';
     } else {
       prSoalAktifSaatIni = { mapel:"", soal:"" };
-      box.innerHTML = '<div class="status-msg">Belum ada soal aktif. Isi lewat panel "Atur Soal Aktif" di bawah.</div>';
+      box.innerHTML = '<div class="status-msg">Belum ada soal aktif. Buat lewat menu "Buat PR Baru".</div>';
     }
   } catch(err){
     console.error(err);
@@ -2558,11 +2586,11 @@ async function muatJawabanPR(){
   }
 }
 
-// Gabungkan roster + jawaban -> render kartu ringkasan, tabel sudah submit, daftar belum submit
+// Gabungkan roster + jawaban -> render kartu ringkasan + 2 kolom (sudah/belum submit)
 function renderRingkasanPR(){
-  const tbodySudah = document.getElementById("prTbodySudah");
+  const listSudah = document.getElementById("prListSudah");
   const listBelum = document.getElementById("prListBelum");
-  if(!tbodySudah || !listBelum) return;
+  if(!listSudah || !listBelum) return;
 
   const kelasFilter = document.getElementById("prFilterKelas").value || "SEMUA";
   const kataKunci = document.getElementById("prFilterCari").value.trim().toUpperCase();
@@ -2582,14 +2610,14 @@ function renderRingkasanPR(){
   const kelasList = kelasFilter === "SEMUA" ? Object.keys(prRosterSemua).sort() : [kelasFilter];
 
   let totalSemua = 0, sudahSemua = 0;
-  let barisSudah = [];
-  let htmlBelum = "";
+  let htmlSudah = "", htmlBelum = "";
 
   kelasList.forEach(kelas => {
     const siswaKelas = prRosterSemua[kelas] || [];
     const cocok = siswaKelas.filter(nama => !kataKunci || nama.toUpperCase().includes(kataKunci));
     if(cocok.length === 0) return;
 
+    const sudahList = [];
     const belumList = [];
 
     cocok.forEach(nama => {
@@ -2598,11 +2626,26 @@ function renderRingkasanPR(){
       const info = submitted[key];
       if(info){
         sudahSemua++;
-        barisSudah.push({ nama, kelas, waktu: info.waktu, jawaban: info.jawaban });
+        sudahList.push({ nama, waktu: info.waktu, jawaban: info.jawaban });
       } else {
         belumList.push(nama);
       }
     });
+
+    if(sudahList.length > 0){
+      htmlSudah += '<li class="lap-kelas-heading">' + kelas + '</li>';
+      sudahList.forEach(s => {
+        htmlSudah += `
+          <li class="lap-item sudah" style="flex-direction:column; align-items:flex-start; gap:4px;">
+            <div style="display:flex; justify-content:space-between; width:100%; gap:8px;">
+              <span style="font-weight:700;">${escapeHtmlSoal(s.nama)}</span>
+              <span style="font-size:11px; color:var(--muted); font-weight:600; white-space:nowrap;">${formatWaktuLaporan(s.waktu)}</span>
+            </div>
+            <div style="font-size:13px; font-weight:500; white-space:pre-wrap;">${escapeHtmlSoal(s.jawaban)}</div>
+          </li>
+        `;
+      });
+    }
 
     if(belumList.length > 0){
       htmlBelum += '<li class="lap-kelas-heading">' + kelas + '</li>';
@@ -2617,20 +2660,13 @@ function renderRingkasanPR(){
   document.getElementById("prStatTotal").textContent = totalSemua;
   document.getElementById("prStatSudah").textContent = sudahSemua;
   document.getElementById("prStatBelum").textContent = belumSemua;
+  document.getElementById("prCountSudah").textContent = sudahSemua;
+  document.getElementById("prCountBelum").textContent = belumSemua;
 
   if(!prSoalAktifSaatIni.soal){
-    tbodySudah.innerHTML = '<tr><td colspan="4" class="lap-empty">Belum ada soal aktif.</td></tr>';
-  } else if(barisSudah.length === 0){
-    tbodySudah.innerHTML = '<tr><td colspan="4" class="lap-empty">Belum ada yang submit untuk soal ini.</td></tr>';
+    listSudah.innerHTML = '<li class="lap-empty">Belum ada soal aktif.</li>';
   } else {
-    tbodySudah.innerHTML = barisSudah.map(b => `
-      <tr>
-        <td>${escapeHtmlSoal(b.nama)}</td>
-        <td>${escapeHtmlSoal(b.kelas)}</td>
-        <td>${formatWaktuLaporan(b.waktu)}</td>
-        <td style="white-space:pre-wrap;">${escapeHtmlSoal(b.jawaban)}</td>
-      </tr>
-    `).join("");
+    listSudah.innerHTML = htmlSudah || '<li class="lap-empty">Belum ada yang submit untuk soal ini.</li>';
   }
 
   listBelum.innerHTML = htmlBelum || '<li class="lap-empty">Semua siswa sudah submit 🎉</li>';
@@ -2648,10 +2684,94 @@ const prFilterCariEl = document.getElementById("prFilterCari");
 if(prFilterKelasEl) prFilterKelasEl.addEventListener("change", renderRingkasanPR);
 if(prFilterCariEl) prFilterCariEl.addEventListener("input", renderRingkasanPR);
 
+muatRingkasanPR();
+
+// ======================================================
+// BUAT PR BARU — kelola bank soal (tambah/edit/hapus/aktifkan)
+// ======================================================
+let prDaftarSoalSemua = [];
+let prEditingId = null;
+
+function ambilPinAdminPR(){
+  return document.getElementById("prAdminPin").value.trim();
+}
+
+async function muatDaftarSoalPR(){
+  const box = document.getElementById("prDaftarSoalBox");
+  if(!box) return;
+  box.innerHTML = '<div class="status-msg">Memuat daftar soal...</div>';
+  try{
+    const res = await fetch(scriptURL + "?action=prSoalList");
+    const json = await res.json();
+    if(json.status !== "success"){
+      box.innerHTML = '<div class="status-msg error">Gagal memuat daftar soal.</div>';
+      return;
+    }
+    prDaftarSoalSemua = json.data || [];
+    renderDaftarSoalPR();
+  } catch(err){
+    console.error(err);
+    box.innerHTML = '<div class="status-msg error">Gagal memuat daftar soal.</div>';
+  }
+}
+
+function renderDaftarSoalPR(){
+  const box = document.getElementById("prDaftarSoalBox");
+  if(!box) return;
+
+  if(prDaftarSoalSemua.length === 0){
+    box.innerHTML = '<div class="status-msg">Belum ada soal yang dibuat.</div>';
+    return;
+  }
+
+  box.innerHTML = prDaftarSoalSemua.map(item => `
+    <div class="card-link" style="cursor:default; flex-direction:column; align-items:flex-start; gap:10px;">
+      <div style="width:100%;">
+        <span class="subjek-tag">${escapeHtmlSoal(item.mapel)}</span>
+        ${item.aktif ? '<span class="status penuh" style="margin-left:6px;">Aktif</span>' : ''}
+        <div style="font-size:14px; font-weight:600; margin-top:8px; white-space:pre-wrap;">${escapeHtmlSoal(item.soal)}</div>
+        <div style="font-size:11.5px; color:var(--muted); font-weight:600; margin-top:6px;">${formatWaktuLaporan(item.waktu)}</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        ${item.aktif ? '' : `<button class="btn-copy" onclick="aktifkanSoalPR('${item.id}')">▶️ Aktifkan</button>`}
+        <button class="btn-copy" onclick="mulaiEditSoalPR('${item.id}')">✏️ Edit</button>
+        <button class="btn-copy" onclick="hapusSoalPR('${item.id}')">🗑️ Hapus</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function mulaiEditSoalPR(id){
+  const item = prDaftarSoalSemua.find(x => x.id === id);
+  if(!item) return;
+  prEditingId = id;
+  document.getElementById("prAdminMapel").value = item.mapel;
+  document.getElementById("prAdminSoal").value = item.soal;
+  document.getElementById("prFormJudul").textContent = "✏️ Edit Soal";
+  document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Perubahan";
+  document.getElementById("prBtnBatalEdit").style.display = "inline-flex";
+  document.getElementById("prAktifkanRow").style.display = "none";
+  document.getElementById("prAdminPesan").textContent = "";
+  const panel = document.getElementById("prFormSoalPanel");
+  if(panel) panel.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function batalEditSoalPR(){
+  prEditingId = null;
+  document.getElementById("prAdminMapel").value = "";
+  document.getElementById("prAdminSoal").value = "";
+  document.getElementById("prFormJudul").textContent = "📝 Buat Soal Baru";
+  document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Soal Baru";
+  document.getElementById("prBtnBatalEdit").style.display = "none";
+  document.getElementById("prAktifkanRow").style.display = "flex";
+  document.getElementById("prAdminPesan").textContent = "";
+}
+
 async function simpanSoalPR(){
   const mapel = document.getElementById("prAdminMapel").value.trim();
   const soal = document.getElementById("prAdminSoal").value.trim();
-  const pin = document.getElementById("prAdminPin").value.trim();
+  const pin = ambilPinAdminPR();
+  const aktifkan = document.getElementById("prAdminAktifkan").checked;
   const pesanEl = document.getElementById("prAdminPesan");
 
   pesanEl.textContent = "";
@@ -2660,20 +2780,29 @@ async function simpanSoalPR(){
   if(!mapel || !soal){ pesanEl.textContent = "Mata pelajaran & soal wajib diisi."; pesanEl.style.color = "#dc2626"; return; }
   if(!pin){ pesanEl.textContent = "Masukkan kode admin."; pesanEl.style.color = "#dc2626"; return; }
 
+  const btn = document.getElementById("prBtnSimpanSoal");
+  btn.disabled = true;
+  btn.textContent = "Menyimpan...";
+
   try{
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify({ type:"prSettings", mapel, soal, pin })
-    });
+    const body = prEditingId
+      ? { type:"prSoalEdit", id: prEditingId, mapel, soal, pin }
+      : { type:"prSoalTambah", mapel, soal, pin, aktifkan };
+
+    const res = await fetch(scriptURL, { method:"POST", body: JSON.stringify(body) });
     const json = await res.json();
 
     if(json.status === "success"){
-      pesanEl.textContent = "✅ Soal baru berhasil disimpan.";
+      pesanEl.textContent = prEditingId ? "✅ Perubahan berhasil disimpan." : "✅ Soal baru berhasil disimpan.";
       pesanEl.style.color = "#16a34a";
-      document.getElementById("prAdminPin").value = "";
-      await muatSoalAktifPR();
-      await muatJawabanPR();
-      renderRingkasanPR();
+      const sedangEdit = !!prEditingId;
+      batalEditSoalPR();
+      await muatDaftarSoalPR();
+      if(!sedangEdit && aktifkan){
+        await muatSoalAktifPR();
+        await muatJawabanPR();
+        renderRingkasanPR();
+      }
     } else {
       pesanEl.textContent = "⚠️ " + (json.message || "Gagal menyimpan.");
       pesanEl.style.color = "#dc2626";
@@ -2682,10 +2811,64 @@ async function simpanSoalPR(){
     console.error(err);
     pesanEl.textContent = "Gagal terhubung ke server.";
     pesanEl.style.color = "#dc2626";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prEditingId ? "💾 Simpan Perubahan" : "💾 Simpan Soal Baru";
   }
 }
 
-muatRingkasanPR();
+async function hapusSoalPR(id){
+  const item = prDaftarSoalSemua.find(x => x.id === id);
+  if(!item) return;
+  const cuplikan = item.soal.length > 80 ? item.soal.slice(0, 80) + "..." : item.soal;
+  if(!confirm('Hapus soal ini?\n\n"' + cuplikan + '"')) return;
+
+  const pin = ambilPinAdminPR();
+  if(!pin){ alert("Masukkan kode admin dulu di kotak Kode Admin sebelum menghapus."); return; }
+
+  try{
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ type:"prSoalHapus", id, pin })
+    });
+    const json = await res.json();
+    if(json.status === "success"){
+      if(prEditingId === id) batalEditSoalPR();
+      await muatDaftarSoalPR();
+    } else {
+      alert(json.message || "Gagal menghapus soal.");
+    }
+  } catch(err){
+    console.error(err);
+    alert("Gagal terhubung ke server.");
+  }
+}
+
+async function aktifkanSoalPR(id){
+  const pin = ambilPinAdminPR();
+  if(!pin){ alert("Masukkan kode admin dulu di kotak Kode Admin sebelum mengaktifkan."); return; }
+
+  try{
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ type:"prSoalAktifkan", id, pin })
+    });
+    const json = await res.json();
+    if(json.status === "success"){
+      await muatDaftarSoalPR();
+      await muatSoalAktifPR();
+      await muatJawabanPR();
+      renderRingkasanPR();
+    } else {
+      alert(json.message || "Gagal mengaktifkan soal.");
+    }
+  } catch(err){
+    console.error(err);
+    alert("Gagal terhubung ke server.");
+  }
+}
+
+muatDaftarSoalPR();
 
 // ======================================================
 // UTILITAS SALIN UMUM (dipakai semua generator di bawah)
