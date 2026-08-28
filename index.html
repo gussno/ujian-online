@@ -874,7 +874,7 @@
       <div class="cards">
         <div class="card-link clickable" onclick="pindahSection('pr')">
           <div class="icon">📋</div>
-          <div><div class="nama">Papan PR</div><div class="url">Siswa mengisi jawaban PR langsung di sini; guru mengatur mata pelajaran & soal aktif lewat panel admin.</div></div>
+          <div><div class="nama">Papan PR</div><div class="url">Pantau siapa sudah/belum submit PR per kelas, dan atur mata pelajaran & soal aktif untuk siswa.</div></div>
         </div>
       </div>
     </div>
@@ -1144,69 +1144,81 @@
   <section class="section" id="section-pr">
 
     <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">📋 Soal Aktif Saat Ini</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap;">
+        <div style="font-weight:800; font-size:15px;">📋 Soal Aktif Saat Ini</div>
+        <a class="btn btn-outline" href="https://gussno.github.io/ujian-online/papan-pr.html" target="_blank">🔗 Buka Papan Jawaban PR (tampilan siswa)</a>
+      </div>
       <div id="prSoalAktifBox">
         <div class="status-msg">Memuat soal aktif...</div>
       </div>
     </div>
 
     <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">✍️ Kirim Jawaban</div>
-      <div class="gen-2col">
-        <div class="gen-row">
-          <label for="prKelas">Kelas</label>
-          <select id="prKelas" onchange="updateNamaPR()">
-            <option value="">-- Pilih Kelas --</option>
+      <div class="controls">
+        <div class="field">
+          <label for="prFilterKelas">Kelas</label>
+          <select id="prFilterKelas">
+            <option value="SEMUA">Semua Kelas</option>
           </select>
         </div>
-        <div class="gen-row">
-          <label for="prNama">Nama</label>
-          <select id="prNama">
-            <option value="">-- Pilih Nama --</option>
-          </select>
+        <div class="field">
+          <label for="prFilterCari">Cari nama</label>
+          <input type="text" id="prFilterCari" placeholder="Ketik nama siswa...">
         </div>
+        <button class="btn btn-primary" onclick="muatRingkasanPR()">↻ Muat Ulang</button>
       </div>
-      <div class="gen-row">
-        <label for="prJawabanInput">Jawaban</label>
-        <textarea id="prJawabanInput" rows="5" placeholder="Tulis jawabanmu di sini..."></textarea>
+
+      <div class="stats" style="margin-top:4px;">
+        <div class="stat"><div class="num" id="prStatTotal">0</div><div class="lbl">Total Siswa</div></div>
+        <div class="stat sudah"><div class="num" id="prStatSudah">0</div><div class="lbl">Sudah Submit</div></div>
+        <div class="stat belum"><div class="num" id="prStatBelum">0</div><div class="lbl">Belum Submit</div></div>
       </div>
-      <button class="btn btn-primary" id="prBtnKirim" onclick="kirimJawabanPR()">📤 Kirim Jawaban</button>
-      <div class="gen-row hint" id="prKirimPesan" style="margin-top:10px;"></div>
     </div>
 
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <div style="font-weight:800; font-size:15px;">🗂️ Papan Jawaban (soal aktif saat ini)</div>
-        <button class="btn btn-outline" onclick="muatPapanPR()">↻ Muat Ulang</button>
+      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">✅ Sudah Submit</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Waktu</th>
+              <th>Jawaban</th>
+            </tr>
+          </thead>
+          <tbody id="prTbodySudah">
+            <tr><td colspan="4" class="lap-empty">Memuat data...</td></tr>
+          </tbody>
+        </table>
       </div>
-      <ul class="lap-list" id="prDaftarJawaban">
-        <li class="lap-empty">Memuat jawaban...</li>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">❌ Belum Submit</div>
+      <ul class="lap-list" id="prListBelum">
+        <li class="lap-empty">Memuat data...</li>
       </ul>
     </div>
 
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleAdminPR()">
-        <div style="font-weight:800; font-size:15px;">🔐 Panel Admin (Guru)</div>
-        <span id="prAdminToggleIcon" style="color:var(--muted); font-weight:800;">▾</span>
-      </div>
-      <div class="gen-row hint" style="margin-top:6px; margin-bottom:0;">Isi mata pelajaran & soal baru untuk mengganti soal aktif. Perlu kode admin.</div>
+      <div style="font-weight:800; font-size:15px; margin-bottom:6px;">🔐 Atur Soal Aktif</div>
+      <div class="gen-row hint" style="margin-top:0; margin-bottom:16px;">Isi mata pelajaran & soal baru di sini untuk mengganti soal aktif yang dilihat semua siswa. Perlu kode admin.</div>
 
-      <div id="prAdminBox" style="display:none; margin-top:14px;">
-        <div class="gen-row">
-          <label for="prAdminMapel">Mata Pelajaran</label>
-          <input type="text" id="prAdminMapel" placeholder="Contoh: IPS">
-        </div>
-        <div class="gen-row">
-          <label for="prAdminSoal">Soal</label>
-          <textarea id="prAdminSoal" rows="4" placeholder="Tulis soal/pertanyaan PR di sini..."></textarea>
-        </div>
-        <div class="gen-row">
-          <label for="prAdminPin">Kode Admin</label>
-          <input type="text" id="prAdminPin" placeholder="Kode admin" style="max-width:180px;">
-        </div>
-        <button class="btn btn-primary" onclick="simpanSoalPR()">💾 Simpan Soal Baru</button>
-        <div class="gen-row hint" id="prAdminPesan" style="margin-top:10px;"></div>
+      <div class="gen-row">
+        <label for="prAdminMapel">Mata Pelajaran</label>
+        <input type="text" id="prAdminMapel" placeholder="Contoh: IPS">
       </div>
+      <div class="gen-row">
+        <label for="prAdminSoal">Soal</label>
+        <textarea id="prAdminSoal" rows="4" placeholder="Tulis soal/pertanyaan PR di sini..."></textarea>
+      </div>
+      <div class="gen-row">
+        <label for="prAdminPin">Kode Admin</label>
+        <input type="text" id="prAdminPin" placeholder="Kode admin" style="max-width:180px;">
+      </div>
+      <button class="btn btn-primary" onclick="simpanSoalPR()">💾 Simpan Soal Baru</button>
+      <div class="gen-row hint" id="prAdminPesan" style="margin-top:10px;"></div>
     </div>
 
   </section>
@@ -1733,7 +1745,7 @@ const JUDUL_HALAMAN = {
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
-  pr: { title:"Papan PR", sub:"Siswa mengisi jawaban PR di sini; guru mengatur mata pelajaran & soal aktif lewat panel admin." },
+  pr: { title:"Papan PR", sub:"Pantau siapa sudah/belum submit PR per kelas, dan atur mata pelajaran & soal aktif untuk siswa." },
   genlink: { title:"Generator Link Berbagi", sub:"Buat link Rekap Pengerjaan yang dibatasi hanya ke ujian & kelas tertentu." },
   template: { title:"Generator Soal", sub:"Isi data ujian & soal, langsung dapat kode HTML siap disalin — tanpa perlu utak-atik kode manual." },
   checklist: { title:"Checklist Deploy Ujian Baru", sub:"Langkah-langkah supaya tidak ada yang terlewat saat menerbitkan ujian baru." },
@@ -2483,41 +2495,34 @@ inputLapCari.addEventListener("input", renderLaporan);
 muatDaftarUjianLaporan();
 
 // ======================================================
-// PAPAN PR — siswa isi jawaban PR, guru atur soal aktif lewat panel admin
+// PAPAN PR — tampilan GURU: siapa sudah/belum submit + atur soal aktif
+// (siswa mengisi jawaban lewat halaman terpisah papan-pr.html)
 // ======================================================
 let prSoalAktifSaatIni = { mapel:"", soal:"" };
-let prDataSiswa = {};
+let prRosterSemua = {};   // { "7A": ["NAMA1", ...], ... }
+let prJawabanSemua = [];  // seluruh entri dari ?action=prList (belum difilter soal)
 
-async function muatDataSiswaPR(){
-  const selKelas = document.getElementById("prKelas");
-  if(!selKelas) return;
+async function muatRosterPR(){
+  const selKelas = document.getElementById("prFilterKelas");
   try{
     const res = await fetch(scriptURL + "?action=siswa");
     const json = await res.json();
     if(json.status === "success"){
-      prDataSiswa = json.data || {};
-      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-      Object.keys(prDataSiswa).sort().forEach(k => {
-        const opt = document.createElement("option");
-        opt.value = k; opt.textContent = k;
-        selKelas.appendChild(opt);
-      });
+      prRosterSemua = json.data || {};
+      if(selKelas){
+        const terpilihLama = selKelas.value;
+        selKelas.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+        Object.keys(prRosterSemua).sort().forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k; opt.textContent = k;
+          selKelas.appendChild(opt);
+        });
+        if(Object.keys(prRosterSemua).includes(terpilihLama)) selKelas.value = terpilihLama;
+      }
     }
   } catch(err){
     console.error(err);
   }
-}
-
-function updateNamaPR(){
-  const kelas = document.getElementById("prKelas").value;
-  const selNama = document.getElementById("prNama");
-  selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
-  if(!kelas || !prDataSiswa[kelas]) return;
-  prDataSiswa[kelas].forEach(nama => {
-    const opt = document.createElement("option");
-    opt.value = nama; opt.textContent = nama;
-    selNama.appendChild(opt);
-  });
 }
 
 async function muatSoalAktifPR(){
@@ -2534,7 +2539,7 @@ async function muatSoalAktifPR(){
         '<div style="font-size:14.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; margin-top:8px;">' + escapeHtmlSoal(json.data.soal) + '</div>';
     } else {
       prSoalAktifSaatIni = { mapel:"", soal:"" };
-      box.innerHTML = '<div class="status-msg">Guru belum mengisi soal aktif. Cek lagi nanti.</div>';
+      box.innerHTML = '<div class="status-msg">Belum ada soal aktif. Isi lewat panel "Atur Soal Aktif" di bawah.</div>';
     }
   } catch(err){
     console.error(err);
@@ -2542,90 +2547,106 @@ async function muatSoalAktifPR(){
   }
 }
 
-async function muatPapanPR(){
-  const list = document.getElementById("prDaftarJawaban");
-  if(!list) return;
-  list.innerHTML = '<li class="lap-empty">Memuat jawaban...</li>';
+async function muatJawabanPR(){
   try{
     const res = await fetch(scriptURL + "?action=prList");
     const json = await res.json();
-    if(json.status !== "success"){
-      list.innerHTML = '<li class="lap-empty">Gagal memuat jawaban.</li>';
-      return;
-    }
-
-    const semua = json.data || [];
-    const cocok = prSoalAktifSaatIni.soal
-      ? semua.filter(item => item.soal === prSoalAktifSaatIni.soal)
-      : semua;
-
-    if(cocok.length === 0){
-      list.innerHTML = '<li class="lap-empty">Belum ada jawaban untuk soal ini.</li>';
-      return;
-    }
-
-    list.innerHTML = cocok.slice().reverse().map(item => `
-      <li class="lap-item sudah" style="flex-direction:column; align-items:flex-start; gap:4px;">
-        <div style="font-weight:700;">${escapeHtmlSoal(item.nama)} <span class="subjek-tag">${escapeHtmlSoal(item.kelas)}</span></div>
-        <div style="font-size:13px; font-weight:500; white-space:pre-wrap;">${escapeHtmlSoal(item.jawaban)}</div>
-      </li>
-    `).join("");
+    prJawabanSemua = (json.status === "success") ? (json.data || []) : [];
   } catch(err){
     console.error(err);
-    list.innerHTML = '<li class="lap-empty">Gagal memuat jawaban.</li>';
+    prJawabanSemua = [];
   }
 }
 
-async function kirimJawabanPR(){
-  const kelas = document.getElementById("prKelas").value.trim();
-  const nama = document.getElementById("prNama").value.trim();
-  const jawaban = document.getElementById("prJawabanInput").value.trim();
-  const pesanEl = document.getElementById("prKirimPesan");
-  const btn = document.getElementById("prBtnKirim");
+// Gabungkan roster + jawaban -> render kartu ringkasan, tabel sudah submit, daftar belum submit
+function renderRingkasanPR(){
+  const tbodySudah = document.getElementById("prTbodySudah");
+  const listBelum = document.getElementById("prListBelum");
+  if(!tbodySudah || !listBelum) return;
 
-  pesanEl.textContent = "";
-  pesanEl.style.color = "";
+  const kelasFilter = document.getElementById("prFilterKelas").value || "SEMUA";
+  const kataKunci = document.getElementById("prFilterCari").value.trim().toUpperCase();
 
-  if(!kelas || !nama){ pesanEl.textContent = "Pilih kelas & nama dulu."; pesanEl.style.color = "#dc2626"; return; }
-  if(!jawaban){ pesanEl.textContent = "Jawaban belum diisi."; pesanEl.style.color = "#dc2626"; return; }
+  // Hanya jawaban untuk soal yang sedang aktif yang dihitung sebagai "sudah submit"
+  const jawabanSoalAktif = prSoalAktifSaatIni.soal
+    ? prJawabanSemua.filter(item => item.soal === prSoalAktifSaatIni.soal)
+    : [];
 
-  btn.disabled = true;
-  btn.textContent = "Mengirim...";
+  // key "KELAS|NAMA" (uppercase) -> entri jawaban
+  const submitted = {};
+  jawabanSoalAktif.forEach(item => {
+    const key = (item.kelas || "").toString().trim().toUpperCase() + "|" + (item.nama || "").toString().trim().toUpperCase();
+    submitted[key] = item;
+  });
 
-  try{
-    const res = await fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify({ type:"prJawaban", nama, kelas, jawaban })
+  const kelasList = kelasFilter === "SEMUA" ? Object.keys(prRosterSemua).sort() : [kelasFilter];
+
+  let totalSemua = 0, sudahSemua = 0;
+  let barisSudah = [];
+  let htmlBelum = "";
+
+  kelasList.forEach(kelas => {
+    const siswaKelas = prRosterSemua[kelas] || [];
+    const cocok = siswaKelas.filter(nama => !kataKunci || nama.toUpperCase().includes(kataKunci));
+    if(cocok.length === 0) return;
+
+    const belumList = [];
+
+    cocok.forEach(nama => {
+      totalSemua++;
+      const key = kelas.toString().trim().toUpperCase() + "|" + nama.toString().trim().toUpperCase();
+      const info = submitted[key];
+      if(info){
+        sudahSemua++;
+        barisSudah.push({ nama, kelas, waktu: info.waktu, jawaban: info.jawaban });
+      } else {
+        belumList.push(nama);
+      }
     });
-    const json = await res.json();
 
-    if(json.status === "success"){
-      pesanEl.textContent = "✅ Jawaban berhasil dikirim!";
-      pesanEl.style.color = "#16a34a";
-      document.getElementById("prJawabanInput").value = "";
-      muatPapanPR();
-    } else {
-      pesanEl.textContent = "⚠️ " + (json.message || "Gagal mengirim jawaban.");
-      pesanEl.style.color = "#dc2626";
+    if(belumList.length > 0){
+      htmlBelum += '<li class="lap-kelas-heading">' + kelas + '</li>';
+      belumList.forEach(nama => {
+        htmlBelum += '<li class="lap-item belum"><span>' + escapeHtmlSoal(nama) + '</span><span>Belum</span></li>';
+      });
     }
-  } catch(err){
-    console.error(err);
-    pesanEl.textContent = "Gagal terhubung ke server.";
-    pesanEl.style.color = "#dc2626";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "📤 Kirim Jawaban";
+  });
+
+  const belumSemua = totalSemua - sudahSemua;
+
+  document.getElementById("prStatTotal").textContent = totalSemua;
+  document.getElementById("prStatSudah").textContent = sudahSemua;
+  document.getElementById("prStatBelum").textContent = belumSemua;
+
+  if(!prSoalAktifSaatIni.soal){
+    tbodySudah.innerHTML = '<tr><td colspan="4" class="lap-empty">Belum ada soal aktif.</td></tr>';
+  } else if(barisSudah.length === 0){
+    tbodySudah.innerHTML = '<tr><td colspan="4" class="lap-empty">Belum ada yang submit untuk soal ini.</td></tr>';
+  } else {
+    tbodySudah.innerHTML = barisSudah.map(b => `
+      <tr>
+        <td>${escapeHtmlSoal(b.nama)}</td>
+        <td>${escapeHtmlSoal(b.kelas)}</td>
+        <td>${formatWaktuLaporan(b.waktu)}</td>
+        <td style="white-space:pre-wrap;">${escapeHtmlSoal(b.jawaban)}</td>
+      </tr>
+    `).join("");
   }
+
+  listBelum.innerHTML = htmlBelum || '<li class="lap-empty">Semua siswa sudah submit 🎉</li>';
 }
 
-function toggleAdminPR(){
-  const box = document.getElementById("prAdminBox");
-  const icon = document.getElementById("prAdminToggleIcon");
-  if(!box) return;
-  const buka = box.style.display === "none";
-  box.style.display = buka ? "block" : "none";
-  if(icon) icon.textContent = buka ? "▴" : "▾";
+async function muatRingkasanPR(){
+  if(Object.keys(prRosterSemua).length === 0) await muatRosterPR();
+  await muatSoalAktifPR();
+  await muatJawabanPR();
+  renderRingkasanPR();
 }
+
+const prFilterKelasEl = document.getElementById("prFilterKelas");
+const prFilterCariEl = document.getElementById("prFilterCari");
+if(prFilterKelasEl) prFilterKelasEl.addEventListener("change", renderRingkasanPR);
+if(prFilterCariEl) prFilterCariEl.addEventListener("input", renderRingkasanPR);
 
 async function simpanSoalPR(){
   const mapel = document.getElementById("prAdminMapel").value.trim();
@@ -2651,7 +2672,8 @@ async function simpanSoalPR(){
       pesanEl.style.color = "#16a34a";
       document.getElementById("prAdminPin").value = "";
       await muatSoalAktifPR();
-      muatPapanPR();
+      await muatJawabanPR();
+      renderRingkasanPR();
     } else {
       pesanEl.textContent = "⚠️ " + (json.message || "Gagal menyimpan.");
       pesanEl.style.color = "#dc2626";
@@ -2663,8 +2685,7 @@ async function simpanSoalPR(){
   }
 }
 
-muatDataSiswaPR();
-muatSoalAktifPR().then(muatPapanPR);
+muatRingkasanPR();
 
 // ======================================================
 // UTILITAS SALIN UMUM (dipakai semua generator di bawah)
