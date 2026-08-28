@@ -650,13 +650,81 @@
     font-size:11px;
     font-weight:700;
   }
+  #splashGate{
+    position:absolute;
+    left:50%;
+    bottom:9%;
+    transform:translateX(-50%);
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    width:250px;
+    max-width:80vw;
+    cursor:default;
+  }
+  #splashGate .gate-label{
+    color:rgba(255,255,255,0.55);
+    font-size:11.5px;
+    font-weight:700;
+    text-align:center;
+  }
+  #splashGate input{
+    width:100%;
+    padding:10px 14px;
+    border-radius:10px;
+    border:1.5px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.08);
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    text-align:center;
+    letter-spacing:0.1em;
+    font-family:inherit;
+  }
+  #splashGate input::placeholder{
+    color:rgba(255,255,255,0.35);
+    font-weight:600;
+    letter-spacing:normal;
+  }
+  #splashGate input:focus{
+    outline:none;
+    border-color:rgba(255,255,255,0.6);
+  }
+  #splashGate button{
+    padding:9px 24px;
+    border-radius:10px;
+    border:none;
+    background:var(--primary);
+    color:white;
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  #splashGate button:hover{opacity:0.9;}
+  #splashGate button:disabled{opacity:0.6; cursor:not-allowed;}
+  #splashGate .gate-error{
+    color:#fca5a5;
+    font-size:12px;
+    font-weight:700;
+    min-height:14px;
+    text-align:center;
+  }
 </style>
 </head>
 <body data-theme="biru">
 
 <div id="splash">
   <img src="splash.png" alt="Portal Pak Agus">
-  <div class="tap-hint">klik untuk masuk</div>
+  <div class="tap-hint" id="splashTapHint">klik untuk masuk</div>
+
+  <div id="splashGate">
+    <div class="gate-label">Masukkan kode akses</div>
+    <input type="text" id="splashKode" inputmode="numeric" placeholder="Kode akses" maxlength="20" autocomplete="off">
+    <button id="splashKodeBtn" type="button">Masuk</button>
+    <div class="gate-error" id="splashKodeError"></div>
+  </div>
 </div>
 
 <button id="sidebarToggle" title="Buka/tutup menu">☰</button>
@@ -689,6 +757,11 @@
     </button>
     <button class="nav-item" data-target="panduan">
       <span class="ic">📖</span> Panduan Buat Ujian
+    </button>
+
+    <div class="nav-group-label">PR</div>
+    <button class="nav-item" data-target="pr">
+      <span class="ic">📋</span> Papan PR
     </button>
 
     <div class="nav-group-label">Alat Bantu</div>
@@ -792,6 +865,16 @@
         <div class="card-link clickable" onclick="pindahSection('panduan')">
           <div class="icon">📖</div>
           <div><div class="nama">Panduan Buat Ujian</div><div class="url">Format penamaan ujian & cara membagikan rekap secara terbatas.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-group">
+      <div class="dash-group-title">PR</div>
+      <div class="cards">
+        <div class="card-link clickable" onclick="pindahSection('pr')">
+          <div class="icon">📋</div>
+          <div><div class="nama">Papan PR</div><div class="url">Siswa mengisi jawaban PR langsung di sini; guru mengatur mata pelajaran & soal aktif lewat panel admin.</div></div>
         </div>
       </div>
     </div>
@@ -1052,6 +1135,77 @@
         • <code>ujian</code> = nama ujian persis seperti di sheet (boleh lebih dari satu, pisah koma)<br>
         • <code>kelas</code> = rombel yang boleh dilihat (boleh lebih dari satu, pisah koma)<br>
         • Tanpa parameter sama sekali → halaman tampil lengkap seperti biasa (mode untuk Anda sendiri)
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= SECTION: PAPAN PR ================= -->
+  <section class="section" id="section-pr">
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">📋 Soal Aktif Saat Ini</div>
+      <div id="prSoalAktifBox">
+        <div class="status-msg">Memuat soal aktif...</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:14px;">✍️ Kirim Jawaban</div>
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="prKelas">Kelas</label>
+          <select id="prKelas" onchange="updateNamaPR()">
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div class="gen-row">
+          <label for="prNama">Nama</label>
+          <select id="prNama">
+            <option value="">-- Pilih Nama --</option>
+          </select>
+        </div>
+      </div>
+      <div class="gen-row">
+        <label for="prJawabanInput">Jawaban</label>
+        <textarea id="prJawabanInput" rows="5" placeholder="Tulis jawabanmu di sini..."></textarea>
+      </div>
+      <button class="btn btn-primary" id="prBtnKirim" onclick="kirimJawabanPR()">📤 Kirim Jawaban</button>
+      <div class="gen-row hint" id="prKirimPesan" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="font-weight:800; font-size:15px;">🗂️ Papan Jawaban (soal aktif saat ini)</div>
+        <button class="btn btn-outline" onclick="muatPapanPR()">↻ Muat Ulang</button>
+      </div>
+      <ul class="lap-list" id="prDaftarJawaban">
+        <li class="lap-empty">Memuat jawaban...</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleAdminPR()">
+        <div style="font-weight:800; font-size:15px;">🔐 Panel Admin (Guru)</div>
+        <span id="prAdminToggleIcon" style="color:var(--muted); font-weight:800;">▾</span>
+      </div>
+      <div class="gen-row hint" style="margin-top:6px; margin-bottom:0;">Isi mata pelajaran & soal baru untuk mengganti soal aktif. Perlu kode admin.</div>
+
+      <div id="prAdminBox" style="display:none; margin-top:14px;">
+        <div class="gen-row">
+          <label for="prAdminMapel">Mata Pelajaran</label>
+          <input type="text" id="prAdminMapel" placeholder="Contoh: IPS">
+        </div>
+        <div class="gen-row">
+          <label for="prAdminSoal">Soal</label>
+          <textarea id="prAdminSoal" rows="4" placeholder="Tulis soal/pertanyaan PR di sini..."></textarea>
+        </div>
+        <div class="gen-row">
+          <label for="prAdminPin">Kode Admin</label>
+          <input type="text" id="prAdminPin" placeholder="Kode admin" style="max-width:180px;">
+        </div>
+        <button class="btn btn-primary" onclick="simpanSoalPR()">💾 Simpan Soal Baru</button>
+        <div class="gen-row hint" id="prAdminPesan" style="margin-top:10px;"></div>
       </div>
     </div>
 
@@ -1416,25 +1570,110 @@ Setelah benar-benar paham, kerjakan soal asesmen yang linknya tersedia di bagian
 
 <script>
 // ======================================================
-// SPLASH SCREEN (bisa dibuka lagi lewat klik judul di sidebar)
+// SPLASH SCREEN + GERBANG KODE AKSES
+// (bisa dibuka lagi lewat klik judul di sidebar; kode akses hanya
+// diminta sekali per sesi browser, dicek ke Apps Script supaya kode
+// aslinya tidak pernah ada di HTML/JS halaman ini)
 // ======================================================
 const splash = document.getElementById("splash");
+const splashTapHint = document.getElementById("splashTapHint");
+const splashGate = document.getElementById("splashGate");
+const splashKodeInput = document.getElementById("splashKode");
+const splashKodeBtn = document.getElementById("splashKodeBtn");
+const splashKodeError = document.getElementById("splashKodeError");
+
+const KEY_AKSES_PORTAL = "portal_akses_ok";
+let aksesPortalOk = false;
+try{ aksesPortalOk = sessionStorage.getItem(KEY_AKSES_PORTAL) === "1"; }catch(e){}
 
 function tutupSplash(){
   if(!splash) return;
   splash.classList.add("hide");
 }
+
+function tampilkanGerbang(){
+  if(aksesPortalOk){
+    if(splashGate) splashGate.style.display = "none";
+    if(splashTapHint) splashTapHint.style.display = "block";
+  } else {
+    if(splashGate) splashGate.style.display = "flex";
+    if(splashTapHint) splashTapHint.style.display = "none";
+    if(splashKodeError) splashKodeError.textContent = "";
+    if(splashKodeInput) splashKodeInput.value = "";
+  }
+}
+
 function bukaSplash(){
   if(!splash) return;
   splash.classList.remove("hide");
+  tampilkanGerbang();
+  if(!aksesPortalOk && splashKodeInput) splashKodeInput.focus();
 }
+
 if(splash){
-  splash.addEventListener("click", tutupSplash);
+  splash.addEventListener("click", function(evt){
+    if(splashGate && splashGate.contains(evt.target)) return;
+    if(aksesPortalOk) tutupSplash();
+  });
 }
+
 const brandEl = document.querySelector(".brand");
 if(brandEl){
   brandEl.addEventListener("click", bukaSplash);
 }
+
+async function verifikasiKodeAkses(kode){
+  try{
+    const res = await fetch(scriptURL + "?action=cekPinPortal&kode=" + encodeURIComponent(kode));
+    const json = await res.json();
+    return json.status === "success" ? !!json.valid : null;
+  }catch(err){
+    console.error(err);
+    return null;
+  }
+}
+
+async function submitKodeAkses(){
+  if(!splashKodeInput) return;
+  const kode = splashKodeInput.value.trim();
+
+  if(!kode){
+    splashKodeError.textContent = "Masukkan kode dulu.";
+    return;
+  }
+
+  splashKodeBtn.disabled = true;
+  splashKodeBtn.textContent = "Memeriksa...";
+  splashKodeError.textContent = "";
+
+  const valid = await verifikasiKodeAkses(kode);
+
+  splashKodeBtn.disabled = false;
+  splashKodeBtn.textContent = "Masuk";
+
+  if(valid === true){
+    aksesPortalOk = true;
+    try{ sessionStorage.setItem(KEY_AKSES_PORTAL, "1"); }catch(e){}
+    tutupSplash();
+  } else if(valid === false){
+    splashKodeError.textContent = "Kode salah, coba lagi.";
+    splashKodeInput.value = "";
+    splashKodeInput.focus();
+  } else {
+    splashKodeError.textContent = "Gagal memeriksa kode, periksa koneksi internet.";
+  }
+}
+
+if(splashKodeBtn){
+  splashKodeBtn.addEventListener("click", submitKodeAkses);
+}
+if(splashKodeInput){
+  splashKodeInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") submitKodeAkses();
+  });
+}
+
+tampilkanGerbang();
 
 // ======================================================
 // JAM & TANGGAL DIGITAL REAL-TIME
@@ -1494,6 +1733,7 @@ const JUDUL_HALAMAN = {
   beranda: { title:"Asesmen / Ujian", sub:"Daftar ujian otomatis mengikuti file di repository GitHub — tidak perlu diedit manual saat ada ujian baru." },
   laporan: { title:"Laporan Ujian", sub:"Status pengerjaan & nilai lengkap tiap ujian, dalam satu tempat." },
   panduan: { title:"Panduan Buat Ujian", sub:"Format penamaan ujian & cara membagikan rekap secara terbatas." },
+  pr: { title:"Papan PR", sub:"Siswa mengisi jawaban PR di sini; guru mengatur mata pelajaran & soal aktif lewat panel admin." },
   genlink: { title:"Generator Link Berbagi", sub:"Buat link Rekap Pengerjaan yang dibatasi hanya ke ujian & kelas tertentu." },
   template: { title:"Generator Soal", sub:"Isi data ujian & soal, langsung dapat kode HTML siap disalin — tanpa perlu utak-atik kode manual." },
   checklist: { title:"Checklist Deploy Ujian Baru", sub:"Langkah-langkah supaya tidak ada yang terlewat saat menerbitkan ujian baru." },
@@ -2241,6 +2481,190 @@ selLapKelas.addEventListener("change", renderLaporan);
 inputLapCari.addEventListener("input", renderLaporan);
 
 muatDaftarUjianLaporan();
+
+// ======================================================
+// PAPAN PR — siswa isi jawaban PR, guru atur soal aktif lewat panel admin
+// ======================================================
+let prSoalAktifSaatIni = { mapel:"", soal:"" };
+let prDataSiswa = {};
+
+async function muatDataSiswaPR(){
+  const selKelas = document.getElementById("prKelas");
+  if(!selKelas) return;
+  try{
+    const res = await fetch(scriptURL + "?action=siswa");
+    const json = await res.json();
+    if(json.status === "success"){
+      prDataSiswa = json.data || {};
+      selKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      Object.keys(prDataSiswa).sort().forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k; opt.textContent = k;
+        selKelas.appendChild(opt);
+      });
+    }
+  } catch(err){
+    console.error(err);
+  }
+}
+
+function updateNamaPR(){
+  const kelas = document.getElementById("prKelas").value;
+  const selNama = document.getElementById("prNama");
+  selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+  if(!kelas || !prDataSiswa[kelas]) return;
+  prDataSiswa[kelas].forEach(nama => {
+    const opt = document.createElement("option");
+    opt.value = nama; opt.textContent = nama;
+    selNama.appendChild(opt);
+  });
+}
+
+async function muatSoalAktifPR(){
+  const box = document.getElementById("prSoalAktifBox");
+  if(!box) return;
+  box.innerHTML = '<div class="status-msg">Memuat soal aktif...</div>';
+  try{
+    const res = await fetch(scriptURL + "?action=prSettings");
+    const json = await res.json();
+    if(json.status === "success" && json.data && json.data.mapel && json.data.soal){
+      prSoalAktifSaatIni = json.data;
+      box.innerHTML =
+        '<span class="subjek-tag" style="margin-bottom:10px; display:inline-block;">' + escapeHtmlSoal(json.data.mapel) + '</span>' +
+        '<div style="font-size:14.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; margin-top:8px;">' + escapeHtmlSoal(json.data.soal) + '</div>';
+    } else {
+      prSoalAktifSaatIni = { mapel:"", soal:"" };
+      box.innerHTML = '<div class="status-msg">Guru belum mengisi soal aktif. Cek lagi nanti.</div>';
+    }
+  } catch(err){
+    console.error(err);
+    box.innerHTML = '<div class="status-msg error">Gagal memuat soal aktif.</div>';
+  }
+}
+
+async function muatPapanPR(){
+  const list = document.getElementById("prDaftarJawaban");
+  if(!list) return;
+  list.innerHTML = '<li class="lap-empty">Memuat jawaban...</li>';
+  try{
+    const res = await fetch(scriptURL + "?action=prList");
+    const json = await res.json();
+    if(json.status !== "success"){
+      list.innerHTML = '<li class="lap-empty">Gagal memuat jawaban.</li>';
+      return;
+    }
+
+    const semua = json.data || [];
+    const cocok = prSoalAktifSaatIni.soal
+      ? semua.filter(item => item.soal === prSoalAktifSaatIni.soal)
+      : semua;
+
+    if(cocok.length === 0){
+      list.innerHTML = '<li class="lap-empty">Belum ada jawaban untuk soal ini.</li>';
+      return;
+    }
+
+    list.innerHTML = cocok.slice().reverse().map(item => `
+      <li class="lap-item sudah" style="flex-direction:column; align-items:flex-start; gap:4px;">
+        <div style="font-weight:700;">${escapeHtmlSoal(item.nama)} <span class="subjek-tag">${escapeHtmlSoal(item.kelas)}</span></div>
+        <div style="font-size:13px; font-weight:500; white-space:pre-wrap;">${escapeHtmlSoal(item.jawaban)}</div>
+      </li>
+    `).join("");
+  } catch(err){
+    console.error(err);
+    list.innerHTML = '<li class="lap-empty">Gagal memuat jawaban.</li>';
+  }
+}
+
+async function kirimJawabanPR(){
+  const kelas = document.getElementById("prKelas").value.trim();
+  const nama = document.getElementById("prNama").value.trim();
+  const jawaban = document.getElementById("prJawabanInput").value.trim();
+  const pesanEl = document.getElementById("prKirimPesan");
+  const btn = document.getElementById("prBtnKirim");
+
+  pesanEl.textContent = "";
+  pesanEl.style.color = "";
+
+  if(!kelas || !nama){ pesanEl.textContent = "Pilih kelas & nama dulu."; pesanEl.style.color = "#dc2626"; return; }
+  if(!jawaban){ pesanEl.textContent = "Jawaban belum diisi."; pesanEl.style.color = "#dc2626"; return; }
+
+  btn.disabled = true;
+  btn.textContent = "Mengirim...";
+
+  try{
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ type:"prJawaban", nama, kelas, jawaban })
+    });
+    const json = await res.json();
+
+    if(json.status === "success"){
+      pesanEl.textContent = "✅ Jawaban berhasil dikirim!";
+      pesanEl.style.color = "#16a34a";
+      document.getElementById("prJawabanInput").value = "";
+      muatPapanPR();
+    } else {
+      pesanEl.textContent = "⚠️ " + (json.message || "Gagal mengirim jawaban.");
+      pesanEl.style.color = "#dc2626";
+    }
+  } catch(err){
+    console.error(err);
+    pesanEl.textContent = "Gagal terhubung ke server.";
+    pesanEl.style.color = "#dc2626";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "📤 Kirim Jawaban";
+  }
+}
+
+function toggleAdminPR(){
+  const box = document.getElementById("prAdminBox");
+  const icon = document.getElementById("prAdminToggleIcon");
+  if(!box) return;
+  const buka = box.style.display === "none";
+  box.style.display = buka ? "block" : "none";
+  if(icon) icon.textContent = buka ? "▴" : "▾";
+}
+
+async function simpanSoalPR(){
+  const mapel = document.getElementById("prAdminMapel").value.trim();
+  const soal = document.getElementById("prAdminSoal").value.trim();
+  const pin = document.getElementById("prAdminPin").value.trim();
+  const pesanEl = document.getElementById("prAdminPesan");
+
+  pesanEl.textContent = "";
+  pesanEl.style.color = "";
+
+  if(!mapel || !soal){ pesanEl.textContent = "Mata pelajaran & soal wajib diisi."; pesanEl.style.color = "#dc2626"; return; }
+  if(!pin){ pesanEl.textContent = "Masukkan kode admin."; pesanEl.style.color = "#dc2626"; return; }
+
+  try{
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ type:"prSettings", mapel, soal, pin })
+    });
+    const json = await res.json();
+
+    if(json.status === "success"){
+      pesanEl.textContent = "✅ Soal baru berhasil disimpan.";
+      pesanEl.style.color = "#16a34a";
+      document.getElementById("prAdminPin").value = "";
+      await muatSoalAktifPR();
+      muatPapanPR();
+    } else {
+      pesanEl.textContent = "⚠️ " + (json.message || "Gagal menyimpan.");
+      pesanEl.style.color = "#dc2626";
+    }
+  } catch(err){
+    console.error(err);
+    pesanEl.textContent = "Gagal terhubung ke server.";
+    pesanEl.style.color = "#dc2626";
+  }
+}
+
+muatDataSiswaPR();
+muatSoalAktifPR().then(muatPapanPR);
 
 // ======================================================
 // UTILITAS SALIN UMUM (dipakai semua generator di bawah)
