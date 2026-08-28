@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>Papan Jawaban PR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF6E9;
+    --bg-blob-1: #FFE1EC;
+    --bg-blob-2: #DFF6FF;
+    --ink: #2B2250;
+    --ink-soft: #6B6394;
+    --card: #FFFFFF;
+    --line: #F0D9E8;
+    --coral: #FF6B6B;
+    --coral-dark: #E5484D;
+    --coral-soft: #FFE4E4;
+    --turquoise: #2FBFB0;
+    --turquoise-soft: #DEFBF6;
+    --yellow: #E8A800;
+    --yellow-soft: #FFF3D0;
+    --violet: #8B7CF6;
+    --violet-soft: #ECE7FF;
+    --blue: #4C8DFF;
+    --blue-soft: #E3EDFF;
+    --pink: #F062A8;
+    --pink-soft: #FFE3F2;
+    --danger: #E5484D;
+    --danger-soft: #FFE3E3;
+    --shadow: 0 2px 0 rgba(43,34,80,0.06), 0 14px 28px -14px rgba(43,34,80,0.28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1B1533;
+      --bg-blob-1: #2A1E44;
+      --bg-blob-2: #1A2A3E;
+      --ink: #F3EFFF;
+      --ink-soft: #B7ADD9;
+      --card: #241C42;
+      --line: #392C5C;
+      --coral: #FF8080;
+      --coral-dark: #FF5C5C;
+      --coral-soft: #3A2233;
+      --turquoise: #52DFCE;
+      --turquoise-soft: #16352F;
+      --yellow: #FFD666;
+      --yellow-soft: #3A2F14;
+      --violet: #A79BFF;
+      --violet-soft: #322A5C;
+      --blue: #7FADFF;
+      --blue-soft: #1F2E4E;
+      --pink: #FF8FC6;
+      --pink-soft: #3A2036;
+      --danger: #FF7A7A;
+      --danger-soft: #3E1F22;
+      --shadow: 0 2px 0 rgba(0,0,0,0.3), 0 14px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(600px 320px at 8% -8%, var(--bg-blob-1), transparent 60%),
+      radial-gradient(560px 300px at 108% 12%, var(--bg-blob-2), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 36px 18px 90px; }
+
+  header.page-head { text-align: center; margin-bottom: 28px; }
+
+  .mapel-badge {
+    display: inline-block;
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: var(--violet-soft);
+    color: var(--violet);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 800;
+    font-size: clamp(30px, 7vw, 44px);
+    line-height: 1.08;
+    margin: 0 0 8px;
+    text-wrap: balance;
+    color: var(--coral-dark);
+  }
+  @media (prefers-color-scheme: dark) { h1 { color: var(--coral); } }
+
+  .lede { margin: 0 auto; max-width: 46ch; color: var(--ink-soft); font-size: 15.5px; font-weight: 600; }
+
+  .card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+  }
+
+  form.card { padding: 24px; margin-bottom: 18px; }
+
+  .soal-box {
+    background: linear-gradient(135deg, var(--yellow-soft), var(--coral-soft));
+    border: 2px dashed var(--yellow);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .soal-box .soal-label {
+    display: block;
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #8A6600;
+    margin-bottom: 4px;
+  }
+  @media (prefers-color-scheme: dark) { .soal-box .soal-label { color: #FFE9A8; } }
+  .soal-box .soal-text { font-weight: 700; font-size: 15.5px; white-space: pre-wrap; word-break: break-word; }
+  .soal-box .soal-text.empty { font-weight: 600; font-style: italic; color: var(--ink-soft); }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row + .field-row,
+  .field-row + .field,
+  .field + .field-row { margin-top: 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { margin-top: 14px; }
+
+  label {
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  label .opt { font-family: "Nunito", sans-serif; font-weight: 600; font-style: italic; color: var(--ink-soft); opacity: 0.8; }
+
+  select, input[type="text"], input[type="password"], textarea {
+    font: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 13px;
+    padding: 11px 13px;
+    width: 100%;
+    appearance: none;
+  }
+
+  select {
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+    background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 34px;
+  }
+
+  textarea { min-height: 96px; resize: vertical; font-family: inherit; font-weight: 600; }
+
+  select:focus, input:focus, textarea:focus {
+    outline: 3px solid var(--turquoise);
+    outline-offset: 1px;
+    border-color: var(--turquoise);
+  }
+
+  select:disabled, input:disabled, textarea:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .form-actions { margin-top: 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  button.submit {
+    font: inherit;
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: var(--coral);
+    border: none;
+    border-radius: 14px;
+    padding: 13px 26px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--coral-dark);
+    transition: transform 100ms ease, box-shadow 100ms ease, background-color 100ms ease;
+  }
+  button.submit:hover { background: var(--coral-dark); }
+  button.submit:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--coral-dark); }
+  button.submit:disabled { background: var(--line); color: var(--ink-soft); box-shadow: none; cursor: not-allowed; transform: none; }
+
+  button.ghost {
+    font: inherit;
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: transparent;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    padding: 9px 16px;
+    cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--turquoise); color: var(--turquoise); }
+
+  .form-status { font-weight: 700; font-size: 13.5px; color: var(--ink-soft); }
+
+  .banner {
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+  }
+  .banner.show { display: flex; }
+  .banner.info { background: var(--blue-soft); color: var(--blue); }
+  .banner.success { background: var(--turquoise-soft); color: var(--turquoise); }
+  .banner.warn { background: var(--yellow-soft); color: #8A6600; }
+  .banner.error { background: var(--danger-soft); color: var(--danger); }
+  @media (prefers-color-scheme: dark) { .banner.warn { color: #FFE9A8; } }
+
+  .field-error { font-size: 12.5px; font-weight: 700; color: var(--danger); display: none; }
+  .field-error.show { display: block; }
+  .field.has-error select, .field.has-error input, .field.has-error textarea { border-color: var(--danger); }
+
+  .list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 34px 0 6px; flex-wrap: wrap; }
+  .list-head h2 { font-family: "Baloo 2", ui-rounded, sans-serif; font-weight: 700; font-size: 20px; margin: 0; color: var(--violet); }
+
+  .count-chip { display: block; font-weight: 800; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
+
+  .filter-input {
+    font: inherit;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 8px 13px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--ink);
+    width: 230px;
+    max-width: 100%;
+  }
+  .filter-input:focus { outline: 3px solid var(--turquoise); outline-offset: 1px; }
+
+  ul.entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+
+  li.entry {
+    background: var(--accent-bg, var(--card));
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 15px 17px;
+    position: relative;
+    overflow: hidden;
+  }
+  li.entry::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 7px;
+    background: var(--accent-bar, var(--coral));
+  }
+
+  .entry-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; padding-left: 6px; }
+  .entry-who { font-family: "Baloo 2", ui-rounded, sans-serif; font-weight: 700; font-size: 15.5px; }
+  .entry-meta { font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+
+  .entry-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 8px; padding-left: 6px; }
+  .tag { font-size: 11.5px; font-weight: 800; letter-spacing: 0.01em; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.6); color: var(--ink); }
+  @media (prefers-color-scheme: dark) { .tag { background: rgba(0,0,0,0.25); } }
+
+  .entry-answer { font-size: 14.5px; font-weight: 600; white-space: pre-wrap; word-break: break-word; margin: 0; padding-left: 6px; }
+
+  /* Jawaban yang sudah masuk tidak dimaksudkan untuk disalin — lihat catatan di PANDUAN-SETUP.md */
+  #entries-container, #entries-container * {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .field-hint {
+    margin: 0 0 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .empty-state, .loading-state {
+    padding: 34px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-weight: 700;
+    border: 2px dashed var(--line);
+    border-radius: 18px;
+    font-size: 14px;
+  }
+
+  .no-match { display: none; padding: 18px; text-align: center; color: var(--ink-soft); font-weight: 700; font-size: 13.5px; }
+
+  footer.note {
+    margin-top: 40px;
+    padding-top: 16px;
+    text-align: center;
+  }
+  .admin-toggle {
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink-soft);
+    opacity: 0.6;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px;
+  }
+  .admin-toggle:hover { opacity: 1; color: var(--violet); }
+
+  .celebrate {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    opacity: 0;
+    z-index: 40;
+  }
+  .celebrate.show { animation: pop-fade 900ms ease forwards; }
+  @keyframes pop-fade {
+    0% { opacity: 0; transform: scale(0.4) rotate(-8deg); }
+    35% { opacity: 1; transform: scale(1.15) rotate(4deg); }
+    60% { opacity: 1; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: scale(1) rotate(0deg); }
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43,34,80,0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-panel {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .modal-panel h3 {
+    font-family: "Baloo 2", ui-rounded, sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    margin: 0 0 4px;
+    color: var(--violet);
+  }
+  .modal-panel .modal-sub { margin: 0 0 16px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+  .modal-actions { margin-top: 18px; display: flex; gap: 10px; justify-content: flex-end; }
+
+  @media (max-width: 520px) {
+    .field-row { grid-template-columns: 1fr; }
+    .list-head { flex-direction: column; align-items: flex-start; }
+    .filter-input { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button.submit, .celebrate.show { transition: none; animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="page-head">
+    <span class="mapel-badge" id="mapel-badge" style="display:none;"></span>
+    <h1>Papan Jawaban PR 🎒</h1>
+    <p class="lede">Pilih kelas &amp; namamu, isi jawabannya, terus klik kirim. Jawabanmu langsung muncul di bawah.</p>
+  </header>
+
+  <div id="banner" class="banner" role="status" aria-live="polite"></div>
+
+  <form id="pr-form" class="card" novalidate>
+    <div class="soal-box">
+      <span class="soal-label">📌 SOAL</span>
+      <span class="soal-text empty" id="soal-text">Memuat soal...</span>
+    </div>
+
+    <div class="field-row">
+      <div class="field" id="field-kelas">
+        <label for="kelas">Kelas kamu</label>
+        <select id="kelas" name="kelas" required>
+          <option value="">Pilih kelas...</option>
+        </select>
+        <span class="field-error" id="err-kelas">Pilih kelas dulu ya.</span>
+      </div>
+      <div class="field" id="field-nama">
+        <label for="nama">Nama kamu</label>
+        <select id="nama" name="nama" required disabled>
+          <option value="">Pilih kelas dulu</option>
+        </select>
+        <span class="field-error" id="err-nama">Pilih namamu dulu ya.</span>
+      </div>
+    </div>
+    <div class="field full" id="field-jawaban">
+      <label for="jawaban">Jawabanmu</label>
+      <p class="field-hint">✍️ Tulis jawabanmu sendiri, jangan meniru jawaban teman, dan jangan minta bantuan AI.</p>
+      <textarea id="jawaban" name="jawaban" maxlength="2000" required placeholder="Tulis jawabanmu di sini..."></textarea>
+      <span class="field-error" id="err-jawaban">Jawaban belum diisi.</span>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="submit" id="submit-btn">Kirim Jawaban 🚀</button>
+      <span class="form-status" id="form-status"></span>
+    </div>
+  </form>
+
+  <div class="list-head">
+    <h2>Jawaban yang Sudah Masuk 📋</h2>
+    <input type="text" class="filter-input" id="filter" placeholder="Cari nama, kelas, pelajaran..." />
+  </div>
+  <span class="count-chip" id="count-chip"></span>
+
+  <div id="entries-container">
+    <div class="loading-state" id="loading-state">Lagi ambil data jawaban...</div>
+  </div>
+  <p class="no-match" id="no-match">Tidak ada jawaban yang cocok dengan pencarian.</p>
+
+  <footer class="note">
+    <button type="button" class="admin-toggle" id="admin-toggle">⚙️ Admin</button>
+  </footer>
+</div>
+
+<div class="celebrate" id="celebrate">🎉</div>
+
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-panel">
+    <h3>Panel Admin</h3>
+    <p class="modal-sub">Atur mata pelajaran &amp; soal yang tampil untuk siswa.</p>
+    <div id="admin-banner" class="banner" role="status" aria-live="polite"></div>
+    <div class="field">
+      <label for="admin-pin">Kode admin</label>
+      <input type="password" id="admin-pin" autocomplete="off" placeholder="Masukkan kode admin" />
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label for="admin-mapel">Mata pelajaran</label>
+      <input type="text" id="admin-mapel" autocomplete="off" maxlength="40" placeholder="mis. IPS" />
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label for="admin-soal">Soal</label>
+      <textarea id="admin-soal" maxlength="2000" placeholder="Tulis soal PR di sini..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="ghost" id="admin-cancel">Tutup</button>
+      <button type="button" class="submit" id="admin-save">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // =========================================================================
+  // KONFIGURASI — EDIT BAGIAN INI
+  // =========================================================================
+
+  // Tempel URL Web App Google Apps Script yang SAMA dengan yang dipakai
+  // portal ujian online Anda (lihat PANDUAN-GABUNG-PORTAL.md).
+  var WEB_APP_URL = "PASTE_URL_WEB_APP_DI_SINI";
+
+  // Daftar siswa TIDAK diketik manual di sini lagi — halaman ini otomatis
+  // mengambilnya dari tab "Data_anak" di spreadsheet lewat ?action=siswa,
+  // endpoint yang sama yang sudah dipakai portal ujian online Anda.
+
+  // =========================================================================
+
+  var ACCENT_CYCLE = [
+    { bar: "var(--coral)", bg: "var(--coral-soft)" },
+    { bar: "var(--turquoise)", bg: "var(--turquoise-soft)" },
+    { bar: "var(--violet)", bg: "var(--violet-soft)" },
+    { bar: "var(--blue)", bg: "var(--blue-soft)" },
+    { bar: "var(--pink)", bg: "var(--pink-soft)" },
+    { bar: "var(--yellow)", bg: "var(--yellow-soft)" }
+  ];
+
+  var currentEntries = [];
+  var currentMapel = "";
+  var currentSoal = "";
+  var SISWA_DATA = {};
+  var rosterLoaded = false;
+  var submitting = false;
+  var savingSettings = false;
+  var configured = WEB_APP_URL.indexOf("https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec") === -1;
+
+  var DUPLICATE_MSG = "Tidak bisa submit. Gunakan jawabanmu sendiri.";
+  var DEFAULT_FIELD_ERRORS = {
+    kelas: "Pilih kelas dulu ya.",
+    nama: "Pilih namamu dulu ya.",
+    jawaban: "Jawaban belum diisi."
+  };
+
+  function normalizeJawaban(str) {
+    return String(str == null ? "" : str).toLowerCase().trim().replace(/\s+/g, " ");
+  }
+
+  function isDuplicateJawaban(jawabanText) {
+    var normalized = normalizeJawaban(jawabanText);
+    if (!normalized) return false;
+    return currentEntries.some(function (e) {
+      return e.soal === currentSoal && normalizeJawaban(e.jawaban) === normalized;
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function formatWaktu(iso) {
+    try {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      return d.toLocaleString("id-ID", {
+        day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+      }) + " WIB";
+    } catch (e) { return ""; }
+  }
+
+  function populateKelasOptions() {
+    var sel = document.getElementById("kelas");
+    sel.innerHTML = "";
+    var kelasList = Object.keys(SISWA_DATA);
+    if (!kelasList.length) {
+      sel.appendChild(new Option("Belum ada data kelas", ""));
+      sel.disabled = true;
+      return;
+    }
+    sel.appendChild(new Option("Pilih kelas...", ""));
+    kelasList.forEach(function (kelas) {
+      sel.appendChild(new Option("Kelas " + kelas, kelas));
+    });
+    sel.disabled = false;
+  }
+
+  function populateNamaOptions(kelas) {
+    var sel = document.getElementById("nama");
+    sel.innerHTML = "";
+    var siswa = SISWA_DATA[kelas] || [];
+    if (!kelas) {
+      sel.appendChild(new Option("Pilih kelas dulu", ""));
+      sel.disabled = true;
+      return;
+    }
+    sel.appendChild(new Option("Pilih nama...", ""));
+    siswa.forEach(function (nm) { sel.appendChild(new Option(nm, nm)); });
+    sel.disabled = false;
+  }
+
+  async function loadSiswaRoster() {
+    var kelasSel = document.getElementById("kelas");
+    if (!configured) {
+      kelasSel.innerHTML = "";
+      kelasSel.appendChild(new Option("Belum terhubung ke Sheet", ""));
+      kelasSel.disabled = true;
+      return;
+    }
+    kelasSel.innerHTML = "";
+    kelasSel.appendChild(new Option("Memuat kelas...", ""));
+    kelasSel.disabled = true;
+    try {
+      var res = await fetch(WEB_APP_URL + "?action=siswa", { method: "GET" });
+      var data = await res.json();
+      if (data.status !== "success") throw new Error(data.message || "Gagal memuat daftar siswa");
+      SISWA_DATA = data.data || {};
+      rosterLoaded = true;
+      populateKelasOptions();
+    } catch (err) {
+      kelasSel.innerHTML = "";
+      kelasSel.appendChild(new Option("Gagal memuat kelas — muat ulang halaman", ""));
+      kelasSel.disabled = true;
+      showBanner("error", "Gagal memuat daftar siswa dari Sheet. Coba muat ulang halaman.");
+    }
+  }
+
+  function sortedNewestFirst(entries) {
+    return entries.slice().sort(function (a, b) {
+      return String(b.waktu).localeCompare(String(a.waktu));
+    });
+  }
+
+  function renderEntriesMarkup(entries) {
+    if (!entries.length) {
+      return '<div class="empty-state">Belum ada jawaban yang masuk. Jadilah yang pertama! 🙌</div>';
+    }
+    var sorted = sortedNewestFirst(entries);
+    var html = [];
+    for (var i = 0; i < sorted.length; i++) {
+      var e = sorted[i];
+      var accent = ACCENT_CYCLE[i % ACCENT_CYCLE.length];
+      html.push(
+        '<li class="entry" style="--accent-bar:' + accent.bar + ';--accent-bg:' + accent.bg + '" ' +
+        'data-search="' + escapeHtml((e.nama + " " + e.kelas + " " + e.mapel).toLowerCase()) + '">' +
+          '<div class="entry-top">' +
+            '<span class="entry-who">' + escapeHtml(e.nama) + '</span>' +
+            '<span class="entry-meta">' + escapeHtml(formatWaktu(e.waktu)) + '</span>' +
+          '</div>' +
+          '<div class="entry-tags">' +
+            '<span class="tag">Kelas ' + escapeHtml(e.kelas) + '</span>' +
+            (e.mapel ? '<span class="tag">' + escapeHtml(e.mapel) + '</span>' : '') +
+          '</div>' +
+          '<p class="entry-answer">' + escapeHtml(e.jawaban) + '</p>' +
+        '</li>'
+      );
+    }
+    return '<ul class="entries" id="entries-list">' + html.join("") + '</ul>';
+  }
+
+  function renderEntries() {
+    var container = document.getElementById("entries-container");
+    container.innerHTML = renderEntriesMarkup(currentEntries);
+    var countChip = document.getElementById("count-chip");
+    countChip.textContent = currentEntries.length + (currentEntries.length === 1 ? " jawaban" : " jawaban");
+    applyFilter();
+  }
+
+  function applyFilter() {
+    var input = document.getElementById("filter");
+    var q = input ? input.value.trim().toLowerCase() : "";
+    var items = document.querySelectorAll("#entries-list .entry");
+    var visibleCount = 0;
+    items.forEach(function (li) {
+      var match = !q || (li.getAttribute("data-search") || "").indexOf(q) !== -1;
+      li.style.display = match ? "" : "none";
+      if (match) visibleCount++;
+    });
+    var noMatch = document.getElementById("no-match");
+    if (noMatch) noMatch.style.display = (q && items.length && visibleCount === 0) ? "block" : "none";
+  }
+
+  function showBanner(kind, msg) {
+    var b = document.getElementById("banner");
+    b.className = "banner show " + kind;
+    b.textContent = msg;
+  }
+  function hideBanner() {
+    var b = document.getElementById("banner");
+    b.className = "banner";
+    b.textContent = "";
+  }
+  function showAdminBanner(kind, msg) {
+    var b = document.getElementById("admin-banner");
+    b.className = "banner show " + kind;
+    b.textContent = msg;
+  }
+  function hideAdminBanner() {
+    var b = document.getElementById("admin-banner");
+    b.className = "banner";
+    b.textContent = "";
+  }
+  function setFormStatus(msg) {
+    document.getElementById("form-status").textContent = msg || "";
+  }
+  function clearFieldErrors() {
+    document.querySelectorAll(".field").forEach(function (f) { f.classList.remove("has-error"); });
+    Object.keys(DEFAULT_FIELD_ERRORS).forEach(function (key) {
+      var err = document.getElementById("err-" + key);
+      if (err) {
+        err.textContent = DEFAULT_FIELD_ERRORS[key];
+        err.classList.remove("show");
+      }
+    });
+  }
+  function showFieldErrors(errors) {
+    Object.keys(errors).forEach(function (key) {
+      var field = document.getElementById("field-" + key);
+      var err = document.getElementById("err-" + key);
+      if (field) field.classList.add("has-error");
+      if (err) {
+        var val = errors[key];
+        if (typeof val === "string") err.textContent = val;
+        err.classList.add("show");
+      }
+    });
+  }
+
+  function celebrate() {
+    var el = document.getElementById("celebrate");
+    el.classList.remove("show");
+    void el.offsetWidth; // restart animation
+    el.classList.add("show");
+  }
+
+  function renderMapelSoal() {
+    var badge = document.getElementById("mapel-badge");
+    if (currentMapel) {
+      badge.textContent = "📘 " + currentMapel;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+
+    var soalText = document.getElementById("soal-text");
+    if (currentSoal) {
+      soalText.textContent = currentSoal;
+      soalText.classList.remove("empty");
+    } else {
+      soalText.textContent = "Belum ada soal yang diisi guru. Mohon tunggu ya.";
+      soalText.classList.add("empty");
+    }
+
+    var btn = document.getElementById("submit-btn");
+    if (!currentSoal) {
+      btn.disabled = true;
+    } else if (configured) {
+      btn.disabled = false;
+    }
+  }
+
+  async function loadSettings() {
+    if (!configured) return;
+    try {
+      var res = await fetch(WEB_APP_URL + "?action=prSettings", { method: "GET" });
+      var data = await res.json();
+      if (data.status !== "success") throw new Error(data.message || "Gagal memuat pengaturan");
+      currentMapel = (data.data && data.data.mapel) || "";
+      currentSoal = (data.data && data.data.soal) || "";
+      renderMapelSoal();
+    } catch (err) {
+      document.getElementById("soal-text").textContent = "Gagal memuat soal. Coba muat ulang halaman.";
+    }
+  }
+
+  async function loadRecap() {
+    if (!configured) {
+      document.getElementById("entries-container").innerHTML =
+        '<div class="empty-state">Rekap belum bisa dimuat karena WEB_APP_URL belum diisi. Lihat PANDUAN-GABUNG-PORTAL.md.</div>';
+      document.getElementById("count-chip").textContent = "";
+      return;
+    }
+    try {
+      var res = await fetch(WEB_APP_URL + "?action=prList", { method: "GET" });
+      var data = await res.json();
+      if (data.status !== "success") throw new Error(data.message || "Gagal memuat data");
+      currentEntries = data.data || [];
+      renderEntries();
+    } catch (err) {
+      document.getElementById("entries-container").innerHTML =
+        '<div class="empty-state">Gagal memuat rekap jawaban. Coba muat ulang halaman ini.</div>';
+      document.getElementById("count-chip").textContent = "";
+    }
+  }
+
+  function validateForm(data) {
+    var errors = {};
+    if (!data.kelas) errors.kelas = true;
+    if (!data.nama) errors.nama = true;
+    if (!data.jawaban) errors.jawaban = true;
+    return errors;
+  }
+
+  async function handleSubmit(evt) {
+    evt.preventDefault();
+    if (submitting) return;
+    hideBanner();
+    clearFieldErrors();
+
+    if (!configured) {
+      showBanner("warn", "Formulir belum terhubung ke Google Sheet. Admin perlu mengisi WEB_APP_URL dulu (lihat PANDUAN-SETUP.md).");
+      return;
+    }
+    if (!currentSoal) {
+      showBanner("warn", "Belum ada soal yang diisi guru, jadi jawaban belum bisa dikirim dulu.");
+      return;
+    }
+
+    var data = {
+      type: "prJawaban",
+      kelas: document.getElementById("kelas").value,
+      nama: document.getElementById("nama").value,
+      jawaban: document.getElementById("jawaban").value.trim()
+    };
+
+    var errors = validateForm(data);
+    if (Object.keys(errors).length) {
+      showFieldErrors(errors);
+      setFormStatus("Lengkapi dulu bagian yang ditandai merah ya.");
+      return;
+    }
+
+    if (isDuplicateJawaban(data.jawaban)) {
+      showFieldErrors({ jawaban: DUPLICATE_MSG });
+      showBanner("warn", DUPLICATE_MSG);
+      setFormStatus("");
+      return;
+    }
+
+    submitting = true;
+    var btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    setFormStatus("Mengirim...");
+
+    try {
+      var res = await fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(data)
+      });
+      var result = await res.json();
+      if (result.status !== "success") throw new Error(result.message || "Gagal menyimpan jawaban");
+
+      setFormStatus("Tersimpan! 🎉");
+      showBanner("success", "Jawaban " + data.nama + " berhasil dikirim!");
+      celebrate();
+      document.getElementById("jawaban").value = "";
+      await loadRecap();
+    } catch (err) {
+      var msg = (err && err.message) ? err.message : "Jawaban gagal terkirim. Periksa koneksi internet lalu coba lagi.";
+      showBanner("error", msg);
+      if (msg === DUPLICATE_MSG) showFieldErrors({ jawaban: DUPLICATE_MSG });
+      setFormStatus("");
+    } finally {
+      btn.disabled = !currentSoal ? true : false;
+      submitting = false;
+    }
+  }
+
+  function openAdminModal() {
+    hideAdminBanner();
+    document.getElementById("admin-pin").value = "";
+    document.getElementById("admin-mapel").value = currentMapel;
+    document.getElementById("admin-soal").value = currentSoal;
+    document.getElementById("admin-modal").classList.add("show");
+    if (!configured) {
+      showAdminBanner("warn", "WEB_APP_URL belum diisi, pengaturan tidak bisa disimpan dari sini.");
+    }
+  }
+  function closeAdminModal() {
+    document.getElementById("admin-modal").classList.remove("show");
+  }
+
+  async function handleAdminSave() {
+    if (savingSettings) return;
+    hideAdminBanner();
+
+    if (!configured) {
+      showAdminBanner("warn", "WEB_APP_URL belum diisi, pengaturan tidak bisa disimpan dari sini.");
+      return;
+    }
+
+    var pin = document.getElementById("admin-pin").value;
+    var mapel = document.getElementById("admin-mapel").value.trim();
+    var soal = document.getElementById("admin-soal").value.trim();
+
+    if (!pin) {
+      showAdminBanner("error", "Masukkan kode admin dulu.");
+      return;
+    }
+    if (!mapel || !soal) {
+      showAdminBanner("error", "Mata pelajaran dan soal wajib diisi.");
+      return;
+    }
+
+    savingSettings = true;
+    var saveBtn = document.getElementById("admin-save");
+    saveBtn.disabled = true;
+    showAdminBanner("info", "Menyimpan...");
+
+    try {
+      var res = await fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ type: "prSettings", pin: pin, mapel: mapel, soal: soal })
+      });
+      var result = await res.json();
+      if (result.status !== "success") throw new Error(result.message || "Gagal menyimpan pengaturan");
+
+      currentMapel = mapel;
+      currentSoal = soal;
+      renderMapelSoal();
+      showAdminBanner("success", "Pengaturan tersimpan!");
+      setTimeout(closeAdminModal, 900);
+    } catch (err) {
+      showAdminBanner("error", String(err.message || err));
+    } finally {
+      saveBtn.disabled = false;
+      savingSettings = false;
+    }
+  }
+
+  function init() {
+    document.getElementById("kelas").addEventListener("change", function () {
+      populateNamaOptions(this.value);
+    });
+    document.getElementById("pr-form").addEventListener("submit", handleSubmit);
+    document.getElementById("filter").addEventListener("input", applyFilter);
+
+    document.getElementById("admin-toggle").addEventListener("click", openAdminModal);
+    document.getElementById("admin-cancel").addEventListener("click", closeAdminModal);
+    document.getElementById("admin-save").addEventListener("click", handleAdminSave);
+    document.getElementById("admin-modal").addEventListener("click", function (evt) {
+      if (evt.target === this) closeAdminModal();
+    });
+
+    var entriesContainer = document.getElementById("entries-container");
+    entriesContainer.addEventListener("copy", function (evt) {
+      evt.preventDefault();
+      showBanner("warn", "Jawaban ini tidak bisa disalin. Tulis jawabanmu sendiri ya!");
+    });
+    entriesContainer.addEventListener("cut", function (evt) { evt.preventDefault(); });
+    entriesContainer.addEventListener("contextmenu", function (evt) { evt.preventDefault(); });
+    entriesContainer.addEventListener("selectstart", function (evt) { evt.preventDefault(); });
+
+    if (!configured) {
+      showBanner("warn", "Formulir belum terhubung ke Google Sheet. Admin perlu mengisi WEB_APP_URL di index.html (lihat PANDUAN-GABUNG-PORTAL.md).");
+      document.getElementById("submit-btn").disabled = true;
+    }
+
+    document.getElementById("submit-btn").disabled = true; // terkunci sampai soal termuat
+    loadSiswaRoster();
+    loadSettings();
+    loadRecap();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
