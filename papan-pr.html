@@ -438,7 +438,7 @@
 
   // Tempel URL Web App Google Apps Script yang SAMA dengan yang dipakai
   // portal ujian online Anda (lihat PANDUAN-GABUNG-PORTAL.md).
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
+  var WEB_APP_URL = "PASTE_URL_WEB_APP_DI_SINI";
 
   // Daftar siswa TIDAK diketik manual di sini lagi — halaman ini otomatis
   // mengambilnya dari tab "Data_anak" di spreadsheet lewat ?action=siswa,
@@ -588,14 +588,24 @@
   }
 
   // Daftar jawaban yang ditampilkan SELALU hanya untuk soal PR yang sedang aktif
-  // (diatur oleh admin lewat tab Pengaturan_PR di spreadsheet). Siswa tidak bisa
-  // mengubah tampilan ini ke soal lain — jawaban PR sebelumnya tetap tersimpan
-  // aman di tab Jawaban_PR, hanya tidak ditampilkan di halaman ini lagi.
+  // UNTUK KELAS SISWA YANG DIPILIH (diatur admin lewat Bank Soal PR di portal,
+  // per tingkat kelas). Siswa tidak bisa mengubah tampilan ini ke soal/kelas
+  // lain — jawaban PR kelas lain / soal sebelumnya tetap tersimpan aman di tab
+  // Jawaban_PR, hanya tidak ditampilkan di halaman ini.
   function renderEntries() {
-    var filtered = currentEntries.filter(function (e) { return e.soal === currentSoal; });
+    var kelasTerpilih = document.getElementById("kelas") ? document.getElementById("kelas").value : "";
     var container = document.getElementById("entries-container");
-    container.innerHTML = renderEntriesMarkup(filtered);
     var countChip = document.getElementById("count-chip");
+
+    if (!kelasTerpilih) {
+      container.innerHTML = '<div class="empty-state">Pilih kelasmu dulu untuk melihat soal &amp; jawaban PR-nya.</div>';
+      countChip.textContent = "";
+      applyFilter();
+      return;
+    }
+
+    var filtered = currentEntries.filter(function (e) { return e.soal === currentSoal; });
+    container.innerHTML = renderEntriesMarkup(filtered);
     countChip.textContent = filtered.length + (filtered.length === 1 ? " jawaban" : " jawaban");
     applyFilter();
   }
@@ -666,12 +676,16 @@
       badge.style.display = "none";
     }
 
+    var kelasTerpilih = document.getElementById("kelas") ? document.getElementById("kelas").value : "";
     var soalText = document.getElementById("soal-text");
     if (currentSoal) {
       soalText.textContent = currentSoal;
       soalText.classList.remove("empty");
+    } else if (!kelasTerpilih) {
+      soalText.textContent = "Pilih kelasmu dulu untuk melihat soal PR-nya ya.";
+      soalText.classList.add("empty");
     } else {
-      soalText.textContent = "Belum ada soal yang diisi guru. Mohon tunggu ya.";
+      soalText.textContent = "Guru belum mengisi soal PR untuk kelasmu. Mohon tunggu ya.";
       soalText.classList.add("empty");
     }
 
@@ -683,10 +697,20 @@
     }
   }
 
-  async function loadSettings() {
+  // Soal PR sekarang bisa berbeda per tingkat kelas (diatur lewat Bank Soal PR
+  // di portal), jadi soal baru diminta SETELAH siswa memilih kelasnya sendiri —
+  // dipanggil dari listener perubahan dropdown Kelas di init().
+  async function loadSettings(kelas) {
     if (!configured) return;
+    if (!kelas) {
+      currentMapel = "";
+      currentSoal = "";
+      renderMapelSoal();
+      renderEntries();
+      return;
+    }
     try {
-      var res = await fetch(WEB_APP_URL + "?action=prSettings", { method: "GET" });
+      var res = await fetch(WEB_APP_URL + "?action=prSettings&kelas=" + encodeURIComponent(kelas), { method: "GET" });
       var data = await res.json();
       if (data.status !== "success") throw new Error(data.message || "Gagal memuat pengaturan");
       currentMapel = (data.data && data.data.mapel) || "";
@@ -694,7 +718,11 @@
       renderMapelSoal();
       renderEntries(); // soal aktif baru diketahui di sini — render ulang supaya daftar jawaban ikut ter-filter dengan benar
     } catch (err) {
+      currentMapel = "";
+      currentSoal = "";
       document.getElementById("soal-text").textContent = "Gagal memuat soal. Coba muat ulang halaman.";
+      document.getElementById("soal-text").classList.add("empty");
+      renderEntries();
     }
   }
 
@@ -795,6 +823,7 @@
   function init() {
     document.getElementById("kelas").addEventListener("change", function () {
       populateNamaOptions(this.value);
+      loadSettings(this.value); // soal PR bisa beda per tingkat kelas — muat ulang tiap kelas berganti
     });
     document.getElementById("pr-form").addEventListener("submit", handleSubmit);
     document.getElementById("filter").addEventListener("input", applyFilter);
@@ -814,8 +843,8 @@
     }
 
     document.getElementById("submit-btn").disabled = true; // terkunci sampai soal termuat
+    renderMapelSoal(); // tampilkan pesan "pilih kelas dulu" sebelum data lain termuat
     loadSiswaRoster();
-    loadSettings();
     loadRecap();
   }
 
