@@ -1210,9 +1210,20 @@
       <div style="font-weight:800; font-size:15px; margin-bottom:6px;" id="prFormJudul">📝 Buat Soal Baru</div>
       <div class="gen-row hint" style="margin-top:0; margin-bottom:16px;">Soal yang dibuat/diaktifkan di sini akan langsung tampil di halaman Papan Jawaban PR untuk siswa. Perlu kode admin untuk setiap perubahan.</div>
 
-      <div class="gen-row">
-        <label for="prAdminMapel">Mata Pelajaran</label>
-        <input type="text" id="prAdminMapel" placeholder="Contoh: IPS">
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="prAdminMapel">Mata Pelajaran</label>
+          <input type="text" id="prAdminMapel" placeholder="Contoh: IPS">
+        </div>
+        <div class="gen-row">
+          <label for="prAdminKelasTarget">Target Kelas</label>
+          <select id="prAdminKelasTarget">
+            <option value="Semua">Semua Kelas</option>
+            <option value="7">Kelas 7</option>
+            <option value="8">Kelas 8</option>
+            <option value="9">Kelas 9</option>
+          </select>
+        </div>
       </div>
       <div class="gen-row">
         <label for="prAdminSoal">Soal</label>
@@ -1227,7 +1238,7 @@
         <input type="checkbox" id="prAdminAktifkan" checked>
         <div class="txt">
           <b>Langsung aktifkan soal ini</b>
-          <span>Kalau dicentang, soal ini langsung ditampilkan ke siswa menggantikan soal aktif sebelumnya.</span>
+          <span>Kalau dicentang, soal ini langsung menggantikan soal aktif SEBELUMNYA untuk Target Kelas yang sama saja — kelas lain tidak ikut berubah.</span>
         </div>
       </div>
 
@@ -2526,7 +2537,8 @@ muatDaftarUjianLaporan();
 // HASIL PR — tampilan GURU: siapa sudah/belum submit (2 kolom, hemat tempat)
 // (siswa mengisi jawaban lewat halaman terpisah papan-pr.html)
 // ======================================================
-let prSoalAktifSaatIni = { mapel:"", soal:"" };
+const TINGKAT_PR_DIPANTAU = ["7","8","9"];
+let prSoalAktifPerTingkat = {}; // { "7": {mapel,soal}, "8": {...}, "9": {...} } — sudah fallback ke "Semua" dari server
 let prRosterSemua = {};   // { "7A": ["NAMA1", ...], ... }
 let prJawabanSemua = [];  // seluruh entri dari ?action=prList (belum difilter soal)
 
@@ -2553,22 +2565,45 @@ async function muatRosterPR(){
   }
 }
 
+// Tingkat dari nama kelas, mis. "8A" -> "8", "9B" -> "9" (sama seperti logika di server)
+function tingkatDariKelasPR(kelas){
+  const m = String(kelas || "").match(/\d+/);
+  return m ? m[0] : "";
+}
+
+// Ambil soal aktif untuk tiap tingkat (7/8/9) sekaligus — server sudah otomatis
+// fallback ke soal tingkat "Semua" kalau tingkat itu belum punya soal sendiri,
+// jadi di sini tinggal dipakai apa adanya, tidak perlu ulang logika fallback-nya.
 async function muatSoalAktifPR(){
   const box = document.getElementById("prSoalAktifBox");
   if(!box) return;
   box.innerHTML = '<div class="status-msg">Memuat soal aktif...</div>';
+
   try{
-    const res = await fetch(scriptURL + "?action=prSettings");
-    const json = await res.json();
-    if(json.status === "success" && json.data && json.data.mapel && json.data.soal){
-      prSoalAktifSaatIni = json.data;
-      box.innerHTML =
-        '<span class="subjek-tag" style="margin-bottom:10px; display:inline-block;">' + escapeHtmlSoal(json.data.mapel) + '</span>' +
-        '<div style="font-size:14.5px; font-weight:600; line-height:1.6; white-space:pre-wrap; margin-top:8px;">' + escapeHtmlSoal(json.data.soal) + '</div>';
-    } else {
-      prSoalAktifSaatIni = { mapel:"", soal:"" };
-      box.innerHTML = '<div class="status-msg">Belum ada soal aktif. Buat lewat menu "Buat PR Baru".</div>';
-    }
+    const hasil = await Promise.all(TINGKAT_PR_DIPANTAU.map(t =>
+      fetch(scriptURL + "?action=prSettings&kelas=" + encodeURIComponent(t))
+        .then(r => r.json())
+        .then(j => ({ tingkat: t, data: (j.status === "success" && j.data) ? j.data : { mapel:"", soal:"" } }))
+        .catch(() => ({ tingkat: t, data: { mapel:"", soal:"" } }))
+    ));
+
+    prSoalAktifPerTingkat = {};
+    hasil.forEach(h => { prSoalAktifPerTingkat[h.tingkat] = h.data; });
+
+    box.innerHTML = '<div class="dash-stats">' + hasil.map(h => {
+      if(!h.data.mapel || !h.data.soal){
+        return `<div class="dash-stat-card" style="text-align:left;">
+          <div style="font-weight:800; font-size:11.5px; color:var(--primary-dark); text-transform:uppercase; letter-spacing:0.04em;">Kelas ${h.tingkat}</div>
+          <div style="font-size:12.5px; color:var(--muted); font-weight:600; margin-top:8px;">Belum ada soal aktif.</div>
+        </div>`;
+      }
+      return `<div class="dash-stat-card" style="text-align:left;">
+        <div style="font-weight:800; font-size:11.5px; color:var(--primary-dark); text-transform:uppercase; letter-spacing:0.04em;">Kelas ${h.tingkat}</div>
+        <span class="subjek-tag" style="margin-top:8px; display:inline-block;">${escapeHtmlSoal(h.data.mapel)}</span>
+        <div style="font-size:13px; font-weight:600; line-height:1.5; white-space:pre-wrap; margin-top:6px;">${escapeHtmlSoal(h.data.soal)}</div>
+      </div>`;
+    }).join("") + '</div>';
+
   } catch(err){
     console.error(err);
     box.innerHTML = '<div class="status-msg error">Gagal memuat soal aktif.</div>';
@@ -2586,7 +2621,9 @@ async function muatJawabanPR(){
   }
 }
 
-// Gabungkan roster + jawaban -> render kartu ringkasan + 2 kolom (sudah/belum submit)
+// Gabungkan roster + jawaban -> render kartu ringkasan + 2 kolom (sudah/belum submit).
+// Tiap siswa dibandingkan ke soal aktif TINGKATNYA SENDIRI (bukan satu soal global),
+// karena kelas 7/8/9 sekarang bisa punya soal PR aktif yang berbeda.
 function renderRingkasanPR(){
   const listSudah = document.getElementById("prListSudah");
   const listBelum = document.getElementById("prListBelum");
@@ -2595,14 +2632,13 @@ function renderRingkasanPR(){
   const kelasFilter = document.getElementById("prFilterKelas").value || "SEMUA";
   const kataKunci = document.getElementById("prFilterCari").value.trim().toUpperCase();
 
-  // Hanya jawaban untuk soal yang sedang aktif yang dihitung sebagai "sudah submit"
-  const jawabanSoalAktif = prSoalAktifSaatIni.soal
-    ? prJawabanSemua.filter(item => item.soal === prSoalAktifSaatIni.soal)
-    : [];
-
-  // key "KELAS|NAMA" (uppercase) -> entri jawaban
+  // key "KELAS|NAMA" (uppercase) -> entri jawaban, HANYA kalau jawabannya cocok
+  // dengan soal aktif tingkat siswa itu sendiri
   const submitted = {};
-  jawabanSoalAktif.forEach(item => {
+  prJawabanSemua.forEach(item => {
+    const tingkat = tingkatDariKelasPR(item.kelas);
+    const efektif = prSoalAktifPerTingkat[tingkat];
+    if(!efektif || !efektif.soal || item.soal !== efektif.soal) return;
     const key = (item.kelas || "").toString().trim().toUpperCase() + "|" + (item.nama || "").toString().trim().toUpperCase();
     submitted[key] = item;
   });
@@ -2611,11 +2647,16 @@ function renderRingkasanPR(){
 
   let totalSemua = 0, sudahSemua = 0;
   let htmlSudah = "", htmlBelum = "";
+  let tingkatTanpaSoal = new Set();
 
   kelasList.forEach(kelas => {
     const siswaKelas = prRosterSemua[kelas] || [];
     const cocok = siswaKelas.filter(nama => !kataKunci || nama.toUpperCase().includes(kataKunci));
     if(cocok.length === 0) return;
+
+    const tingkat = tingkatDariKelasPR(kelas);
+    const efektif = prSoalAktifPerTingkat[tingkat];
+    if(!efektif || !efektif.soal) tingkatTanpaSoal.add(tingkat || kelas);
 
     const sudahList = [];
     const belumList = [];
@@ -2663,12 +2704,12 @@ function renderRingkasanPR(){
   document.getElementById("prCountSudah").textContent = sudahSemua;
   document.getElementById("prCountBelum").textContent = belumSemua;
 
-  if(!prSoalAktifSaatIni.soal){
-    listSudah.innerHTML = '<li class="lap-empty">Belum ada soal aktif.</li>';
-  } else {
-    listSudah.innerHTML = htmlSudah || '<li class="lap-empty">Belum ada yang submit untuk soal ini.</li>';
+  let catatanTingkat = "";
+  if(tingkatTanpaSoal.size > 0){
+    catatanTingkat = '<li class="lap-empty" style="color:#b45309;">⚠️ Kelas ' + [...tingkatTanpaSoal].join(", ") + ' belum punya soal aktif — semua siswanya otomatis tampil "Belum".</li>';
   }
 
+  listSudah.innerHTML = (catatanTingkat + htmlSudah) || '<li class="lap-empty">Belum ada yang submit untuk soal aktif saat ini.</li>';
   listBelum.innerHTML = htmlBelum || '<li class="lap-empty">Semua siswa sudah submit 🎉</li>';
 }
 
@@ -2715,6 +2756,18 @@ async function muatDaftarSoalPR(){
   }
 }
 
+const KELOMPOK_TINGKAT_PR = [
+  { key:"Semua", label:"Semua Kelas" },
+  { key:"7", label:"Kelas 7" },
+  { key:"8", label:"Kelas 8" },
+  { key:"9", label:"Kelas 9" }
+];
+
+function labelKelasTargetPR(kode){
+  const found = KELOMPOK_TINGKAT_PR.find(k => k.key === kode);
+  return found ? found.label : (kode || "Semua Kelas");
+}
+
 function renderDaftarSoalPR(){
   const box = document.getElementById("prDaftarSoalBox");
   if(!box) return;
@@ -2724,21 +2777,30 @@ function renderDaftarSoalPR(){
     return;
   }
 
-  box.innerHTML = prDaftarSoalSemua.map(item => `
-    <div class="card-link" style="cursor:default; flex-direction:column; align-items:flex-start; gap:10px;">
-      <div style="width:100%;">
-        <span class="subjek-tag">${escapeHtmlSoal(item.mapel)}</span>
-        ${item.aktif ? '<span class="status penuh" style="margin-left:6px;">Aktif</span>' : ''}
-        <div style="font-size:14px; font-weight:600; margin-top:8px; white-space:pre-wrap;">${escapeHtmlSoal(item.soal)}</div>
-        <div style="font-size:11.5px; color:var(--muted); font-weight:600; margin-top:6px;">${formatWaktuLaporan(item.waktu)}</div>
+  let html = "";
+  KELOMPOK_TINGKAT_PR.forEach(grp => {
+    const items = prDaftarSoalSemua.filter(it => (it.kelasTarget || "Semua") === grp.key);
+    if(items.length === 0) return;
+
+    html += '<div class="dash-group-title">' + grp.label + '</div>';
+    html += items.map(item => `
+      <div class="card-link" style="cursor:default; flex-direction:column; align-items:flex-start; gap:10px;">
+        <div style="width:100%;">
+          <span class="subjek-tag">${escapeHtmlSoal(item.mapel)}</span>
+          ${item.aktif ? '<span class="status penuh" style="margin-left:6px;">Aktif</span>' : ''}
+          <div style="font-size:14px; font-weight:600; margin-top:8px; white-space:pre-wrap;">${escapeHtmlSoal(item.soal)}</div>
+          <div style="font-size:11.5px; color:var(--muted); font-weight:600; margin-top:6px;">${formatWaktuLaporan(item.waktu)}</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          ${item.aktif ? '' : `<button class="btn-copy" onclick="aktifkanSoalPR('${item.id}')">▶️ Aktifkan</button>`}
+          <button class="btn-copy" onclick="mulaiEditSoalPR('${item.id}')">✏️ Edit</button>
+          <button class="btn-copy" onclick="hapusSoalPR('${item.id}')">🗑️ Hapus</button>
+        </div>
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${item.aktif ? '' : `<button class="btn-copy" onclick="aktifkanSoalPR('${item.id}')">▶️ Aktifkan</button>`}
-        <button class="btn-copy" onclick="mulaiEditSoalPR('${item.id}')">✏️ Edit</button>
-        <button class="btn-copy" onclick="hapusSoalPR('${item.id}')">🗑️ Hapus</button>
-      </div>
-    </div>
-  `).join("");
+    `).join("");
+  });
+
+  box.innerHTML = html || '<div class="status-msg">Belum ada soal yang dibuat.</div>';
 }
 
 function mulaiEditSoalPR(id){
@@ -2747,6 +2809,7 @@ function mulaiEditSoalPR(id){
   prEditingId = id;
   document.getElementById("prAdminMapel").value = item.mapel;
   document.getElementById("prAdminSoal").value = item.soal;
+  document.getElementById("prAdminKelasTarget").value = item.kelasTarget || "Semua";
   document.getElementById("prFormJudul").textContent = "✏️ Edit Soal";
   document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Perubahan";
   document.getElementById("prBtnBatalEdit").style.display = "inline-flex";
@@ -2760,6 +2823,7 @@ function batalEditSoalPR(){
   prEditingId = null;
   document.getElementById("prAdminMapel").value = "";
   document.getElementById("prAdminSoal").value = "";
+  document.getElementById("prAdminKelasTarget").value = "Semua";
   document.getElementById("prFormJudul").textContent = "📝 Buat Soal Baru";
   document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Soal Baru";
   document.getElementById("prBtnBatalEdit").style.display = "none";
@@ -2770,6 +2834,7 @@ function batalEditSoalPR(){
 async function simpanSoalPR(){
   const mapel = document.getElementById("prAdminMapel").value.trim();
   const soal = document.getElementById("prAdminSoal").value.trim();
+  const kelasTarget = document.getElementById("prAdminKelasTarget").value;
   const pin = ambilPinAdminPR();
   const aktifkan = document.getElementById("prAdminAktifkan").checked;
   const pesanEl = document.getElementById("prAdminPesan");
@@ -2786,8 +2851,8 @@ async function simpanSoalPR(){
 
   try{
     const body = prEditingId
-      ? { type:"prSoalEdit", id: prEditingId, mapel, soal, pin }
-      : { type:"prSoalTambah", mapel, soal, pin, aktifkan };
+      ? { type:"prSoalEdit", id: prEditingId, mapel, soal, kelasTarget, pin }
+      : { type:"prSoalTambah", mapel, soal, kelasTarget, pin, aktifkan };
 
     const res = await fetch(scriptURL, { method:"POST", body: JSON.stringify(body) });
     const json = await res.json();
