@@ -209,7 +209,8 @@
     50%{ transform:rotate(-34deg); }
   }
 
-  /* Gelembung ucapan kecil saat burung diklik langsung */
+  /* Gelembung ucapan kecil — dipakai banyak reaksi (klik, dekat elemen,
+     jungkir balik, bosan, hitung sayang, sambutan harian) */
   .mk-bubble{
     position:absolute;
     left:50%;
@@ -228,7 +229,13 @@
     white-space:nowrap;
     transition: opacity 0.22s ease, transform 0.22s ease;
   }
-  #maskotBurung.disapa .mk-bubble{
+  #maskotBurung.disapa .mk-bubble,
+  #maskotBurung.mk-dekat .mk-bubble,
+  #maskotBurung.jungkir .mk-bubble,
+  #maskotBurung.bosan .mk-bubble,
+  #maskotBurung.mk-hitung .mk-bubble,
+  #maskotBurung.sambut .mk-bubble,
+  #maskotBurung.makan .mk-bubble{
     opacity:1;
     transform:translate(-50%,-18px) scale(1);
   }
@@ -242,6 +249,132 @@
     35%{ transform:translateY(4px) scaleY(0.8); }
     65%{ transform:translateY(4px) scaleY(0.8); }
     100%{ transform:translateY(0) scaleY(1); }
+  }
+
+  /* Diberi makan: kepala mematuk-matuk + badan bergoyang senang */
+  #maskotBurung.makan{
+    animation: mkGoyangSenang 0.9s ease;
+  }
+  @keyframes mkGoyangSenang{
+    0%, 100%{ transform:translateX(0) rotate(0deg); }
+    20%{ transform:translateX(-2px) rotate(-4deg); }
+    40%{ transform:translateX(2px) rotate(4deg); }
+    60%{ transform:translateX(-2px) rotate(-3deg); }
+    80%{ transform:translateX(2px) rotate(3deg); }
+  }
+  #maskotBurung.makan .mk-kepala,
+  #maskotBurung.makan .mk-mata,
+  #maskotBurung.makan .mk-pipi,
+  #maskotBurung.makan .mk-paruh{
+    animation: mkMematuk 0.3s ease-in-out 3;
+  }
+  @keyframes mkMematuk{
+    0%, 100%{ transform:rotate(0deg); }
+    50%{ transform:rotate(-28deg) translateX(-3px); }
+  }
+
+  /* Klik beruntun -> pusing, bintang berputar di atas kepala */
+  #maskotBurung.pusing{
+    animation: mkPusing 1.6s ease-in-out;
+  }
+  @keyframes mkPusing{
+    0%, 100%{ transform:translateY(0) rotate(0deg); }
+    15%{ transform:translateY(-4px) rotate(-8deg); }
+    30%{ transform:translateY(0) rotate(8deg); }
+    45%{ transform:translateY(-4px) rotate(-8deg); }
+    60%{ transform:translateY(0) rotate(8deg); }
+    75%{ transform:translateY(-2px) rotate(-4deg); }
+    90%{ transform:translateY(0) rotate(2deg); }
+  }
+  .mk-bintang{
+    position:absolute;
+    left:50%;
+    top:-20px;
+    transform:translateX(-50%);
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+    transition: opacity 0.25s ease;
+  }
+  #maskotBurung.pusing .mk-bintang{
+    opacity:1;
+    animation: mkBintangOrbit 0.7s linear infinite;
+  }
+  @keyframes mkBintangOrbit{
+    0%{ transform:translateX(-50%) rotate(0deg); }
+    100%{ transform:translateX(-50%) rotate(360deg); }
+  }
+
+  /* Ketiduran larut malam: mata terpejam + "Zzz" melayang berkala */
+  #maskotBurung.tidur .mk-mata{
+    transform-origin: 76px 26px;
+    transform: scaleY(0.15);
+  }
+  .mk-zzz{
+    position:absolute;
+    right:2px;
+    top:-4px;
+    font-size:11px;
+    font-weight:800;
+    color:var(--primary-dark);
+    opacity:0;
+    pointer-events:none;
+  }
+  .mk-zzz.tampil{
+    animation: mkZzzMelayang 2.2s ease-out;
+  }
+  @keyframes mkZzzMelayang{
+    0%{ opacity:0; transform:translateY(0) scale(0.6); }
+    20%{ opacity:1; transform:translateY(-6px) scale(1); }
+    80%{ opacity:1; transform:translateY(-18px) scale(1.1); }
+    100%{ opacity:0; transform:translateY(-26px) scale(1.1); }
+  }
+
+  /* Klik ganda -> jungkir balik */
+  #maskotBurung.jungkir{
+    animation: mkJungkirBalik 0.7s ease;
+  }
+  @keyframes mkJungkirBalik{
+    0%{ transform:translateY(0) rotate(0deg); }
+    40%{ transform:translateY(-22px) rotate(180deg); }
+    70%{ transform:translateY(-6px) rotate(360deg); }
+    100%{ transform:translateY(0) rotate(360deg); }
+  }
+
+  /* Dibiarkan lama -> menguap/meregang */
+  #maskotBurung.bosan{
+    animation: mkBosan 1.1s ease-in-out;
+  }
+  @keyframes mkBosan{
+    0%, 100%{ transform:scale(1,1) rotate(0deg); }
+    30%{ transform:scale(1.1,0.9) rotate(-4deg); }
+    60%{ transform:scale(0.95,1.05) rotate(3deg); }
+    85%{ transform:scale(1.03,0.98) rotate(-1deg); }
+  }
+
+  /* Sambutan harian, sekali per hari saat splash ditutup */
+  #maskotBurung.sambut{
+    animation: mkLompat 0.6s ease;
+  }
+
+  /* Hati melayang tiap diklik (meteran disayang) */
+  .mk-hati{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translate(-50%,0) scale(0.6);
+    font-size:14px;
+    opacity:0;
+    pointer-events:none;
+  }
+  .mk-hati.tampil{
+    animation: mkHatiMelayang 1s ease-out;
+  }
+  @keyframes mkHatiMelayang{
+    0%{ opacity:0; transform:translate(-50%,0) scale(0.5); }
+    20%{ opacity:1; transform:translate(-50%,-6px) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-30px) scale(1.15); }
   }
 
   /* Telur yang dijatuhkan burung */
@@ -292,8 +425,39 @@
     transition: left 0.7s ease-in, transform 0.7s linear, opacity 0.5s ease-in 0.25s;
   }
 
+  /* Ikon makanan — diseret ke arah burung untuk kasih makan */
+  #maskotMakanan{
+    position:fixed;
+    left:16px;
+    bottom:16px;
+    width:34px;
+    height:34px;
+    z-index:150;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+    background:var(--card);
+    border-radius:50%;
+    box-shadow:0 3px 8px rgba(0,0,0,0.18);
+    cursor:grab;
+    user-select:none;
+    touch-action:none;
+    transition:left 0.4s cubic-bezier(.34,1.5,.64,1), top 0.4s cubic-bezier(.34,1.5,.64,1), transform 0.15s ease, opacity 0.3s ease;
+  }
+  #maskotMakanan:hover{ transform:scale(1.08); }
+  #maskotMakanan.mk-drag{
+    cursor:grabbing;
+    transition:transform 0.15s ease;
+  }
+  #maskotMakanan.mk-dimakan{
+    opacity:0;
+    transform:scale(0.4);
+  }
+
   @media (max-width:480px){
     #maskotBurung{ width:46px; height:42px; right:12px; bottom:12px; }
+    #maskotMakanan{ width:30px; height:30px; font-size:16px; left:12px; bottom:12px; }
   }
 
   .brand{
@@ -927,6 +1091,9 @@
 
 <div id="maskotBurung" title="Halo! 👋">
   <div class="mk-bubble" id="maskotBubble"></div>
+  <div class="mk-zzz" id="maskotZzz">Zzz</div>
+  <div class="mk-hati" id="maskotHati">❤️</div>
+  <div class="mk-bintang" id="maskotBintang">✨⭐✨</div>
   <svg class="mk-svg" viewBox="0 0 100 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <path class="mk-ekor" d="M18 55 L2 46 L22 60 Z"></path>
     <ellipse class="mk-badan" cx="52" cy="55" rx="30" ry="26"></ellipse>
@@ -938,6 +1105,7 @@
   </svg>
 </div>
 <div id="maskotTelur"></div>
+<div id="maskotMakanan" title="Seret ke burung untuk kasih makan">🌾</div>
 
 
 
@@ -1866,6 +2034,7 @@ try{ aksesPortalOk = sessionStorage.getItem(KEY_AKSES_PORTAL) === "1"; }catch(e)
 function tutupSplash(){
   if(!splash) return;
   splash.classList.add("hide");
+  if(typeof window.mkSambutHarian === "function") window.mkSambutHarian();
 }
 
 function tampilkanGerbang(){
@@ -1959,6 +2128,7 @@ tampilkanGerbang();
 function reaksiBurungMenu(){
   const mk = document.getElementById("maskotBurung");
   if(!mk) return;
+  if(typeof window.mkCatatAktivitas === "function") window.mkCatatAktivitas();
   mk.classList.remove("kaget");
   void mk.offsetWidth; // paksa reflow supaya animasi restart walau diklik cepat berturut-turut
   mk.classList.add("kaget");
@@ -1969,17 +2139,35 @@ function reaksiBurungMenu(){
   const mk = document.getElementById("maskotBurung");
   const bubble = document.getElementById("maskotBubble");
   const telur = document.getElementById("maskotTelur");
+  const zzz = document.getElementById("maskotZzz");
+  const hati = document.getElementById("maskotHati");
   if(!mk) return;
 
   const UCAPAN = ["cvit!", "♪", "halo!", "✨", "cip cip"];
   const KEY_POSISI = "maskot_pos";
+  const KEY_DISAYANG = "maskot_disayang";
   const AMBANG_DRAG = 6; // px — di bawah ini masih dianggap klik, bukan geser
 
   let menekan = false;
   let sedangDrag = false;
   let baruSajaDrag = false;
   let sedangPulang = false;
+  let sedangTidur = false;
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  let waktuAktivitasTerakhir = Date.now();
+  let klikBaruBaru = [];
+  let waktuKlikTerakhir = 0;
+  let klikTimeoutId = null;
+  let hoverTimeoutId = null;
+  let targetDekatAktif = null;
+  let jumlahDisayang = 0;
+  try{ jumlahDisayang = parseInt(localStorage.getItem(KEY_DISAYANG) || "0", 10) || 0; }catch(e){}
+
+  function catatAktivitas(){
+    waktuAktivitasTerakhir = Date.now();
+  }
+  window.mkCatatAktivitas = catatAktivitas;
 
   // Jalankan cb PERSIS SEKALI: dipicu oleh event CSS (transitionend/animationend)
   // ATAU oleh batas waktu jaring pengaman — mana pun yang lebih dulu, yang
@@ -2040,8 +2228,28 @@ function reaksiBurungMenu(){
     terapkanPosisi(batasiPosisi(rect.left, rect.top));
   });
 
+  // Elemen-elemen yang dikasih reaksi khusus kalau burung diseret dekat situ
+  const TARGET_DEKAT = [
+    { cari: () => document.querySelector(".brand"), pesan: "Halo Portal Pak Agus! 👋" },
+    { cari: () => document.querySelector('.nav-item[data-target="prhasil"]'), pesan: "Ada PR baru? 👀" },
+    { cari: () => document.querySelector('.nav-item[data-target="beranda"]'), pesan: "Cek ujian yuk! 📝" }
+  ];
+
+  function cekDekatElemen(rectBurung){
+    for(const t of TARGET_DEKAT){
+      const el = t.cari();
+      if(!el) continue;
+      const r = el.getBoundingClientRect();
+      if(r.width === 0 || r.height === 0) continue; // sedang tersembunyi (mis. sidebar tertutup)
+      const kena = !(rectBurung.right < r.left || rectBurung.left > r.right || rectBurung.bottom < r.top || rectBurung.top > r.bottom);
+      if(kena) return t;
+    }
+    return null;
+  }
+
   mk.addEventListener("pointerdown", (e) => {
     if(e.button !== undefined && e.button !== 0) return;
+    catatAktivitas();
     menekan = true;
     sedangDrag = false;
     startX = e.clientX;
@@ -2065,6 +2273,17 @@ function reaksiBurungMenu(){
 
     if(sedangDrag){
       terapkanPosisi(batasiPosisi(startLeft + dx, startTop + dy));
+
+      const target = cekDekatElemen(mk.getBoundingClientRect());
+      if(target !== targetDekatAktif){
+        targetDekatAktif = target;
+        if(target){
+          if(bubble) bubble.textContent = target.pesan;
+          mk.classList.add("mk-dekat");
+        } else {
+          mk.classList.remove("mk-dekat");
+        }
+      }
     }
   });
 
@@ -2072,7 +2291,8 @@ function reaksiBurungMenu(){
     if(!menekan) return;
     menekan = false;
     if(sedangDrag){
-      mk.classList.remove("mk-drag");
+      mk.classList.remove("mk-drag", "mk-dekat");
+      targetDekatAktif = null;
       const rect = mk.getBoundingClientRect();
       const pos = batasiPosisi(rect.left, rect.top);
       terapkanPosisi(pos);
@@ -2086,7 +2306,7 @@ function reaksiBurungMenu(){
   // ---- Terbang rendah otomatis (acak): keluar dari tepi kiri layar,
   // lalu muncul kembali dari tepi kanan menuju posisi semula. ----
   function terbangRendahOtomatis(){
-    if(menekan || sedangDrag || sedangPulang) return;
+    if(menekan || sedangDrag || sedangPulang || sedangTidur) return;
 
     const asal = {
       left: parseFloat(mk.style.left) || 0,
@@ -2127,7 +2347,7 @@ function reaksiBurungMenu(){
   function jadwalkanMenoleh(){
     const jeda = 4000 + Math.random() * 5000;
     setTimeout(() => {
-      if(sedangPulang){ jadwalkanMenoleh(); return; }
+      if(sedangPulang || sedangTidur){ jadwalkanMenoleh(); return; }
       mk.classList.add("menoleh");
       setTimeout(() => mk.classList.remove("menoleh"), 900);
       jadwalkanMenoleh();
@@ -2137,22 +2357,137 @@ function reaksiBurungMenu(){
   function jadwalkanTerbang(){
     const jeda = 25000 + Math.random() * 35000;
     setTimeout(() => {
-      if(sedangPulang){ jadwalkanTerbang(); return; }
+      if(sedangPulang || sedangTidur){ jadwalkanTerbang(); return; }
       terbangRendahOtomatis();
       jadwalkanTerbang();
     }, jeda);
   }
 
-  mk.addEventListener("mouseenter", () => mk.classList.add("sigap"));
-  mk.addEventListener("mouseleave", () => mk.classList.remove("sigap"));
+  // ---- Ketiduran larut malam (23:00–04:59) ----
+  function apakahMalam(){
+    const j = new Date().getHours();
+    return j >= 23 || j < 5;
+  }
 
-  mk.addEventListener("click", () => {
-    if(baruSajaDrag){ baruSajaDrag = false; return; } // baru selesai digeser, bukan diklik
+  function perbaruiTidur(){
+    const seharusnyaTidur = apakahMalam();
+    if(seharusnyaTidur && !sedangTidur && !sedangPulang){
+      sedangTidur = true;
+      mk.classList.add("tidur");
+    } else if(!seharusnyaTidur && sedangTidur){
+      sedangTidur = false;
+      mk.classList.remove("tidur");
+    }
+  }
+
+  function jadwalkanZzz(){
+    setTimeout(() => {
+      if(sedangTidur && !menekan && !sedangPulang && zzz){
+        zzz.classList.remove("tampil");
+        void zzz.offsetWidth;
+        zzz.classList.add("tampil");
+      }
+      jadwalkanZzz();
+    }, 3500 + Math.random() * 2000);
+  }
+
+  // ---- Bosan kalau dibiarkan lama tanpa interaksi ----
+  function jadwalkanBosan(){
+    const jeda = 15000 + Math.random() * 15000;
+    setTimeout(() => {
+      if(menekan || sedangDrag || sedangPulang){ jadwalkanBosan(); return; }
+      const diam = Date.now() - waktuAktivitasTerakhir;
+      if(diam > 90000){
+        const KATA_BOSAN = ["hoaahm~", "*menguap*", "bosan nih..."];
+        if(bubble) bubble.textContent = KATA_BOSAN[Math.floor(Math.random() * KATA_BOSAN.length)];
+        mk.classList.remove("bosan");
+        void mk.offsetWidth;
+        mk.classList.add("bosan");
+        setTimeout(() => mk.classList.remove("bosan"), 1200);
+        waktuAktivitasTerakhir = Date.now();
+      }
+      jadwalkanBosan();
+    }, jeda);
+  }
+
+  mk.addEventListener("mouseenter", () => {
+    mk.classList.add("sigap");
+    catatAktivitas();
+    hoverTimeoutId = setTimeout(() => {
+      if(bubble) bubble.textContent = "Disayang " + jumlahDisayang + "x! 💕";
+      mk.classList.add("mk-hitung");
+    }, 3000);
+  });
+  mk.addEventListener("mouseleave", () => {
+    mk.classList.remove("sigap", "mk-hitung");
+    clearTimeout(hoverTimeoutId);
+  });
+
+  function tambahDisayang(){
+    jumlahDisayang++;
+    try{ localStorage.setItem(KEY_DISAYANG, String(jumlahDisayang)); }catch(e){}
+    if(hati){
+      hati.classList.remove("tampil");
+      void hati.offsetWidth;
+      hati.classList.add("tampil");
+    }
+  }
+
+  function reaksiKlikTunggal(){
     if(bubble) bubble.textContent = UCAPAN[Math.floor(Math.random() * UCAPAN.length)];
     mk.classList.remove("disapa");
     void mk.offsetWidth;
     mk.classList.add("disapa");
     setTimeout(() => mk.classList.remove("disapa"), 700);
+    tambahDisayang();
+  }
+
+  function reaksiJungkirBalik(){
+    if(bubble) bubble.textContent = "wiii~";
+    mk.classList.remove("jungkir");
+    void mk.offsetWidth;
+    mk.classList.add("jungkir");
+    setTimeout(() => mk.classList.remove("jungkir"), 700);
+    tambahDisayang();
+  }
+
+  function reaksiPusing(){
+    mk.classList.remove("pusing");
+    void mk.offsetWidth;
+    mk.classList.add("pusing");
+    setTimeout(() => mk.classList.remove("pusing"), 1600);
+    klikBaruBaru = [];
+  }
+
+  mk.addEventListener("click", () => {
+    if(baruSajaDrag){ baruSajaDrag = false; return; } // baru selesai digeser, bukan diklik
+    catatAktivitas();
+    if(sedangTidur){ sedangTidur = false; mk.classList.remove("tidur"); } // dibangunkan
+
+    const sekarang = Date.now();
+    const jedaKlik = sekarang - waktuKlikTerakhir;
+    waktuKlikTerakhir = sekarang;
+
+    klikBaruBaru.push(sekarang);
+    klikBaruBaru = klikBaruBaru.filter(t => sekarang - t < 3000);
+
+    if(jedaKlik < 350){
+      // klik kedua yang berdekatan -> klik ganda -> jungkir balik
+      clearTimeout(klikTimeoutId);
+      klikTimeoutId = null;
+      reaksiJungkirBalik();
+      return;
+    }
+
+    // tunda sebentar supaya bisa dibatalkan kalau ternyata klik kedua menyusul
+    klikTimeoutId = setTimeout(() => {
+      klikTimeoutId = null;
+      if(klikBaruBaru.length >= 6){
+        reaksiPusing();
+      } else {
+        reaksiKlikTunggal();
+      }
+    }, 260);
   });
 
   // ---- Bertelur saat tema warna diganti: telur jatuh lurus dulu, baru
@@ -2168,8 +2503,9 @@ function reaksiBurungMenu(){
     if(!telur) return;
     if(menekan || sedangDrag || sedangPulang) return;
     sedangPulang = true;
+    sedangTidur = false;
 
-    mk.classList.remove("terbang", "kaget", "disapa", "menoleh");
+    mk.classList.remove("terbang", "kaget", "disapa", "menoleh", "tidur");
 
     const w = mk.offsetWidth || 56;
     const h = mk.offsetHeight || 50;
@@ -2261,6 +2597,117 @@ function reaksiBurungMenu(){
   }
 
   window.mkBertelurLaluPulang = mkBertelurLaluPulang;
+
+  // ---- Sambutan harian: sekali per hari, begitu splash screen ditutup ----
+  function mkSambutHarian(){
+    if(!bubble) return;
+    const KEY_HARI = "maskot_sambut_tanggal";
+    const hariIni = new Date().toDateString();
+    let sudah = false;
+    try{ sudah = localStorage.getItem(KEY_HARI) === hariIni; }catch(e){}
+    if(sudah) return;
+    try{ localStorage.setItem(KEY_HARI, hariIni); }catch(e){}
+
+    setTimeout(() => {
+      if(sedangPulang) return;
+      catatAktivitas();
+      if(sedangTidur){ sedangTidur = false; mk.classList.remove("tidur"); }
+      const SAPAAN_HARIAN = ["Semangat ngajar hari ini! 💪", "Selamat datang kembali! 👋", "Portal siap dipakai! ✨", "Hari yang cerah untuk mengajar 🌤️"];
+      bubble.textContent = SAPAAN_HARIAN[Math.floor(Math.random() * SAPAAN_HARIAN.length)];
+      mk.classList.remove("sambut");
+      void mk.offsetWidth;
+      mk.classList.add("sambut");
+      setTimeout(() => mk.classList.remove("sambut"), 2600);
+    }, 700);
+  }
+  window.mkSambutHarian = mkSambutHarian;
+
+  // ---- Diberi makan: seret ikon makanan ke atas burung ----
+  const makanan = document.getElementById("maskotMakanan");
+  if(makanan){
+    let makananMenekan = false;
+    let makananStartX = 0, makananStartY = 0, makananStartLeft = 0, makananStartTop = 0;
+    let makananAsalLeft = 0, makananAsalTop = 0;
+
+    function makananPosisiAwal(){
+      const rect = makanan.getBoundingClientRect();
+      makananAsalLeft = rect.left;
+      makananAsalTop = rect.top;
+    }
+    setTimeout(makananPosisiAwal, 0);
+
+    makanan.addEventListener("pointerdown", (e) => {
+      if(e.button !== undefined && e.button !== 0) return;
+      catatAktivitas();
+      makananMenekan = true;
+      makananStartX = e.clientX;
+      makananStartY = e.clientY;
+      const rect = makanan.getBoundingClientRect();
+      makananStartLeft = rect.left;
+      makananStartTop = rect.top;
+      makanan.classList.add("mk-drag");
+      makanan.style.transition = "none";
+      makanan.style.bottom = "auto";
+      makanan.setPointerCapture(e.pointerId);
+    });
+
+    makanan.addEventListener("pointermove", (e) => {
+      if(!makananMenekan) return;
+      const dx = e.clientX - makananStartX;
+      const dy = e.clientY - makananStartY;
+      makanan.style.left = (makananStartLeft + dx) + "px";
+      makanan.style.top = (makananStartTop + dy) + "px";
+    });
+
+    function makananSelesai(){
+      if(!makananMenekan) return;
+      makananMenekan = false;
+      makanan.classList.remove("mk-drag");
+
+      const rectMakanan = makanan.getBoundingClientRect();
+      const rectBurung = mk.getBoundingClientRect();
+      const kena = !(rectMakanan.right < rectBurung.left || rectMakanan.left > rectBurung.right || rectMakanan.bottom < rectBurung.top || rectMakanan.top > rectBurung.bottom);
+
+      if(kena){
+        catatAktivitas();
+        if(sedangTidur){ sedangTidur = false; mk.classList.remove("tidur"); }
+
+        makanan.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+        makanan.classList.add("mk-dimakan");
+
+        const KATA_MAKAN = ["kenyang~", "makasih! 😋", "enak!"];
+        if(bubble) bubble.textContent = KATA_MAKAN[Math.floor(Math.random() * KATA_MAKAN.length)];
+        mk.classList.remove("makan");
+        void mk.offsetWidth;
+        mk.classList.add("makan");
+        setTimeout(() => mk.classList.remove("makan"), 900);
+
+        setTimeout(() => {
+          makanan.style.transition = "none";
+          makanan.style.left = makananAsalLeft + "px";
+          makanan.style.top = makananAsalTop + "px";
+          void makanan.offsetWidth;
+          makanan.style.transition = "left 0.4s cubic-bezier(.34,1.5,.64,1), top 0.4s cubic-bezier(.34,1.5,.64,1), transform 0.15s ease, opacity 0.3s ease";
+          makanan.classList.remove("mk-dimakan");
+        }, 900);
+      } else {
+        makanan.style.transition = "left 0.4s cubic-bezier(.34,1.5,.64,1), top 0.4s cubic-bezier(.34,1.5,.64,1), transform 0.15s ease, opacity 0.3s ease";
+        makanan.style.left = makananAsalLeft + "px";
+        makanan.style.top = makananAsalTop + "px";
+      }
+    }
+    makanan.addEventListener("pointerup", makananSelesai);
+    makanan.addEventListener("pointercancel", makananSelesai);
+
+    window.addEventListener("resize", () => {
+      if(!makananMenekan) makananPosisiAwal();
+    });
+  }
+
+  perbaruiTidur();
+  setInterval(perbaruiTidur, 5 * 60 * 1000);
+  jadwalkanZzz();
+  jadwalkanBosan();
 
   jadwalkanMenoleh();
   jadwalkanTerbang();
