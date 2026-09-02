@@ -1981,6 +1981,24 @@ function reaksiBurungMenu(){
   let sedangPulang = false;
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
+  // Jalankan cb PERSIS SEKALI: dipicu oleh event CSS (transitionend/animationend)
+  // ATAU oleh batas waktu jaring pengaman — mana pun yang lebih dulu, yang
+  // satunya otomatis dibatalkan supaya langkah animasi tidak terpicu dobel.
+  function jalankanSekali(elemen, namaEvent, cb, batasWaktuMs){
+    let sudah = false;
+    let timeoutId = null;
+    function pembungkus(ev){
+      if(ev && ev.target !== elemen) return; // abaikan event yang menggelembung dari elemen anak
+      if(sudah) return;
+      sudah = true;
+      elemen.removeEventListener(namaEvent, pembungkus);
+      clearTimeout(timeoutId);
+      cb(ev);
+    }
+    elemen.addEventListener(namaEvent, pembungkus);
+    timeoutId = setTimeout(pembungkus, batasWaktuMs);
+  }
+
   function batasiPosisi(left, top){
     const w = mk.offsetWidth || 56;
     const h = mk.offsetHeight || 50;
@@ -2084,10 +2102,7 @@ function reaksiBurungMenu(){
     mk.style.top = (asal.top - 22) + "px";
     mk.style.opacity = "0";
 
-    function keFaseMasukKanan(ev){
-      if(ev && ev.target !== mk) return;
-      mk.removeEventListener("transitionend", keFaseMasukKanan);
-
+    jalankanSekali(mk, "transitionend", () => {
       // lompat instan (masih transparan) ke luar tepi kanan layar
       mk.style.transition = "none";
       mk.style.left = (window.innerWidth + 24) + "px";
@@ -2100,19 +2115,13 @@ function reaksiBurungMenu(){
       mk.style.top = asal.top + "px";
       mk.style.opacity = "1";
 
-      function selesaiTerbang(ev2){
-        if(ev2 && ev2.target !== mk) return;
-        mk.removeEventListener("transitionend", selesaiTerbang);
+      jalankanSekali(mk, "transitionend", () => {
         mk.classList.remove("terbang");
         mk.style.transition = "";
         mk.style.opacity = "";
         simpanPosisi(asal);
-      }
-      mk.addEventListener("transitionend", selesaiTerbang);
-      setTimeout(selesaiTerbang, 2200);
-    }
-    mk.addEventListener("transitionend", keFaseMasukKanan);
-    setTimeout(keFaseMasukKanan, 1900);
+      }, 2200);
+    }, 1900);
   }
 
   function jadwalkanMenoleh(){
@@ -2194,19 +2203,14 @@ function reaksiBurungMenu(){
       telur.style.transition = `top ${durasiJatuh}s cubic-bezier(.55,0,1,.45)`;
       telur.style.top = lantaiY + "px";
 
-      function keFasePantul(ev){
-        if(ev && ev.target !== telur) return;
-        telur.removeEventListener("transitionend", keFasePantul);
-
+      jalankanSekali(telur, "transitionend", () => {
         // FASE 2: memantul-mantul mendatar menuju homebase
         telur.style.transition = "none";
         telur.style.setProperty("--jarak-x", (tujuanX - spawnLeft) + "px");
         void telur.offsetWidth;
         telur.classList.add("mk-pantul");
 
-        function selesaiPantul(ev2){
-          if(ev2 && ev2.target !== telur) return;
-          telur.removeEventListener("animationend", selesaiPantul);
+        jalankanSekali(telur, "animationend", () => {
           telur.classList.remove("mk-pantul");
           telur.style.transform = "none";
           telur.style.left = tujuanX + "px";
@@ -2228,9 +2232,7 @@ function reaksiBurungMenu(){
           mk.style.left = homebase.left + "px";
           mk.style.top = homebase.top + "px";
 
-          function selesaiPulang(ev3){
-            if(ev3 && ev3.target !== mk) return;
-            mk.removeEventListener("transitionend", selesaiPulang);
+          jalankanSekali(mk, "transitionend", () => {
             mk.classList.remove("mk-pulang");
             mk.style.transition = "";
             simpanPosisi(homebase);
@@ -2244,26 +2246,16 @@ function reaksiBurungMenu(){
             telur.style.transform = "rotate(700deg)";
             telur.style.opacity = "0";
 
-            function selesaiGelinding(ev4){
-              if(ev4 && ev4.target !== telur) return;
-              telur.removeEventListener("transitionend", selesaiGelinding);
+            jalankanSekali(telur, "transitionend", () => {
               telur.classList.remove("tampil", "mk-gelinding");
               telur.style.transition = "none";
               telur.style.transform = "none";
               telur.style.opacity = "";
               sedangPulang = false;
-            }
-            telur.addEventListener("transitionend", selesaiGelinding);
-            setTimeout(selesaiGelinding, 900);
-          }
-          mk.addEventListener("transitionend", selesaiPulang);
-          setTimeout(selesaiPulang, 1100);
-        }
-        telur.addEventListener("animationend", selesaiPantul);
-        setTimeout(selesaiPantul, 1300);
-      }
-      telur.addEventListener("transitionend", keFasePantul);
-      setTimeout(keFasePantul, (durasiJatuh * 1000) + 200);
+            }, 900);
+          }, 1100);
+        }, 1300);
+      }, durasiJatuh * 1000 + 200);
 
     }, 600);
   }
