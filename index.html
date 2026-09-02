@@ -118,10 +118,14 @@
     animation:none;
   }
   /* Burung digambar menghadap kanan; dibalik supaya menghadap kiri (ke arah
-     konten & searah animasi terbang yang bergerak ke kiri). */
+     konten) sebagai posisi bertengger default. Kelas mk-hadap-kanan dipakai
+     saat dia perlu terbang ke arah kanan (mis. pulang ke homebase). */
   #maskotBurung .mk-svg{
     display:block;
     transform: scaleX(-1);
+  }
+  #maskotBurung.mk-hadap-kanan .mk-svg{
+    transform: scaleX(1);
   }
   @keyframes mkIdleBob{
     0%, 100%{ transform:translateY(0); }
@@ -145,17 +149,17 @@
     60%{ transform:translateY(0); }
     100%{ transform:translateY(0); }
   }
-  #maskotBurung.terbang{
-    animation: mkTerbangRendah 4.5s ease-in-out;
+  /* .terbang & .mk-pulang: kelas styling saja (matikan goyang idle, sayap
+     kepak cepat) — posisi/perpindahannya sekarang digerakkan lewat JS
+     (transisi left/top dinamis), bukan keyframe tetap, supaya bisa
+     menyesuaikan posisi burung yang bisa digeser bebas. */
+  #maskotBurung.terbang,
+  #maskotBurung.mk-pulang{
+    animation:none;
   }
-  @keyframes mkTerbangRendah{
-    0%{ transform:translate(0,0); opacity:1; }
-    12%{ transform:translate(-18vw,-16px); opacity:1; }
-    45%{ transform:translate(-55vw,-34px); opacity:1; }
-    60%{ transform:translate(-80vw,-14px); opacity:0; }
-    61%{ transform:translate(0,10px); opacity:0; }
-    80%{ transform:translate(0,-6px); opacity:1; }
-    100%{ transform:translate(0,0); opacity:1; }
+  #maskotBurung.terbang .mk-sayap,
+  #maskotBurung.mk-pulang .mk-sayap{
+    animation: mkKepakCepat 0.18s ease-in-out infinite;
   }
 
   #maskotBurung .mk-badan, #maskotBurung .mk-kepala{ fill:var(--primary); }
@@ -200,9 +204,6 @@
   #maskotBurung.disapa .mk-sayap{
     animation: mkKepakCepat 0.2s ease-in-out infinite;
   }
-  #maskotBurung.terbang .mk-sayap{
-    animation: mkKepakCepat 0.16s ease-in-out infinite;
-  }
   @keyframes mkKepakCepat{
     0%, 100%{ transform:rotate(4deg); }
     50%{ transform:rotate(-34deg); }
@@ -243,17 +244,6 @@
     100%{ transform:translateY(0) scaleY(1); }
   }
 
-  /* Burung terbang pulang ke homebase (pojok) setelah bertelur — posisi
-     tujuannya dinamis (diisi lewat JS), jadi digerakkan lewat transisi
-     left/top, bukan keyframe tetap seperti animasi terbang biasa. */
-  #maskotBurung.mk-pulang{
-    transition: left 0.9s cubic-bezier(.22,1,.36,1), top 0.9s cubic-bezier(.22,1,.36,1);
-    animation:none;
-  }
-  #maskotBurung.mk-pulang .mk-sayap{
-    animation: mkKepakCepat 0.16s ease-in-out infinite;
-  }
-
   /* Telur yang dijatuhkan burung */
   #maskotTelur{
     position:fixed;
@@ -266,6 +256,7 @@
     z-index:149;
     opacity:0;
     pointer-events:none;
+    --jarak-x:0px;
   }
   #maskotTelur.tampil{
     opacity:1;
@@ -278,6 +269,27 @@
     40%{ transform:scale(1.25,0.78); }
     70%{ transform:scale(0.92,1.08); }
     100%{ transform:scale(1,1); }
+  }
+  /* Memantul-mantul mendatar menuju homebase (jarak & arah dinamis lewat
+     custom property --jarak-x yang diisi JS), makin lama makin rendah
+     pantulannya seperti bola kehilangan energi. */
+  #maskotTelur.mk-pantul{
+    animation: mkTelurMemantul 1.1s cubic-bezier(.36,.08,.2,1) forwards;
+  }
+  @keyframes mkTelurMemantul{
+    0%{   transform: translate(0,0); }
+    10%{  transform: translate(calc(var(--jarak-x) * 0.15), -22px); }
+    20%{  transform: translate(calc(var(--jarak-x) * 0.30), 0); }
+    35%{  transform: translate(calc(var(--jarak-x) * 0.45), -14px); }
+    50%{  transform: translate(calc(var(--jarak-x) * 0.60), 0); }
+    65%{  transform: translate(calc(var(--jarak-x) * 0.75), -8px); }
+    80%{  transform: translate(calc(var(--jarak-x) * 0.90), 0); }
+    90%{  transform: translate(calc(var(--jarak-x) * 0.97), -4px); }
+    100%{ transform: translate(var(--jarak-x), 0); }
+  }
+  /* Menggelinding ke kanan lalu hilang keluar layar */
+  #maskotTelur.mk-gelinding{
+    transition: left 0.7s ease-in, transform 0.7s linear, opacity 0.5s ease-in 0.25s;
   }
 
   @media (max-width:480px){
@@ -2053,6 +2065,56 @@ function reaksiBurungMenu(){
   mk.addEventListener("pointerup", selesaiTekan);
   mk.addEventListener("pointercancel", selesaiTekan);
 
+  // ---- Terbang rendah otomatis (acak): keluar dari tepi kiri layar,
+  // lalu muncul kembali dari tepi kanan menuju posisi semula. ----
+  function terbangRendahOtomatis(){
+    if(menekan || sedangDrag || sedangPulang) return;
+
+    const asal = {
+      left: parseFloat(mk.style.left) || 0,
+      top: parseFloat(mk.style.top) || 0
+    };
+    const w = mk.offsetWidth || 56;
+
+    mk.classList.add("terbang");
+    mk.classList.remove("mk-hadap-kanan"); // terbang keluar tetap menghadap kiri (default)
+
+    mk.style.transition = "left 1.6s ease-in, top 1.4s ease-in-out, opacity 1.6s ease-in";
+    mk.style.left = (-w - 24) + "px";
+    mk.style.top = (asal.top - 22) + "px";
+    mk.style.opacity = "0";
+
+    function keFaseMasukKanan(ev){
+      if(ev && ev.target !== mk) return;
+      mk.removeEventListener("transitionend", keFaseMasukKanan);
+
+      // lompat instan (masih transparan) ke luar tepi kanan layar
+      mk.style.transition = "none";
+      mk.style.left = (window.innerWidth + 24) + "px";
+      mk.style.top = Math.max(0, asal.top - 10) + "px";
+      void mk.offsetWidth;
+
+      // lalu terbang balik dari kanan menuju posisi semula, sambil muncul lagi
+      mk.style.transition = "left 1.8s ease-out, top 1.8s ease-out, opacity 0.7s ease-in";
+      mk.style.left = asal.left + "px";
+      mk.style.top = asal.top + "px";
+      mk.style.opacity = "1";
+
+      function selesaiTerbang(ev2){
+        if(ev2 && ev2.target !== mk) return;
+        mk.removeEventListener("transitionend", selesaiTerbang);
+        mk.classList.remove("terbang");
+        mk.style.transition = "";
+        mk.style.opacity = "";
+        simpanPosisi(asal);
+      }
+      mk.addEventListener("transitionend", selesaiTerbang);
+      setTimeout(selesaiTerbang, 2200);
+    }
+    mk.addEventListener("transitionend", keFaseMasukKanan);
+    setTimeout(keFaseMasukKanan, 1900);
+  }
+
   function jadwalkanMenoleh(){
     const jeda = 4000 + Math.random() * 5000;
     setTimeout(() => {
@@ -2067,8 +2129,7 @@ function reaksiBurungMenu(){
     const jeda = 25000 + Math.random() * 35000;
     setTimeout(() => {
       if(sedangPulang){ jadwalkanTerbang(); return; }
-      mk.classList.add("terbang");
-      setTimeout(() => mk.classList.remove("terbang"), 4500);
+      terbangRendahOtomatis();
       jadwalkanTerbang();
     }, jeda);
   }
@@ -2085,8 +2146,9 @@ function reaksiBurungMenu(){
     setTimeout(() => mk.classList.remove("disapa"), 700);
   });
 
-  // ---- Bertelur saat tema warna diganti: telur jatuh ke homebase,
-  // lalu burung menyusul terbang pulang ke sana. ----
+  // ---- Bertelur saat tema warna diganti: telur jatuh lurus dulu, baru
+  // memantul-mantul menuju homebase; burung menyusul terbang pulang
+  // (menghadap arah tujuannya); telur lalu menggelinding pergi. ----
   function hitungHomebase(){
     const w = mk.offsetWidth || 56;
     const h = mk.offsetHeight || 50;
@@ -2095,7 +2157,7 @@ function reaksiBurungMenu(){
 
   function mkBertelurLaluPulang(){
     if(!telur) return;
-    if(menekan || sedangPulang) return;
+    if(menekan || sedangDrag || sedangPulang) return;
     sedangPulang = true;
 
     mk.classList.remove("terbang", "kaget", "disapa", "menoleh");
@@ -2110,44 +2172,98 @@ function reaksiBurungMenu(){
     setTimeout(() => {
       mk.classList.remove("bertelur");
 
+      const spawnLeft = rectBurung.left + rectBurung.width/2 - telurW/2;
+      const spawnTop = rectBurung.top + rectBurung.height - 6;
+
+      const homebase = hitungHomebase();
+      const lantaiY = homebase.top + h - telurH + 4; // "batas bawah" tempat telur akan memantul
+      const tujuanX = homebase.left + w/2 - telurW/2;
+
       // telur muncul tepat di bawah burung
+      telur.classList.remove("mk-pantul", "mk-gelinding", "mendarat");
       telur.style.transition = "none";
-      telur.style.left = (rectBurung.left + rectBurung.width/2 - telurW/2) + "px";
-      telur.style.top = (rectBurung.top + rectBurung.height - 6) + "px";
+      telur.style.transform = "none";
+      telur.style.left = spawnLeft + "px";
+      telur.style.top = spawnTop + "px";
       telur.classList.add("tampil");
       void telur.offsetWidth;
 
-      const homebase = hitungHomebase();
-      const posTelurAkhir = {
-        left: homebase.left + w/2 - telurW/2,
-        top: homebase.top + h - telurH + 4
-      };
+      // FASE 1: jatuh lurus ke bawah sampai kena "batas bawah"
+      const jarakJatuh = Math.max(0, lantaiY - spawnTop);
+      const durasiJatuh = jarakJatuh > 4 ? 0.4 : 0.15;
+      telur.style.transition = `top ${durasiJatuh}s cubic-bezier(.55,0,1,.45)`;
+      telur.style.top = lantaiY + "px";
 
-      // telur jatuh & memantul menuju homebase
-      telur.style.transition = "left 0.85s cubic-bezier(.34,1.15,.64,1), top 0.85s cubic-bezier(.34,1.15,.64,1)";
-      telur.style.left = posTelurAkhir.left + "px";
-      telur.style.top = posTelurAkhir.top + "px";
+      function keFasePantul(ev){
+        if(ev && ev.target !== telur) return;
+        telur.removeEventListener("transitionend", keFasePantul);
 
-      setTimeout(() => {
-        telur.classList.add("mendarat");
-        setTimeout(() => telur.classList.remove("mendarat"), 400);
+        // FASE 2: memantul-mantul mendatar menuju homebase
+        telur.style.transition = "none";
+        telur.style.setProperty("--jarak-x", (tujuanX - spawnLeft) + "px");
+        void telur.offsetWidth;
+        telur.classList.add("mk-pantul");
 
-        // burung menyusul terbang pulang ke telurnya
-        mk.classList.add("mk-pulang");
-        terapkanPosisi(homebase);
+        function selesaiPantul(ev2){
+          if(ev2 && ev2.target !== telur) return;
+          telur.removeEventListener("animationend", selesaiPantul);
+          telur.classList.remove("mk-pantul");
+          telur.style.transform = "none";
+          telur.style.left = tujuanX + "px";
+          telur.style.top = lantaiY + "px";
 
-        function selesaiPulang(ev){
-          if(ev && ev.target !== mk) return;
-          mk.classList.remove("mk-pulang");
-          mk.removeEventListener("transitionend", selesaiPulang);
-          simpanPosisi(homebase);
-          telur.classList.remove("tampil");
-          sedangPulang = false;
+          telur.classList.add("mendarat");
+          setTimeout(() => telur.classList.remove("mendarat"), 400);
+
+          // burung menyusul terbang pulang — menghadap ke arah tujuannya
+          const posBurungSekarang = { left: parseFloat(mk.style.left)||0, top: parseFloat(mk.style.top)||0 };
+          if(homebase.left - posBurungSekarang.left > 4){
+            mk.classList.add("mk-hadap-kanan");
+          } else {
+            mk.classList.remove("mk-hadap-kanan");
+          }
+
+          mk.classList.add("mk-pulang");
+          mk.style.transition = "left 0.9s cubic-bezier(.22,1,.36,1), top 0.9s cubic-bezier(.22,1,.36,1)";
+          mk.style.left = homebase.left + "px";
+          mk.style.top = homebase.top + "px";
+
+          function selesaiPulang(ev3){
+            if(ev3 && ev3.target !== mk) return;
+            mk.removeEventListener("transitionend", selesaiPulang);
+            mk.classList.remove("mk-pulang");
+            mk.style.transition = "";
+            simpanPosisi(homebase);
+
+            // telur menggelinding ke kanan lalu hilang keluar layar
+            telur.style.transition = "none";
+            telur.style.transform = "none";
+            void telur.offsetWidth;
+            telur.classList.add("mk-gelinding");
+            telur.style.left = (window.innerWidth + 30) + "px";
+            telur.style.transform = "rotate(700deg)";
+            telur.style.opacity = "0";
+
+            function selesaiGelinding(ev4){
+              if(ev4 && ev4.target !== telur) return;
+              telur.removeEventListener("transitionend", selesaiGelinding);
+              telur.classList.remove("tampil", "mk-gelinding");
+              telur.style.transition = "none";
+              telur.style.transform = "none";
+              telur.style.opacity = "";
+              sedangPulang = false;
+            }
+            telur.addEventListener("transitionend", selesaiGelinding);
+            setTimeout(selesaiGelinding, 900);
+          }
+          mk.addEventListener("transitionend", selesaiPulang);
+          setTimeout(selesaiPulang, 1100);
         }
-        mk.addEventListener("transitionend", selesaiPulang);
-        setTimeout(selesaiPulang, 1100); // jaring pengaman kalau transitionend tidak terpicu
-
-      }, 900);
+        telur.addEventListener("animationend", selesaiPantul);
+        setTimeout(selesaiPantul, 1300);
+      }
+      telur.addEventListener("transitionend", keFasePantul);
+      setTimeout(keFasePantul, (durasiJatuh * 1000) + 200);
 
     }, 600);
   }
