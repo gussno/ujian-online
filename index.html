@@ -112,6 +112,12 @@
     user-select:none;
     animation: mkIdleBob 3s ease-in-out infinite;
   }
+  /* Burung digambar menghadap kanan; dibalik supaya menghadap kiri (ke arah
+     konten & searah animasi terbang yang bergerak ke kiri). */
+  #maskotBurung .mk-svg{
+    display:block;
+    transform: scaleX(-1);
+  }
   @keyframes mkIdleBob{
     0%, 100%{ transform:translateY(0); }
     50%{ transform:translateY(-3px); }
@@ -121,9 +127,18 @@
   }
   @keyframes mkLompat{
     0%{ transform:translateY(0) scale(1); }
-    30%{ transform:translateY(-11px) scale(1.05); }
-    60%{ transform:translateY(0) scale(0.97); }
+    30%{ transform:translateY(-13px) scale(1.08); }
+    60%{ transform:translateY(0) scale(0.96); }
     100%{ transform:translateY(0) scale(1); }
+  }
+  #maskotBurung.kaget{
+    animation: mkKaget 0.5s ease;
+  }
+  @keyframes mkKaget{
+    0%{ transform:translateY(0); }
+    30%{ transform:translateY(-7px); }
+    60%{ transform:translateY(0); }
+    100%{ transform:translateY(0); }
   }
   #maskotBurung.terbang{
     animation: mkTerbangRendah 4.5s ease-in-out;
@@ -149,29 +164,67 @@
   #maskotBurung .mk-pipi,
   #maskotBurung .mk-paruh{
     transform-origin: 58px 40px;
-    transition: transform 0.4s ease;
+    transition: transform 0.35s ease;
   }
   #maskotBurung.menoleh .mk-kepala,
   #maskotBurung.menoleh .mk-mata,
   #maskotBurung.menoleh .mk-pipi,
-  #maskotBurung.menoleh .mk-paruh{
-    transform: rotate(-15deg);
+  #maskotBurung.menoleh .mk-paruh,
+  #maskotBurung.kaget .mk-kepala,
+  #maskotBurung.kaget .mk-mata,
+  #maskotBurung.kaget .mk-pipi,
+  #maskotBurung.kaget .mk-paruh{
+    transform: rotate(-16deg);
+  }
+  #maskotBurung.sigap .mk-kepala,
+  #maskotBurung.sigap .mk-mata,
+  #maskotBurung.sigap .mk-pipi,
+  #maskotBurung.sigap .mk-paruh{
+    transform: rotate(8deg) translateY(-2px);
   }
 
   #maskotBurung .mk-sayap{
-    transform-origin: 45px 55px;
-    animation: mkKepak 1.8s ease-in-out infinite;
+    transform-origin: 46px 56px;
+    animation: mkKepak 1.3s ease-in-out infinite;
   }
   @keyframes mkKepak{
     0%, 100%{ transform:rotate(0deg); }
-    50%{ transform:rotate(-12deg); }
+    50%{ transform:rotate(-26deg); }
+  }
+  #maskotBurung.sigap .mk-sayap,
+  #maskotBurung.disapa .mk-sayap{
+    animation: mkKepakCepat 0.2s ease-in-out infinite;
   }
   #maskotBurung.terbang .mk-sayap{
-    animation: mkKepakCepat 0.22s ease-in-out infinite;
+    animation: mkKepakCepat 0.16s ease-in-out infinite;
   }
   @keyframes mkKepakCepat{
-    0%, 100%{ transform:rotate(0deg); }
-    50%{ transform:rotate(-24deg); }
+    0%, 100%{ transform:rotate(4deg); }
+    50%{ transform:rotate(-34deg); }
+  }
+
+  /* Gelembung ucapan kecil saat burung diklik langsung */
+  .mk-bubble{
+    position:absolute;
+    left:50%;
+    top:-6px;
+    transform:translate(-50%,-4px) scale(0.5);
+    background:var(--card);
+    color:var(--primary-dark);
+    font-size:13px;
+    font-weight:800;
+    line-height:1;
+    padding:5px 9px;
+    border-radius:999px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.18);
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  #maskotBurung.disapa .mk-bubble{
+    opacity:1;
+    transform:translate(-50%,-18px) scale(1);
   }
 
   @media (max-width:480px){
@@ -808,16 +861,18 @@
 <button id="sidebarToggle" title="Buka/tutup menu">☰</button>
 
 <div id="maskotBurung" title="Halo! 👋">
-  <svg viewBox="0 0 100 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <div class="mk-bubble" id="maskotBubble"></div>
+  <svg class="mk-svg" viewBox="0 0 100 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <path class="mk-ekor" d="M18 55 L2 46 L22 60 Z"></path>
     <ellipse class="mk-badan" cx="52" cy="55" rx="30" ry="26"></ellipse>
-    <path class="mk-sayap" d="M45 50 Q28 44 31 66 Q45 71 53 58 Z"></path>
+    <path class="mk-sayap" d="M50 46 Q18 32 24 70 Q40 80 58 60 Z"></path>
     <circle class="mk-kepala" cx="70" cy="32" r="20"></circle>
     <circle class="mk-pipi" cx="76" cy="38" r="4"></circle>
     <path class="mk-paruh" d="M88 30 L101 34 L88 39 Z"></path>
     <circle class="mk-mata" cx="76" cy="26" r="3.5"></circle>
   </svg>
 </div>
+
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
@@ -1831,11 +1886,24 @@ if(splashKodeInput){
 tampilkanGerbang();
 
 // ======================================================
-// MASKOT BURUNG — nangkring di pojok, sesekali menoleh & terbang rendah
+// MASKOT BURUNG — nangkring di pojok, sesekali menoleh & terbang rendah,
+// plus bereaksi saat di-hover, diklik, atau saat pindah menu di mana pun.
 // ======================================================
-(function(){
+function reaksiBurungMenu(){
   const mk = document.getElementById("maskotBurung");
   if(!mk) return;
+  mk.classList.remove("kaget");
+  void mk.offsetWidth; // paksa reflow supaya animasi restart walau diklik cepat berturut-turut
+  mk.classList.add("kaget");
+  setTimeout(() => mk.classList.remove("kaget"), 500);
+}
+
+(function(){
+  const mk = document.getElementById("maskotBurung");
+  const bubble = document.getElementById("maskotBubble");
+  if(!mk) return;
+
+  const UCAPAN = ["cvit!", "♪", "halo!", "✨", "cip cip"];
 
   function jadwalkanMenoleh(){
     const jeda = 4000 + Math.random() * 5000;
@@ -1855,9 +1923,15 @@ tampilkanGerbang();
     }, jeda);
   }
 
+  mk.addEventListener("mouseenter", () => mk.classList.add("sigap"));
+  mk.addEventListener("mouseleave", () => mk.classList.remove("sigap"));
+
   mk.addEventListener("click", () => {
+    if(bubble) bubble.textContent = UCAPAN[Math.floor(Math.random() * UCAPAN.length)];
+    mk.classList.remove("disapa");
+    void mk.offsetWidth;
     mk.classList.add("disapa");
-    setTimeout(() => mk.classList.remove("disapa"), 600);
+    setTimeout(() => mk.classList.remove("disapa"), 700);
   });
 
   jadwalkanMenoleh();
@@ -1945,6 +2019,8 @@ function pindahSection(target){
 
   document.getElementById("pageTitle").textContent = JUDUL_HALAMAN[target].title;
   document.getElementById("pageSub").textContent = JUDUL_HALAMAN[target].sub;
+
+  if(typeof reaksiBurungMenu === "function") reaksiBurungMenu();
 
   if(!isDesktop()){ setSidebar(false); }
 }
