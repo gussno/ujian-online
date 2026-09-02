@@ -100,6 +100,84 @@
   }
   #sidebarToggle:hover{ opacity:0.9; }
 
+  /* ============ MASKOT BURUNG ============ */
+  #maskotBurung{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    width:56px;
+    height:50px;
+    z-index:150;
+    cursor:pointer;
+    user-select:none;
+    animation: mkIdleBob 3s ease-in-out infinite;
+  }
+  @keyframes mkIdleBob{
+    0%, 100%{ transform:translateY(0); }
+    50%{ transform:translateY(-3px); }
+  }
+  #maskotBurung.disapa{
+    animation: mkLompat 0.6s ease;
+  }
+  @keyframes mkLompat{
+    0%{ transform:translateY(0) scale(1); }
+    30%{ transform:translateY(-11px) scale(1.05); }
+    60%{ transform:translateY(0) scale(0.97); }
+    100%{ transform:translateY(0) scale(1); }
+  }
+  #maskotBurung.terbang{
+    animation: mkTerbangRendah 4.5s ease-in-out;
+  }
+  @keyframes mkTerbangRendah{
+    0%{ transform:translate(0,0); opacity:1; }
+    12%{ transform:translate(-18vw,-16px); opacity:1; }
+    45%{ transform:translate(-55vw,-34px); opacity:1; }
+    60%{ transform:translate(-80vw,-14px); opacity:0; }
+    61%{ transform:translate(0,10px); opacity:0; }
+    80%{ transform:translate(0,-6px); opacity:1; }
+    100%{ transform:translate(0,0); opacity:1; }
+  }
+
+  #maskotBurung .mk-badan, #maskotBurung .mk-kepala{ fill:var(--primary); }
+  #maskotBurung .mk-sayap, #maskotBurung .mk-ekor{ fill:var(--primary-dark); }
+  #maskotBurung .mk-paruh{ fill:#f59e0b; }
+  #maskotBurung .mk-mata{ fill:#1f2937; }
+  #maskotBurung .mk-pipi{ fill:#ffb3ba; opacity:0.55; }
+
+  #maskotBurung .mk-kepala,
+  #maskotBurung .mk-mata,
+  #maskotBurung .mk-pipi,
+  #maskotBurung .mk-paruh{
+    transform-origin: 58px 40px;
+    transition: transform 0.4s ease;
+  }
+  #maskotBurung.menoleh .mk-kepala,
+  #maskotBurung.menoleh .mk-mata,
+  #maskotBurung.menoleh .mk-pipi,
+  #maskotBurung.menoleh .mk-paruh{
+    transform: rotate(-15deg);
+  }
+
+  #maskotBurung .mk-sayap{
+    transform-origin: 45px 55px;
+    animation: mkKepak 1.8s ease-in-out infinite;
+  }
+  @keyframes mkKepak{
+    0%, 100%{ transform:rotate(0deg); }
+    50%{ transform:rotate(-12deg); }
+  }
+  #maskotBurung.terbang .mk-sayap{
+    animation: mkKepakCepat 0.22s ease-in-out infinite;
+  }
+  @keyframes mkKepakCepat{
+    0%, 100%{ transform:rotate(0deg); }
+    50%{ transform:rotate(-24deg); }
+  }
+
+  @media (max-width:480px){
+    #maskotBurung{ width:46px; height:42px; right:12px; bottom:12px; }
+  }
+
   .brand{
     display:flex;
     align-items:center;
@@ -728,6 +806,18 @@
 </div>
 
 <button id="sidebarToggle" title="Buka/tutup menu">☰</button>
+
+<div id="maskotBurung" title="Halo! 👋">
+  <svg viewBox="0 0 100 90" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <path class="mk-ekor" d="M18 55 L2 46 L22 60 Z"></path>
+    <ellipse class="mk-badan" cx="52" cy="55" rx="30" ry="26"></ellipse>
+    <path class="mk-sayap" d="M45 50 Q28 44 31 66 Q45 71 53 58 Z"></path>
+    <circle class="mk-kepala" cx="70" cy="32" r="20"></circle>
+    <circle class="mk-pipi" cx="76" cy="38" r="4"></circle>
+    <path class="mk-paruh" d="M88 30 L101 34 L88 39 Z"></path>
+    <circle class="mk-mata" cx="76" cy="26" r="3.5"></circle>
+  </svg>
+</div>
 
 <aside class="sidebar" id="sidebar">
   <div class="brand">
@@ -1739,6 +1829,40 @@ if(splashKodeInput){
 }
 
 tampilkanGerbang();
+
+// ======================================================
+// MASKOT BURUNG — nangkring di pojok, sesekali menoleh & terbang rendah
+// ======================================================
+(function(){
+  const mk = document.getElementById("maskotBurung");
+  if(!mk) return;
+
+  function jadwalkanMenoleh(){
+    const jeda = 4000 + Math.random() * 5000;
+    setTimeout(() => {
+      mk.classList.add("menoleh");
+      setTimeout(() => mk.classList.remove("menoleh"), 900);
+      jadwalkanMenoleh();
+    }, jeda);
+  }
+
+  function jadwalkanTerbang(){
+    const jeda = 25000 + Math.random() * 35000;
+    setTimeout(() => {
+      mk.classList.add("terbang");
+      setTimeout(() => mk.classList.remove("terbang"), 4500);
+      jadwalkanTerbang();
+    }, jeda);
+  }
+
+  mk.addEventListener("click", () => {
+    mk.classList.add("disapa");
+    setTimeout(() => mk.classList.remove("disapa"), 600);
+  });
+
+  jadwalkanMenoleh();
+  jadwalkanTerbang();
+})();
 
 // ======================================================
 // JAM & TANGGAL DIGITAL REAL-TIME
