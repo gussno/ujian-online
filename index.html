@@ -108,9 +108,14 @@
     width:56px;
     height:50px;
     z-index:150;
-    cursor:pointer;
+    cursor:grab;
     user-select:none;
+    touch-action:none;
     animation: mkIdleBob 3s ease-in-out infinite;
+  }
+  #maskotBurung.mk-drag{
+    cursor:grabbing;
+    animation:none;
   }
   /* Burung digambar menghadap kanan; dibalik supaya menghadap kiri (ke arah
      konten & searah animasi terbang yang bergerak ke kiri). */
@@ -225,6 +230,54 @@
   #maskotBurung.disapa .mk-bubble{
     opacity:1;
     transform:translate(-50%,-18px) scale(1);
+  }
+
+  /* Animasi mengeden bertelur, saat tema warna diganti */
+  #maskotBurung.bertelur{
+    animation: mkBertelur 0.6s ease;
+  }
+  @keyframes mkBertelur{
+    0%{ transform:translateY(0) scaleY(1); }
+    35%{ transform:translateY(4px) scaleY(0.8); }
+    65%{ transform:translateY(4px) scaleY(0.8); }
+    100%{ transform:translateY(0) scaleY(1); }
+  }
+
+  /* Burung terbang pulang ke homebase (pojok) setelah bertelur — posisi
+     tujuannya dinamis (diisi lewat JS), jadi digerakkan lewat transisi
+     left/top, bukan keyframe tetap seperti animasi terbang biasa. */
+  #maskotBurung.mk-pulang{
+    transition: left 0.9s cubic-bezier(.22,1,.36,1), top 0.9s cubic-bezier(.22,1,.36,1);
+    animation:none;
+  }
+  #maskotBurung.mk-pulang .mk-sayap{
+    animation: mkKepakCepat 0.16s ease-in-out infinite;
+  }
+
+  /* Telur yang dijatuhkan burung */
+  #maskotTelur{
+    position:fixed;
+    width:16px;
+    height:20px;
+    border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+    background:linear-gradient(160deg, #fffbea, #fde68a);
+    border:1.5px solid rgba(0,0,0,0.08);
+    box-shadow:0 3px 8px rgba(0,0,0,0.2);
+    z-index:149;
+    opacity:0;
+    pointer-events:none;
+  }
+  #maskotTelur.tampil{
+    opacity:1;
+  }
+  #maskotTelur.mendarat{
+    animation: mkTelurMendarat 0.4s ease;
+  }
+  @keyframes mkTelurMendarat{
+    0%{ transform:scale(1,1); }
+    40%{ transform:scale(1.25,0.78); }
+    70%{ transform:scale(0.92,1.08); }
+    100%{ transform:scale(1,1); }
   }
 
   @media (max-width:480px){
@@ -872,6 +925,8 @@
     <circle class="mk-mata" cx="76" cy="26" r="3.5"></circle>
   </svg>
 </div>
+<div id="maskotTelur"></div>
+
 
 
 <aside class="sidebar" id="sidebar">
@@ -1901,13 +1956,107 @@ function reaksiBurungMenu(){
 (function(){
   const mk = document.getElementById("maskotBurung");
   const bubble = document.getElementById("maskotBubble");
+  const telur = document.getElementById("maskotTelur");
   if(!mk) return;
 
   const UCAPAN = ["cvit!", "♪", "halo!", "✨", "cip cip"];
+  const KEY_POSISI = "maskot_pos";
+  const AMBANG_DRAG = 6; // px — di bawah ini masih dianggap klik, bukan geser
+
+  let menekan = false;
+  let sedangDrag = false;
+  let baruSajaDrag = false;
+  let sedangPulang = false;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+  function batasiPosisi(left, top){
+    const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+    const maxLeft = Math.max(0, window.innerWidth - w);
+    const maxTop = Math.max(0, window.innerHeight - h);
+    return {
+      left: Math.min(Math.max(left, 0), maxLeft),
+      top: Math.min(Math.max(top, 0), maxTop)
+    };
+  }
+
+  function terapkanPosisi(pos){
+    mk.style.left = pos.left + "px";
+    mk.style.top = pos.top + "px";
+    mk.style.right = "auto";
+    mk.style.bottom = "auto";
+  }
+
+  function simpanPosisi(pos){
+    try{ localStorage.setItem(KEY_POSISI, JSON.stringify(pos)); }catch(e){}
+  }
+
+  function posisiAwal(){
+    try{
+      const simpan = JSON.parse(localStorage.getItem(KEY_POSISI) || "null");
+      if(simpan && typeof simpan.left === "number" && typeof simpan.top === "number"){
+        return batasiPosisi(simpan.left, simpan.top);
+      }
+    }catch(e){}
+    const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+    return batasiPosisi(window.innerWidth - w - 16, window.innerHeight - h - 16);
+  }
+
+  terapkanPosisi(posisiAwal());
+
+  window.addEventListener("resize", () => {
+    const rect = mk.getBoundingClientRect();
+    terapkanPosisi(batasiPosisi(rect.left, rect.top));
+  });
+
+  mk.addEventListener("pointerdown", (e) => {
+    if(e.button !== undefined && e.button !== 0) return;
+    menekan = true;
+    sedangDrag = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = mk.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    mk.setPointerCapture(e.pointerId);
+  });
+
+  mk.addEventListener("pointermove", (e) => {
+    if(!menekan) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if(!sedangDrag && (Math.abs(dx) > AMBANG_DRAG || Math.abs(dy) > AMBANG_DRAG)){
+      sedangDrag = true;
+      baruSajaDrag = true;
+      mk.classList.add("mk-drag");
+    }
+
+    if(sedangDrag){
+      terapkanPosisi(batasiPosisi(startLeft + dx, startTop + dy));
+    }
+  });
+
+  function selesaiTekan(){
+    if(!menekan) return;
+    menekan = false;
+    if(sedangDrag){
+      mk.classList.remove("mk-drag");
+      const rect = mk.getBoundingClientRect();
+      const pos = batasiPosisi(rect.left, rect.top);
+      terapkanPosisi(pos);
+      simpanPosisi(pos);
+    }
+    sedangDrag = false;
+  }
+  mk.addEventListener("pointerup", selesaiTekan);
+  mk.addEventListener("pointercancel", selesaiTekan);
 
   function jadwalkanMenoleh(){
     const jeda = 4000 + Math.random() * 5000;
     setTimeout(() => {
+      if(sedangPulang){ jadwalkanMenoleh(); return; }
       mk.classList.add("menoleh");
       setTimeout(() => mk.classList.remove("menoleh"), 900);
       jadwalkanMenoleh();
@@ -1917,6 +2066,7 @@ function reaksiBurungMenu(){
   function jadwalkanTerbang(){
     const jeda = 25000 + Math.random() * 35000;
     setTimeout(() => {
+      if(sedangPulang){ jadwalkanTerbang(); return; }
       mk.classList.add("terbang");
       setTimeout(() => mk.classList.remove("terbang"), 4500);
       jadwalkanTerbang();
@@ -1927,12 +2077,82 @@ function reaksiBurungMenu(){
   mk.addEventListener("mouseleave", () => mk.classList.remove("sigap"));
 
   mk.addEventListener("click", () => {
+    if(baruSajaDrag){ baruSajaDrag = false; return; } // baru selesai digeser, bukan diklik
     if(bubble) bubble.textContent = UCAPAN[Math.floor(Math.random() * UCAPAN.length)];
     mk.classList.remove("disapa");
     void mk.offsetWidth;
     mk.classList.add("disapa");
     setTimeout(() => mk.classList.remove("disapa"), 700);
   });
+
+  // ---- Bertelur saat tema warna diganti: telur jatuh ke homebase,
+  // lalu burung menyusul terbang pulang ke sana. ----
+  function hitungHomebase(){
+    const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+    return batasiPosisi(window.innerWidth - w - 16, window.innerHeight - h - 16);
+  }
+
+  function mkBertelurLaluPulang(){
+    if(!telur) return;
+    if(menekan || sedangPulang) return;
+    sedangPulang = true;
+
+    mk.classList.remove("terbang", "kaget", "disapa", "menoleh");
+
+    const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+    const rectBurung = mk.getBoundingClientRect();
+    const telurW = 16, telurH = 20;
+
+    mk.classList.add("bertelur");
+
+    setTimeout(() => {
+      mk.classList.remove("bertelur");
+
+      // telur muncul tepat di bawah burung
+      telur.style.transition = "none";
+      telur.style.left = (rectBurung.left + rectBurung.width/2 - telurW/2) + "px";
+      telur.style.top = (rectBurung.top + rectBurung.height - 6) + "px";
+      telur.classList.add("tampil");
+      void telur.offsetWidth;
+
+      const homebase = hitungHomebase();
+      const posTelurAkhir = {
+        left: homebase.left + w/2 - telurW/2,
+        top: homebase.top + h - telurH + 4
+      };
+
+      // telur jatuh & memantul menuju homebase
+      telur.style.transition = "left 0.85s cubic-bezier(.34,1.15,.64,1), top 0.85s cubic-bezier(.34,1.15,.64,1)";
+      telur.style.left = posTelurAkhir.left + "px";
+      telur.style.top = posTelurAkhir.top + "px";
+
+      setTimeout(() => {
+        telur.classList.add("mendarat");
+        setTimeout(() => telur.classList.remove("mendarat"), 400);
+
+        // burung menyusul terbang pulang ke telurnya
+        mk.classList.add("mk-pulang");
+        terapkanPosisi(homebase);
+
+        function selesaiPulang(ev){
+          if(ev && ev.target !== mk) return;
+          mk.classList.remove("mk-pulang");
+          mk.removeEventListener("transitionend", selesaiPulang);
+          simpanPosisi(homebase);
+          telur.classList.remove("tampil");
+          sedangPulang = false;
+        }
+        mk.addEventListener("transitionend", selesaiPulang);
+        setTimeout(selesaiPulang, 1100); // jaring pengaman kalau transitionend tidak terpicu
+
+      }, 900);
+
+    }, 600);
+  }
+
+  window.mkBertelurLaluPulang = mkBertelurLaluPulang;
 
   jadwalkanMenoleh();
   jadwalkanTerbang();
@@ -1961,7 +2181,14 @@ function terapkanTema(tema){
   try{ localStorage.setItem(KEY_THEME, tema); }catch(e){}
 }
 document.querySelectorAll(".theme-dot").forEach(d => {
-  d.addEventListener("click", () => terapkanTema(d.dataset.theme));
+  d.addEventListener("click", () => {
+    const temaBaru = d.dataset.theme;
+    const temaLama = document.body.getAttribute("data-theme");
+    terapkanTema(temaBaru);
+    if(temaBaru !== temaLama && typeof window.mkBertelurLaluPulang === "function"){
+      window.mkBertelurLaluPulang();
+    }
+  });
 });
 terapkanTema(localStorage.getItem(KEY_THEME) || "biru");
 
