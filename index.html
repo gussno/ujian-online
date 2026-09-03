@@ -425,11 +425,14 @@
     transition: left 0.7s ease-in, transform 0.7s linear, opacity 0.5s ease-in 0.25s;
   }
 
-  /* Ikon makanan — diseret ke arah burung untuk kasih makan */
+  /* Ikon makanan — diseret ke arah burung untuk kasih makan.
+     Ditaruh di kanan-atas (di bawah tombol menu ☰) supaya tidak menutupi
+     apa pun di sidebar (yang selalu di kiri) atau burung (biasanya di
+     kanan-bawah). */
   #maskotMakanan{
     position:fixed;
-    left:16px;
-    bottom:16px;
+    right:16px;
+    top:68px;
     width:34px;
     height:34px;
     z-index:150;
@@ -457,7 +460,7 @@
 
   @media (max-width:480px){
     #maskotBurung{ width:46px; height:42px; right:12px; bottom:12px; }
-    #maskotMakanan{ width:30px; height:30px; font-size:16px; left:12px; bottom:12px; }
+    #maskotMakanan{ width:30px; height:30px; font-size:16px; right:12px; top:60px; }
   }
 
   .brand{
@@ -2648,6 +2651,7 @@ function reaksiBurungMenu(){
       makanan.classList.add("mk-drag");
       makanan.style.transition = "none";
       makanan.style.bottom = "auto";
+      makanan.style.right = "auto";
       makanan.setPointerCapture(e.pointerId);
     });
 
