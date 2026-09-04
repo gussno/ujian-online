@@ -227,6 +227,42 @@
     margin:16px 0 8px;
   }
   .kelas-heading:first-child{margin-top:0;}
+
+  .kartu-soal-pr-wrap{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:12px;
+  }
+  .kartu-soal-pr{
+    background:var(--bg);
+    border-radius:10px;
+    padding:14px;
+    text-align:left;
+  }
+  .kartu-soal-pr .tingkat-label{
+    font-size:11px;
+    font-weight:800;
+    color:var(--navy);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    margin-bottom:8px;
+  }
+  .kartu-soal-pr .tag-mapel{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:999px;
+    background:#eff6ff;
+    color:var(--navy);
+    font-weight:700;
+    font-size:11px;
+  }
+  .kartu-soal-pr .teks-soal{
+    font-size:13px;
+    font-weight:600;
+    line-height:1.5;
+    white-space:pre-wrap;
+    margin-top:8px;
+  }
 </style>
 </head>
 <body>
@@ -234,13 +270,13 @@
 <div class="wrap">
 
   <header>
-    <h1>📋 Rekap Pengerjaan Tugas</h1>
-    <p>Pantau siswa yang sudah dan belum mengerjakan tiap asesmen, langsung dari data ujian.</p>
+    <h1 id="judulHalaman">📋 Rekap Pengerjaan Tugas</h1>
+    <p id="subjudulHalaman">Pantau siswa yang sudah dan belum mengerjakan tiap asesmen, langsung dari data ujian.</p>
   </header>
 
   <div class="panel">
     <div class="controls">
-      <div class="field">
+      <div class="field" id="fieldUjian">
         <label for="ujian">Pilih Ujian</label>
         <select id="ujian">
           <option value="">-- Memuat daftar ujian... --</option>
@@ -256,9 +292,11 @@
         <label for="cari">Cari nama</label>
         <input type="text" id="cari" placeholder="Ketik nama siswa...">
       </div>
-      <button class="refresh" id="btnRefresh" onclick="muatRekap()">Muat Ulang</button>
+      <button class="refresh" id="btnRefresh" onclick="muatData()">Muat Ulang</button>
     </div>
   </div>
+
+  <div class="panel" id="panelSoalAktifPR" style="display:none;"></div>
 
   <div class="panel" id="panelSummary" style="display:none;">
     <div class="summary">
@@ -292,6 +330,22 @@
 // ======================
 const scriptURL = "https://script.google.com/macros/s/AKfycbzzxNvLxqPpR0ETyyxYNfppsOJ1hjjqaLpUhk0YRCoQ6k55HcnNdVkYQjSnO2eWeK-Yjw/exec";
 
+// ======================
+// PARAMETER URL (?tipe=pr, ?ujian=..., ?kelas=...)
+// tipe: "pr" -> tampilkan rekap PR. selain itu (atau tidak diisi) -> tampilan
+//   ujian seperti sebelumnya, supaya link lama yang sudah dibagikan tetap jalan.
+// ujian: nama-nama ujian yang boleh dipilih, dipisah koma (HANYA berlaku di
+//   tipe ujian). Tanpa parameter ini -> semua ujian ditampilkan (perilaku lama).
+// kelas: kelas yang boleh dilihat, dipisah koma (berlaku di kedua tipe).
+//   Tanpa parameter ini -> semua kelas ditampilkan.
+// ======================
+const paramURL = new URLSearchParams(window.location.search);
+const tipeHalaman = paramURL.get("tipe") === "pr" ? "pr" : "ujian";
+const ujianParam = paramURL.get("ujian");
+const kelasParam = paramURL.get("kelas");
+const ujianAllowed = ujianParam ? ujianParam.split(",").map(s => s.trim()).filter(Boolean) : null;
+const kelasAllowed = kelasParam ? kelasParam.split(",").map(s => s.trim()).filter(Boolean) : null;
+
 let rekapTerakhir = null; // simpan hasil fetch terakhir supaya filter kelas/cari tidak perlu fetch ulang
 
 const selUjian = document.getElementById("ujian");
@@ -300,6 +354,14 @@ const inputCari = document.getElementById("cari");
 const btnRefresh = document.getElementById("btnRefresh");
 const areaHasil = document.getElementById("areaHasil");
 const panelSummary = document.getElementById("panelSummary");
+const panelSoalAktifPR = document.getElementById("panelSoalAktifPR");
+const fieldUjian = document.getElementById("fieldUjian");
+
+// Tombol "Muat Ulang" & pemuatan awal menyesuaikan tipe halaman
+function muatData(){
+  if(tipeHalaman === "pr") muatDataPR();
+  else muatRekap();
+}
 
 // ======================
 // MUAT DAFTAR UJIAN (dropdown)
@@ -316,17 +378,37 @@ async function muatDaftarUjian(){
       return;
     }
 
+    // Kalau link ini dibatasi hanya untuk ujian tertentu, sisihkan yang lain
+    // dari pilihan — jadi penerima link cuma bisa lihat yang diizinkan.
+    let daftarUjian = json.data;
+    if(ujianAllowed){
+      daftarUjian = daftarUjian.filter(nama => ujianAllowed.includes(nama));
+    }
+
+    if(daftarUjian.length === 0){
+      selUjian.innerHTML = '<option value="">-- Ujian tidak ditemukan --</option>';
+      return;
+    }
+
     const optDefault = document.createElement("option");
     optDefault.value = "";
     optDefault.textContent = "-- Pilih Ujian --";
     selUjian.appendChild(optDefault);
 
-    json.data.forEach(nama => {
+    daftarUjian.forEach(nama => {
       const opt = document.createElement("option");
       opt.value = nama;
       opt.textContent = nama;
       selUjian.appendChild(opt);
     });
+
+    // Kalau cuma satu ujian yang diizinkan, langsung pilihkan & sembunyikan
+    // dropdown-nya (tidak perlu penerima link memilih apa-apa lagi).
+    if(ujianAllowed && daftarUjian.length === 1){
+      selUjian.value = daftarUjian[0];
+      if(fieldUjian) fieldUjian.style.display = "none";
+      muatRekap();
+    }
 
   } catch(err){
     console.error(err);
@@ -362,8 +444,9 @@ async function muatRekap(){
 
     rekapTerakhir = json.data;
 
-    // Isi dropdown kelas dari hasil rekap (kalau belum terisi)
-    const kelasSekarang = Object.keys(rekapTerakhir).sort();
+    // Isi dropdown kelas dari hasil rekap, dibatasi ke kelas yang diizinkan (kalau ada)
+    let kelasSekarang = Object.keys(rekapTerakhir).sort();
+    if(kelasAllowed) kelasSekarang = kelasSekarang.filter(k => kelasAllowed.includes(k));
     const kelasTerpilihLama = selKelas.value;
     selKelas.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
     kelasSekarang.forEach(k => {
@@ -395,8 +478,11 @@ function renderHasil(){
   const kelasFilter = selKelas.value;
   const kataKunci = inputCari.value.trim().toUpperCase();
 
+  let kelasSemua = Object.keys(rekapTerakhir).sort();
+  if(kelasAllowed) kelasSemua = kelasSemua.filter(k => kelasAllowed.includes(k));
+
   const kelasList = kelasFilter === "SEMUA"
-    ? Object.keys(rekapTerakhir).sort()
+    ? kelasSemua
     : [kelasFilter];
 
   let totalSemua = 0, sudahSemua = 0;
@@ -507,11 +593,235 @@ function salinFallback(teks, callback){
   document.body.removeChild(area);
 }
 
-selUjian.addEventListener("change", muatRekap);
-selKelas.addEventListener("change", renderHasil);
-inputCari.addEventListener("input", renderHasil);
+// ======================
+// MODE PR: soal aktif per tingkat + status sudah/belum submit
+// ======================
+function tingkatDariKelas(kelas){
+  const m = String(kelas || "").match(/\d+/);
+  return m ? m[0] : "";
+}
 
-muatDaftarUjian();
+function escapeHtmlLokal(teks){
+  return (teks || "").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function formatWaktuLokal(iso){
+  if(!iso) return "-";
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleString("id-ID", { day:"numeric", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+let rosterPR = null;
+let soalAktifPerTingkatPR = {};
+let jawabanPRSemua = [];
+
+async function muatDataPR(){
+  btnRefresh.disabled = true;
+  btnRefresh.textContent = "Memuat...";
+  areaHasil.innerHTML = '<div class="status-msg">Memuat data PR...</div>';
+  panelSummary.style.display = "none";
+  if(panelSoalAktifPR) panelSoalAktifPR.style.display = "none";
+
+  try{
+    const resSiswa = await fetch(scriptURL + "?action=siswa");
+    const jsonSiswa = await resSiswa.json();
+    if(jsonSiswa.status !== "success"){
+      areaHasil.innerHTML = '<div class="status-msg">Gagal memuat data siswa.</div>';
+      return;
+    }
+    rosterPR = jsonSiswa.data || {};
+
+    // Batasi ke kelas yang diizinkan lewat link (kalau ada)
+    let kelasKeys = Object.keys(rosterPR).sort();
+    if(kelasAllowed) kelasKeys = kelasKeys.filter(k => kelasAllowed.includes(k));
+
+    if(kelasKeys.length === 0){
+      areaHasil.innerHTML = '<div class="status-msg">Kelas tidak ditemukan.</div>';
+      return;
+    }
+
+    const kelasTerpilihLama = selKelas.value;
+    selKelas.innerHTML = '<option value="SEMUA">Semua Kelas</option>';
+    kelasKeys.forEach(k => {
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      selKelas.appendChild(opt);
+    });
+    if(kelasKeys.includes(kelasTerpilihLama)) selKelas.value = kelasTerpilihLama;
+
+    // Tingkat (7/8/9) yang relevan dari kelas-kelas yang diizinkan
+    const tingkatSet = Array.from(new Set(kelasKeys.map(tingkatDariKelas).filter(Boolean)));
+
+    const hasilSettings = await Promise.all(tingkatSet.map(t =>
+      fetch(scriptURL + "?action=prSettings&kelas=" + encodeURIComponent(t))
+        .then(r => r.json())
+        .then(j => ({ tingkat: t, data: (j.status === "success" && j.data) ? j.data : { mapel:"", soal:"" } }))
+        .catch(() => ({ tingkat: t, data: { mapel:"", soal:"" } }))
+    ));
+    soalAktifPerTingkatPR = {};
+    hasilSettings.forEach(h => { soalAktifPerTingkatPR[h.tingkat] = h.data; });
+
+    const resList = await fetch(scriptURL + "?action=prList");
+    const jsonList = await resList.json();
+    jawabanPRSemua = (jsonList.status === "success") ? (jsonList.data || []) : [];
+
+    renderSoalAktifPR(tingkatSet);
+    renderHasilPR();
+
+  } catch(err){
+    console.error(err);
+    areaHasil.innerHTML = '<div class="status-msg">Gagal terhubung ke server. Periksa koneksi internet.</div>';
+  } finally {
+    btnRefresh.disabled = false;
+    btnRefresh.textContent = "Muat Ulang";
+  }
+}
+
+function renderSoalAktifPR(tingkatSet){
+  if(!panelSoalAktifPR) return;
+  if(!tingkatSet || tingkatSet.length === 0){
+    panelSoalAktifPR.style.display = "none";
+    return;
+  }
+  panelSoalAktifPR.style.display = "block";
+  panelSoalAktifPR.innerHTML =
+    '<div style="font-weight:800; font-size:15px; margin-bottom:12px;">📋 Soal Aktif Saat Ini</div>' +
+    '<div class="kartu-soal-pr-wrap">' +
+    tingkatSet.map(t => {
+      const d = soalAktifPerTingkatPR[t] || {};
+      if(!d.mapel || !d.soal){
+        return '<div class="kartu-soal-pr"><div class="tingkat-label">Kelas ' + t + '</div><div class="empty" style="padding:6px 0;">Belum ada soal aktif.</div></div>';
+      }
+      return '<div class="kartu-soal-pr"><div class="tingkat-label">Kelas ' + t + '</div>' +
+        '<span class="tag-mapel">' + escapeHtmlLokal(d.mapel) + '</span>' +
+        '<div class="teks-soal">' + escapeHtmlLokal(d.soal) + '</div></div>';
+    }).join("") +
+    '</div>';
+}
+
+function renderHasilPR(){
+  if(!rosterPR) return;
+
+  const kelasFilter = selKelas.value;
+  const kataKunci = inputCari.value.trim().toUpperCase();
+
+  let kelasSemua = Object.keys(rosterPR).sort();
+  if(kelasAllowed) kelasSemua = kelasSemua.filter(k => kelasAllowed.includes(k));
+  const kelasList = kelasFilter === "SEMUA" ? kelasSemua : [kelasFilter];
+
+  // Jawaban dihitung "sudah" hanya kalau cocok dengan soal aktif TINGKAT siswa itu sendiri
+  const submitted = {};
+  jawabanPRSemua.forEach(item => {
+    const t = tingkatDariKelas(item.kelas);
+    const efektif = soalAktifPerTingkatPR[t];
+    if(!efektif || !efektif.soal || item.soal !== efektif.soal) return;
+    const key = (item.kelas || "").toString().trim().toUpperCase() + "|" + (item.nama || "").toString().trim().toUpperCase();
+    submitted[key] = item;
+  });
+
+  let totalSemua = 0, sudahSemua = 0;
+  let htmlSudah = "";
+  let htmlBelum = "";
+  let teksSudah = "Kelas\tNama\tWaktu\n";
+  let teksBelum = "Kelas\tNama\n";
+
+  kelasList.forEach(kelas => {
+    const siswaKelas = rosterPR[kelas] || [];
+    const cocok = siswaKelas.filter(nama => !kataKunci || nama.toUpperCase().includes(kataKunci));
+    if(cocok.length === 0) return;
+
+    const sudahList = [];
+    const belumList = [];
+
+    cocok.forEach(nama => {
+      totalSemua++;
+      const key = kelas.toString().trim().toUpperCase() + "|" + nama.toString().trim().toUpperCase();
+      const info = submitted[key];
+      if(info){
+        sudahSemua++;
+        sudahList.push({ nama, waktu: info.waktu, jawaban: info.jawaban });
+      } else {
+        belumList.push(nama);
+      }
+    });
+
+    if(sudahList.length > 0){
+      htmlSudah += '<li class="kelas-heading">' + kelas + '</li>';
+      sudahList.forEach(s => {
+        htmlSudah +=
+          '<li class="item sudah" style="flex-direction:column; align-items:flex-start; gap:4px;">' +
+            '<div style="display:flex; justify-content:space-between; width:100%; gap:8px;">' +
+              '<span>' + escapeHtmlLokal(s.nama) + '</span>' +
+              '<span style="font-size:11px; font-weight:600; opacity:0.75; white-space:nowrap;">' + formatWaktuLokal(s.waktu) + '</span>' +
+            '</div>' +
+            '<div style="font-size:13px; font-weight:500; white-space:pre-wrap;">' + escapeHtmlLokal(s.jawaban) + '</div>' +
+          '</li>';
+        teksSudah += kelas + "\t" + s.nama + "\t" + formatWaktuLokal(s.waktu) + "\n";
+      });
+    }
+    if(belumList.length > 0){
+      htmlBelum += '<li class="kelas-heading">' + kelas + '</li>';
+      belumList.forEach(nama => {
+        htmlBelum += '<li class="item belum"><span>' + escapeHtmlLokal(nama) + '</span><span>Belum</span></li>';
+        teksBelum += kelas + "\t" + nama + "\n";
+      });
+    }
+  });
+
+  teksUntukCopy.sudah = sudahSemua > 0 ? teksSudah.trim() : "";
+  teksUntukCopy.belum = (totalSemua - sudahSemua) > 0 ? teksBelum.trim() : "";
+
+  const belumSemua = totalSemua - sudahSemua;
+  const pct = totalSemua > 0 ? Math.round((sudahSemua / totalSemua) * 100) : 0;
+
+  panelSummary.innerHTML =
+    '<div class="summary">' +
+      '<div class="ring" id="ring"><span id="ringPct">' + pct + '%</span></div>' +
+      '<div class="stats">' +
+        '<div class="stat"><div class="num" id="statTotal">' + totalSemua + '</div><div class="lbl">Total Siswa</div></div>' +
+        '<div class="stat sudah"><div class="num" id="statSudah">' + sudahSemua + '</div><div class="lbl">Sudah Submit</div></div>' +
+        '<div class="stat belum"><div class="num" id="statBelum">' + belumSemua + '</div><div class="lbl">Belum Submit</div></div>' +
+      '</div>' +
+    '</div>';
+  document.getElementById("ring").style.setProperty("--pct", pct);
+  panelSummary.style.display = "block";
+
+  areaHasil.innerHTML =
+    '<div class="cols">' +
+      '<div class="panel">' +
+        '<div class="col-title">' +
+          '<span class="label"><span class="dot sudah"></span>Sudah Submit (' + sudahSemua + ')</span>' +
+          '<button class="btn-copy" id="btnCopySudah" onclick="copyDaftar(\'sudah\', this)"' + (sudahSemua === 0 ? ' disabled' : '') + '>📋 Salin</button>' +
+        '</div>' +
+        '<ul class="list">' + (htmlSudah || '<div class="empty">Belum ada yang submit.</div>') + '</ul>' +
+      '</div>' +
+      '<div class="panel">' +
+        '<div class="col-title">' +
+          '<span class="label"><span class="dot belum"></span>Belum Submit (' + belumSemua + ')</span>' +
+          '<button class="btn-copy" id="btnCopyBelum" onclick="copyDaftar(\'belum\', this)"' + (belumSemua === 0 ? ' disabled' : '') + '>📋 Salin</button>' +
+        '</div>' +
+        '<ul class="list">' + (htmlBelum || '<div class="empty">Semua siswa sudah submit 🎉</div>') + '</ul>' +
+      '</div>' +
+    '</div>';
+}
+
+// ======================
+// INISIALISASI — menyesuaikan tipe halaman
+// ======================
+selKelas.addEventListener("change", () => { tipeHalaman === "pr" ? renderHasilPR() : renderHasil(); });
+inputCari.addEventListener("input", () => { tipeHalaman === "pr" ? renderHasilPR() : renderHasil(); });
+
+if(tipeHalaman === "pr"){
+  document.getElementById("judulHalaman").textContent = "📋 Rekap Pengerjaan PR";
+  document.getElementById("subjudulHalaman").textContent = "Pantau siswa yang sudah dan belum submit PR, langsung dari soal yang sedang aktif.";
+  if(fieldUjian) fieldUjian.style.display = "none";
+  muatDataPR();
+} else {
+  selUjian.addEventListener("change", muatRekap);
+  muatDaftarUjian();
+}
 </script>
 
 </body>
