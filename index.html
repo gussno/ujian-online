@@ -1621,6 +1621,12 @@
         <input type="text" id="prAdminPin" placeholder="Kode admin" style="max-width:180px;">
       </div>
 
+      <div class="gen-row">
+        <label for="prAdminJadwal">Jadwalkan Aktif (opsional)</label>
+        <input type="datetime-local" id="prAdminJadwal" style="max-width:240px;">
+        <span class="hint">Kosongkan kalau mau diaktifkan langsung sesuai pilihan di bawah. Kalau diisi, soal ini otomatis aktif sendiri pada tanggal & jam itu (meleset maksimal ±15 menit), tanpa perlu Anda buka portal lagi.</span>
+      </div>
+
       <div class="toggle-row" id="prAktifkanRow">
         <input type="checkbox" id="prAdminAktifkan" checked>
         <div class="txt">
@@ -3794,6 +3800,15 @@ function labelKelasTargetPR(kode){
   return found ? found.label : (kode || "Semua Kelas");
 }
 
+// ISO string -> format "YYYY-MM-DDTHH:mm" yang dibutuhkan input datetime-local
+function keFormatDatetimeLocal(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return "";
+  const pad = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
 function renderDaftarSoalPR(){
   const box = document.getElementById("prDaftarSoalBox");
   if(!box) return;
@@ -3809,25 +3824,48 @@ function renderDaftarSoalPR(){
     if(items.length === 0) return;
 
     html += '<div class="dash-group-title">' + grp.label + '</div>';
-    html += items.map(item => `
+    html += items.map(item => {
+      let badge = "";
+      if(item.aktif){
+        badge = '<span class="status penuh" style="margin-left:6px;">Aktif</span>';
+      } else if(item.jadwalAktif){
+        badge = '<span class="status parsial" style="margin-left:6px;">⏰ Terjadwal ' + formatWaktuLaporan(item.jadwalAktif) + '</span>';
+      }
+      return `
       <div class="card-link" style="cursor:default; flex-direction:column; align-items:flex-start; gap:10px;">
         <div style="width:100%;">
           <span class="subjek-tag">${escapeHtmlSoal(item.mapel)}</span>
-          ${item.aktif ? '<span class="status penuh" style="margin-left:6px;">Aktif</span>' : ''}
+          ${badge}
           <div style="font-size:14px; font-weight:600; margin-top:8px; white-space:pre-wrap;">${escapeHtmlSoal(item.soal)}</div>
           <div style="font-size:11.5px; color:var(--muted); font-weight:600; margin-top:6px;">${formatWaktuLaporan(item.waktu)}</div>
         </div>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          ${item.aktif ? '' : `<button class="btn-copy" onclick="aktifkanSoalPR('${item.id}')">▶️ Aktifkan</button>`}
+          ${item.aktif ? '' : `<button class="btn-copy" onclick="aktifkanSoalPR('${item.id}')">▶️ Aktifkan${item.jadwalAktif ? ' Sekarang' : ''}</button>`}
           <button class="btn-copy" onclick="mulaiEditSoalPR('${item.id}')">✏️ Edit</button>
           <button class="btn-copy" onclick="hapusSoalPR('${item.id}')">🗑️ Hapus</button>
         </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
   });
 
   box.innerHTML = html || '<div class="status-msg">Belum ada soal yang dibuat.</div>';
 }
+
+function perbaruiStatusAktifkanRow(){
+  const jadwal = document.getElementById("prAdminJadwal").value;
+  const checkbox = document.getElementById("prAdminAktifkan");
+  const row = document.getElementById("prAktifkanRow");
+  if(jadwal){
+    checkbox.disabled = true;
+    row.style.opacity = "0.5";
+  } else {
+    checkbox.disabled = false;
+    row.style.opacity = "1";
+  }
+}
+const prAdminJadwalEl = document.getElementById("prAdminJadwal");
+if(prAdminJadwalEl) prAdminJadwalEl.addEventListener("change", perbaruiStatusAktifkanRow);
 
 function mulaiEditSoalPR(id){
   const item = prDaftarSoalSemua.find(x => x.id === id);
@@ -3836,6 +3874,7 @@ function mulaiEditSoalPR(id){
   document.getElementById("prAdminMapel").value = item.mapel;
   document.getElementById("prAdminSoal").value = item.soal;
   document.getElementById("prAdminKelasTarget").value = item.kelasTarget || "Semua";
+  document.getElementById("prAdminJadwal").value = keFormatDatetimeLocal(item.jadwalAktif);
   document.getElementById("prFormJudul").textContent = "✏️ Edit Soal";
   document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Perubahan";
   document.getElementById("prBtnBatalEdit").style.display = "inline-flex";
@@ -3850,17 +3889,20 @@ function batalEditSoalPR(){
   document.getElementById("prAdminMapel").value = "";
   document.getElementById("prAdminSoal").value = "";
   document.getElementById("prAdminKelasTarget").value = "Semua";
+  document.getElementById("prAdminJadwal").value = "";
   document.getElementById("prFormJudul").textContent = "📝 Buat Soal Baru";
   document.getElementById("prBtnSimpanSoal").textContent = "💾 Simpan Soal Baru";
   document.getElementById("prBtnBatalEdit").style.display = "none";
   document.getElementById("prAktifkanRow").style.display = "flex";
   document.getElementById("prAdminPesan").textContent = "";
+  perbaruiStatusAktifkanRow();
 }
 
 async function simpanSoalPR(){
   const mapel = document.getElementById("prAdminMapel").value.trim();
   const soal = document.getElementById("prAdminSoal").value.trim();
   const kelasTarget = document.getElementById("prAdminKelasTarget").value;
+  const jadwalAktif = document.getElementById("prAdminJadwal").value; // "" kalau kosong
   const pin = ambilPinAdminPR();
   const aktifkan = document.getElementById("prAdminAktifkan").checked;
   const pesanEl = document.getElementById("prAdminPesan");
@@ -3877,19 +3919,21 @@ async function simpanSoalPR(){
 
   try{
     const body = prEditingId
-      ? { type:"prSoalEdit", id: prEditingId, mapel, soal, kelasTarget, pin }
-      : { type:"prSoalTambah", mapel, soal, kelasTarget, pin, aktifkan };
+      ? { type:"prSoalEdit", id: prEditingId, mapel, soal, kelasTarget, jadwalAktif, pin }
+      : { type:"prSoalTambah", mapel, soal, kelasTarget, jadwalAktif, pin, aktifkan };
 
     const res = await fetch(scriptURL, { method:"POST", body: JSON.stringify(body) });
     const json = await res.json();
 
     if(json.status === "success"){
-      pesanEl.textContent = prEditingId ? "✅ Perubahan berhasil disimpan." : "✅ Soal baru berhasil disimpan.";
+      pesanEl.textContent = prEditingId
+        ? "✅ Perubahan berhasil disimpan."
+        : (jadwalAktif ? "✅ Soal dijadwalkan, akan aktif otomatis nanti." : "✅ Soal baru berhasil disimpan.");
       pesanEl.style.color = "#16a34a";
       const sedangEdit = !!prEditingId;
       batalEditSoalPR();
       await muatDaftarSoalPR();
-      if(!sedangEdit && aktifkan){
+      if(!sedangEdit && aktifkan && !jadwalAktif){
         await muatSoalAktifPR();
         await muatJawabanPR();
         renderRingkasanPR();
