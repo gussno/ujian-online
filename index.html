@@ -2524,6 +2524,60 @@ function reaksiBurungMenu(){
     }, 260);
   });
 
+  // ---- Mendekat ke titik klik di mana pun di halaman ----
+  let waktuMendekatTerakhir = 0;
+  const JEDA_MENDEKAT = 12000; // jangan lebih sering dari ini, supaya tidak mengganggu
+
+  function terbangKeTitik(x, y){
+    if(menekan || sedangDrag || sedangPulang || sedangTidur) return;
+
+    const asal = {
+      left: parseFloat(mk.style.left) || 0,
+      top: parseFloat(mk.style.top) || 0
+    };
+    const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+
+    // mendarat sedikit di atas titik klik, supaya tidak menutupi persis
+    // apa yang baru diklik
+    const tujuan = batasiPosisi(x - w / 2, y - h - 14);
+
+    if(tujuan.left > asal.left + 4){
+      mk.classList.add("mk-hadap-kanan");
+    } else if(tujuan.left < asal.left - 4){
+      mk.classList.remove("mk-hadap-kanan");
+    }
+
+    mk.classList.add("terbang");
+    mk.style.transition = "left 0.7s ease-out, top 0.7s ease-out";
+    mk.style.left = tujuan.left + "px";
+    mk.style.top = tujuan.top + "px";
+
+    jalankanSekali(mk, "transitionend", () => {
+      mk.classList.remove("terbang");
+      mk.style.transition = "";
+      simpanPosisi(tujuan);
+    }, 1000);
+  }
+
+  document.addEventListener("click", (e) => {
+    if(sedangTidur || sedangPulang || menekan || sedangDrag) return;
+    if(mk.contains(e.target)) return; // klik di burung sendiri sudah ditangani terpisah
+    if(telur && telur.contains(e.target)) return;
+    if(makanan && makanan.contains(e.target)) return;
+    if(e.target.closest && e.target.closest(".nav-item")) return; // menu sudah punya reaksi "kaget" sendiri
+
+    const splashEl = document.getElementById("splash");
+    if(splashEl && !splashEl.classList.contains("hide")) return; // portal belum dibuka
+
+    const sekarang = Date.now();
+    if(sekarang - waktuMendekatTerakhir < JEDA_MENDEKAT) return;
+    waktuMendekatTerakhir = sekarang;
+
+    catatAktivitas();
+    terbangKeTitik(e.clientX, e.clientY);
+  });
+
   // ---- Bertelur saat tema warna diganti: telur jatuh lurus dulu, baru
   // memantul-mantul menuju homebase; burung menyusul terbang pulang
   // (menghadap arah tujuannya); telur lalu menggelinding pergi. ----
