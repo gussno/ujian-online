@@ -1885,6 +1885,14 @@ D. Pilihan D"></textarea>
   <section class="section" id="section-genwa">
 
     <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">Jenis Pesan</div>
+      <div class="tabs" id="waTabsJenis">
+        <button class="tab active" data-jenis="ujian">📝 Ujian</button>
+        <button class="tab" data-jenis="pr">📋 PR</button>
+      </div>
+    </div>
+
+    <div class="panel" id="waPanelUjian">
       <div class="gen-2col">
         <div class="gen-row">
           <label for="waKelas">Kelas Tujuan</label>
@@ -1917,12 +1925,42 @@ Setelah benar-benar paham, kerjakan soal asesmen yang linknya tersedia di bagian
         <label for="waTimer">Durasi Timer (menit)</label>
         <input type="number" id="waTimer" value="30" style="max-width:120px;">
       </div>
+    </div>
 
-      <div class="toggle-row">
+    <div class="panel" id="waPanelPR" style="display:none;">
+      <div class="gen-2col">
+        <div class="gen-row">
+          <label for="waPrKelas">1. Pilih Kelas</label>
+          <select id="waPrKelas" onchange="muatSoalPRUntukWA()">
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+        <div class="gen-row">
+          <label for="waPrMapel">Mata Pelajaran</label>
+          <input type="text" id="waPrMapel" placeholder="Otomatis terisi setelah pilih kelas" readonly style="background:var(--bg);">
+        </div>
+      </div>
+      <div class="gen-row">
+        <label for="waPrSoal">2. Soal / Topik PR (otomatis, boleh disunting)</label>
+        <textarea id="waPrSoal" rows="3" placeholder="Otomatis terisi setelah pilih kelas..."></textarea>
+        <span class="hint" id="waPrPesanStatus"></span>
+      </div>
+      <div class="gen-row">
+        <label for="waPrTanggal">Hari, Tanggal</label>
+        <input type="text" id="waPrTanggal" placeholder="Contoh: Selasa, 4 Agustus 2026">
+      </div>
+      <div class="gen-row">
+        <label for="waPrTenggat">Tenggat Waktu Pengumpulan</label>
+        <input type="text" id="waPrTenggat" placeholder="Contoh: Senin, 8 September 2026 pukul 07.00">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="toggle-row" id="waToggleAntiDuplikat">
         <input type="checkbox" id="waAntiDuplikat">
         <div class="txt">
           <b>Sertakan catatan "tidak bisa diulang"</b>
-          <span>Centang HANYA kalau file ujian ini benar-benar sudah pakai fitur cek status (anti-duplikat) dari Code.gs. Salah mencentang ini pernah membuat pesan WA jadi tidak akurat.</span>
+          <span>Hanya untuk Ujian — centang HANYA kalau file ujian ini benar-benar sudah pakai fitur cek status (anti-duplikat) dari Code.gs. Salah mencentang ini pernah membuat pesan WA jadi tidak akurat.</span>
         </div>
       </div>
 
@@ -4728,7 +4766,109 @@ liLangkah + '\n' +
 // ======================================================
 // GENERATOR PESAN WA
 // ======================================================
+let waJenisAktif = "ujian";
+
+function pindahJenisWA(jenis){
+  waJenisAktif = jenis;
+  document.querySelectorAll("#waTabsJenis .tab").forEach(t => t.classList.toggle("active", t.dataset.jenis === jenis));
+  document.getElementById("waPanelUjian").style.display = jenis === "pr" ? "none" : "block";
+  document.getElementById("waPanelPR").style.display = jenis === "pr" ? "block" : "none";
+  document.getElementById("waToggleAntiDuplikat").style.display = jenis === "pr" ? "none" : "flex";
+  document.getElementById("waOutput").value = "";
+}
+document.querySelectorAll("#waTabsJenis .tab").forEach(tab => {
+  tab.addEventListener("click", () => pindahJenisWA(tab.dataset.jenis));
+});
+
+async function muatKelasUntukWAPR(){
+  const sel = document.getElementById("waPrKelas");
+  if(!sel) return;
+  try{
+    const res = await fetch(scriptURL + "?action=siswa");
+    const json = await res.json();
+    if(json.status === "success" && json.data){
+      sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      Object.keys(json.data).sort().forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k; opt.textContent = k;
+        sel.appendChild(opt);
+      });
+    }
+  } catch(err){
+    console.error(err);
+  }
+}
+
+function tingkatDariKelasWA(kelas){
+  const m = String(kelas || "").match(/\d+/);
+  return m ? m[0] : "";
+}
+
+async function muatSoalPRUntukWA(){
+  const kelas = document.getElementById("waPrKelas").value;
+  const mapelEl = document.getElementById("waPrMapel");
+  const soalEl = document.getElementById("waPrSoal");
+  const statusEl = document.getElementById("waPrPesanStatus");
+
+  if(!kelas){
+    mapelEl.value = "";
+    soalEl.value = "";
+    if(statusEl) statusEl.textContent = "";
+    return;
+  }
+
+  const tingkat = tingkatDariKelasWA(kelas);
+  if(statusEl) statusEl.textContent = "Memuat soal aktif untuk kelas " + tingkat + "...";
+
+  try{
+    const res = await fetch(scriptURL + "?action=prSettings&kelas=" + encodeURIComponent(tingkat));
+    const json = await res.json();
+    if(json.status === "success" && json.data && json.data.mapel && json.data.soal){
+      mapelEl.value = json.data.mapel;
+      soalEl.value = json.data.soal;
+      if(statusEl) statusEl.textContent = "";
+    } else {
+      mapelEl.value = "";
+      soalEl.value = "";
+      if(statusEl) statusEl.textContent = "⚠️ Belum ada soal PR aktif untuk kelas " + tingkat + ".";
+    }
+  } catch(err){
+    console.error(err);
+    if(statusEl) statusEl.textContent = "Gagal memuat soal aktif.";
+  }
+}
+
+muatKelasUntukWAPR();
+
 function buatPesanWA(){
+  if(waJenisAktif === "pr") buatPesanWAPR();
+  else buatPesanWAUjian();
+}
+
+function buatPesanWAPR(){
+  const kelas = document.getElementById("waPrKelas").value.trim() || "(pilih kelas)";
+  const mapel = document.getElementById("waPrMapel").value.trim() || "(mata pelajaran)";
+  const soal = document.getElementById("waPrSoal").value.trim() || "(topik/soal PR)";
+  const tanggal = document.getElementById("waPrTanggal").value.trim() || "(isi hari, tanggal)";
+  const tenggat = document.getElementById("waPrTenggat").value.trim() || "(isi tenggat waktu)";
+  const salam = document.getElementById("waSalam").checked;
+
+  let pesan = "";
+  if(salam) pesan += "Assalamualaikum Wr. Wb.\n\n";
+  pesan += "Anak-anak kelas " + kelas + ", sesuai jadwal pelajaran " + mapel + " hari ini, *" + tanggal + "*, ada PR yang perlu dikerjakan \ud83d\udcda\n\n";
+  pesan += "*Topik:* " + soal + "\n\n";
+  pesan += "Cara mengerjakan:\n";
+  pesan += "1. Buka Papan Jawaban PR: https://gussno.github.io/ujian-online/papan-pr.html\n";
+  pesan += "2. Isi nama, kelas, dan jawaban kalian\n";
+  pesan += "3. Kirim paling lambat *" + tenggat + "*\n\n";
+  pesan += "Jangan lupa dicek dulu ya sebelum dikirim.\n\n";
+  pesan += "Semangat belajar! \ud83d\udcaa";
+  if(salam) pesan += "\n\nWassalamualaikum Wr. Wb.";
+
+  document.getElementById("waOutput").value = pesan;
+}
+
+function buatPesanWAUjian(){
   const kelas = document.getElementById("waKelas").value.trim() || "(isi kelas)";
   const mapel = document.getElementById("waMapel").value.trim() || "IPS";
   const tanggal = document.getElementById("waTanggal").value.trim() || "(isi hari, tanggal)";
