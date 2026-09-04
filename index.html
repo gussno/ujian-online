@@ -2320,35 +2320,56 @@ function reaksiBurungMenu(){
       top: parseFloat(mk.style.top) || 0
     };
     const w = mk.offsetWidth || 56;
+    const h = mk.offsetHeight || 50;
+    const margin = 24;
 
     mk.classList.add("terbang");
-    mk.classList.remove("mk-hadap-kanan"); // terbang keluar tetap menghadap kiri (default)
 
-    mk.style.transition = "left 1.6s ease-in, top 1.4s ease-in-out, opacity 1.6s ease-in";
-    mk.style.left = (-w - 24) + "px";
-    mk.style.top = (asal.top - 22) + "px";
-    mk.style.opacity = "0";
+    // FASE KELUAR: terbang sesuai arah hadapnya saat ini (tanpa memudar),
+    // sampai betul-betul melewati batas layar.
+    const menghadapKanan = mk.classList.contains("mk-hadap-kanan");
+    const tujuanKeluar = menghadapKanan
+      ? { left: window.innerWidth + margin, top: asal.top }
+      : { left: -w - margin, top: asal.top };
+
+    mk.style.transition = "left 1.5s ease-in, top 1.5s ease-in";
+    mk.style.left = tujuanKeluar.left + "px";
+    mk.style.top = tujuanKeluar.top + "px";
 
     jalankanSekali(mk, "transitionend", () => {
-      // lompat instan (masih transparan) ke luar tepi kanan layar
+      // FASE MASUK: posisi & sisi kemunculan acak (atas/bawah/kiri/kanan)
+      const sisi = ["kiri", "kanan", "atas", "bawah"][Math.floor(Math.random() * 4)];
+      const acakTop = Math.random() * Math.max(0, window.innerHeight - h);
+      const acakLeft = Math.random() * Math.max(0, window.innerWidth - w);
+      let posisiMasuk;
+
+      if(sisi === "kiri") posisiMasuk = { left: -w - margin, top: acakTop };
+      else if(sisi === "kanan") posisiMasuk = { left: window.innerWidth + margin, top: acakTop };
+      else if(sisi === "atas") posisiMasuk = { left: acakLeft, top: -h - margin };
+      else posisiMasuk = { left: acakLeft, top: window.innerHeight + margin };
+
       mk.style.transition = "none";
-      mk.style.left = (window.innerWidth + 24) + "px";
-      mk.style.top = Math.max(0, asal.top - 10) + "px";
+      mk.style.left = posisiMasuk.left + "px";
+      mk.style.top = posisiMasuk.top + "px";
       void mk.offsetWidth;
 
-      // lalu terbang balik dari kanan menuju posisi semula, sambil muncul lagi
-      mk.style.transition = "left 1.8s ease-out, top 1.8s ease-out, opacity 0.7s ease-in";
+      // menghadap ke arah yang benar untuk kembali ke posisi semula
+      if(asal.left > posisiMasuk.left + 4){
+        mk.classList.add("mk-hadap-kanan");
+      } else if(asal.left < posisiMasuk.left - 4){
+        mk.classList.remove("mk-hadap-kanan");
+      }
+
+      mk.style.transition = "left 1.6s ease-out, top 1.6s ease-out";
       mk.style.left = asal.left + "px";
       mk.style.top = asal.top + "px";
-      mk.style.opacity = "1";
 
       jalankanSekali(mk, "transitionend", () => {
         mk.classList.remove("terbang");
         mk.style.transition = "";
-        mk.style.opacity = "";
         simpanPosisi(asal);
-      }, 2200);
-    }, 1900);
+      }, 2000);
+    }, 1700);
   }
 
   function jadwalkanMenoleh(){
