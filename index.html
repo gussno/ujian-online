@@ -1520,7 +1520,7 @@
     <div class="panel">
       <div style="font-weight:800; font-size:16px; margin-bottom:6px;">🔗 Membagikan Rekap ke Pihak Lain</div>
       <div style="color:var(--muted); font-size:13.5px; font-weight:500; margin-bottom:14px;">
-        Untuk membagikan rekap pengerjaan HANYA untuk ujian & kelas tertentu (tanpa membuka seluruh portal), gunakan halaman <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">rekap-bagikan.html</code> dengan parameter di URL:
+        Untuk membagikan rekap pengerjaan HANYA untuk ujian & kelas tertentu (tanpa membuka seluruh portal), gunakan halaman <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">rekap-bagikan.html</code> dengan parameter di URL — paling gampang lewat menu <b>Generator Link Berbagi</b>, tapi bisa juga ditulis manual:
       </div>
       <div style="background:var(--bg); border-radius:10px; padding:14px 16px; font-family:'Space Mono', monospace; font-size:12.5px; font-weight:700; color:var(--ink); overflow-x:auto; white-space:nowrap;">
         rekap-bagikan.html?ujian=2627.1-7-IPS-Sejarah Lisan&kelas=7A,7B
@@ -1529,6 +1529,16 @@
         • <code>ujian</code> = nama ujian persis seperti di sheet (boleh lebih dari satu, pisah koma)<br>
         • <code>kelas</code> = rombel yang boleh dilihat (boleh lebih dari satu, pisah koma)<br>
         • Tanpa parameter sama sekali → halaman tampil lengkap seperti biasa (mode untuk Anda sendiri)
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1.5px solid var(--line);">
+        <div style="font-size:13.5px; font-weight:700; margin-bottom:8px;">Untuk rekap PR, tambahkan <code style="background:var(--bg); padding:2px 6px; border-radius:5px;">tipe=pr</code> — parameter <code>ujian</code> tidak dipakai lagi:</div>
+        <div style="background:var(--bg); border-radius:10px; padding:14px 16px; font-family:'Space Mono', monospace; font-size:12.5px; font-weight:700; color:var(--ink); overflow-x:auto; white-space:nowrap;">
+          rekap-bagikan.html?tipe=pr&kelas=8A,8B
+        </div>
+        <div style="margin-top:10px; font-size:12.5px; color:var(--muted); font-weight:600;">
+          Halaman akan menampilkan soal PR yang sedang aktif per tingkat kelas, plus status sudah/belum submit — mengikuti kelas yang diizinkan di parameter.
+        </div>
       </div>
     </div>
 
@@ -1658,6 +1668,14 @@
   <section class="section" id="section-genlink">
 
     <div class="panel">
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">Jenis Link</div>
+      <div class="tabs" id="glTabsJenis">
+        <button class="tab active" data-jenis="ujian">📝 Ujian</button>
+        <button class="tab" data-jenis="pr">📋 PR</button>
+      </div>
+    </div>
+
+    <div class="panel" id="glPanelUjian">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <div style="font-weight:800; font-size:15px;">1. Pilih ujian yang boleh dilihat</div>
         <button class="btn btn-outline" onclick="muatGeneratorLink()">↻ Muat Ulang Daftar</button>
@@ -1669,7 +1687,7 @@
     </div>
 
     <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">2. Pilih kelas yang boleh dilihat</div>
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;" id="glJudulKelas">2. Pilih kelas yang boleh dilihat</div>
       <div class="gen-row hint" style="margin-bottom:8px;">Kosongkan semua kalau mau semua kelas terlihat.</div>
       <div class="checkbox-list" id="glKelasList">
         <div class="status-msg">Memuat daftar kelas...</div>
@@ -1677,7 +1695,7 @@
     </div>
 
     <div class="panel">
-      <div style="font-weight:800; font-size:15px; margin-bottom:12px;">3. Link hasil</div>
+      <div style="font-weight:800; font-size:15px; margin-bottom:12px;" id="glJudulLink">3. Link hasil</div>
       <div class="gen-row">
         <label for="glBaseUrl">Alamat halaman rekap-bagikan.html</label>
         <input type="text" id="glBaseUrl" value="https://gussno.github.io/ujian-online/rekap-bagikan.html">
@@ -4097,6 +4115,20 @@ function salinFallbackUmum(teks, callback){
 // ======================================================
 // GENERATOR LINK BERBAGI
 // ======================================================
+let glJenisAktif = "ujian";
+
+function pindahJenisLink(jenis){
+  glJenisAktif = jenis;
+  document.querySelectorAll("#glTabsJenis .tab").forEach(t => t.classList.toggle("active", t.dataset.jenis === jenis));
+  document.getElementById("glPanelUjian").style.display = jenis === "pr" ? "none" : "block";
+  document.getElementById("glJudulKelas").textContent = jenis === "pr" ? "2. Pilih kelas yang boleh dilihat" : "2. Pilih kelas yang boleh dilihat";
+  document.getElementById("glJudulLink").textContent = jenis === "pr" ? "3. Link hasil PR" : "3. Link hasil ujian";
+  document.getElementById("glOutput").value = "";
+}
+document.querySelectorAll("#glTabsJenis .tab").forEach(tab => {
+  tab.addEventListener("click", () => pindahJenisLink(tab.dataset.jenis));
+});
+
 async function muatGeneratorLink(){
   const elUjian = document.getElementById("glUjianList");
   const elKelas = document.getElementById("glKelasList");
@@ -4134,12 +4166,18 @@ async function muatGeneratorLink(){
 }
 
 function buatLinkBerbagi(){
-  const ujianTerpilih = [...document.querySelectorAll("#glUjianList input:checked")].map(c => c.value);
   const kelasTerpilih = [...document.querySelectorAll("#glKelasList input:checked")].map(c => c.value);
   const base = document.getElementById("glBaseUrl").value.trim() || "rekap-bagikan.html";
 
   const params = [];
-  if(ujianTerpilih.length > 0) params.push("ujian=" + encodeURIComponent(ujianTerpilih.join(",")));
+
+  if(glJenisAktif === "pr"){
+    params.push("tipe=pr");
+  } else {
+    const ujianTerpilih = [...document.querySelectorAll("#glUjianList input:checked")].map(c => c.value);
+    if(ujianTerpilih.length > 0) params.push("ujian=" + encodeURIComponent(ujianTerpilih.join(",")));
+  }
+
   if(kelasTerpilih.length > 0) params.push("kelas=" + encodeURIComponent(kelasTerpilih.join(",")));
 
   const url = base + (params.length > 0 ? "?" + params.join("&") : "");
