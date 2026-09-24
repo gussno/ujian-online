@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soal Essay Dinamika Penduduk - SMP Kelas 8</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #1e3a8a;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+    .identitas-box {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #1e40af;
+    }
+    .form-group select, .form-group input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: #fff;
+    }
+    .soal-card {
+      background-color: #fafafa;
+      border-left: 4px solid #2563eb;
+      padding: 18px;
+      margin-bottom: 25px;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .soal-text {
+      font-weight: 600;
+      font-size: 1.05em;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+    textarea {
+      width: 100%;
+      height: 90px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+    }
+    textarea:focus, select:focus, input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+    .btn-submit {
+      width: 100%;
+      background-color: #2563eb;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-submit:hover {
+      background-color: #1d4ed8;
+    }
+    .btn-submit:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    #statusMessage {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      display: none;
+      text-align: center;
+      font-weight: bold;
+    }
+    .status-success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .status-error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Ujian Online: Dinamika Penduduk</h1>
+  <div class="subtitle">Mata Pelajaran: IPS | Kelas VIII SMP</div>
+
+  <form id="quizForm">
+    <!-- Identitas Siswa -->
+    <div class="identitas-box">
+      <div class="form-group">
+        <label for="nama">Pilih Nama Siswa:</label>
+        <select id="nama" name="nama" required>
+          <option value="">-- Memuat Daftar Nama... --</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="kelas">Pilih Kelas:</label>
+        <select id="kelas" name="kelas" required>
+          <option value="">-- Memuat Daftar Kelas... --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Daftar 10 Soal -->
+    <div class="soal-card">
+      <div class="soal-text">1. Jelaskan apa yang dimaksud dengan dinamika penduduk!</div>
+      <textarea name="soal1" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">2. Sebutkan tiga faktor utama yang memengaruhi perubahan jumlah penduduk di suatu wilayah!</div>
+      <textarea name="soal2" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">3. Jelaskan perbedaan utama antara pertumbuhan penduduk alami dan pertumbuhan penduduk total!</div>
+      <textarea name="soal3" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">4. Mengapa tingkat kelahiran di daerah pedesaan cenderung lebih tinggi dibandingkan di daerah perkotaan?</div>
+      <textarea name="soal4" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">5. Jelaskan perbedaan antara faktor pro-mortalitas dan faktor anti-mortalitas!</div>
+      <textarea name="soal5" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">6. Jelaskan dampak positif dari pengiriman Tenaga Kerja Indonesia (TKI) ke luar negeri bagi perekonomian negara asal!</div>
+      <textarea name="soal6" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">7. Jelaskan apa yang dimaksud dengan migrasi komutasi (laju ulang-alik) beserta contohnya!</div>
+      <textarea name="soal7" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">8. Bagaimana karakteristik angka kelahiran dan angka kematian pada negara yang memiliki piramida penduduk berbentuk ekspansif?</div>
+      <textarea name="soal8" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">9. Jelaskan apa yang dimaksud dengan Rasio Ketergantungan (Dependency Ratio) dalam komposisi penduduk!</div>
+      <textarea name="soal9" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="soal-card">
+      <div class="soal-text">10. Apa yang dimaksud dengan kondisi Bonus Demografi pada suatu negara?</div>
+      <textarea name="soal10" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit">Kirim Semua Jawaban</button>
+  </form>
+
+  <div id="statusMessage"></div>
+</div>
+
+<script>
+  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT
+  const scriptURL = 'https://script.google.com/a/macros/guru.smp.belajar.id/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
+
+  const form = document.getElementById('quizForm');
+  const namaSelect = document.getElementById('nama');
+  const kelasSelect = document.getElementById('kelas');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusMessage = document.getElementById('statusMessage');
+
+  // Ambil daftar Nama (Kolom B) dan Kelas (Kolom A) dari Sheet 2
+  window.addEventListener('DOMContentLoaded', () => {
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(data => {
+        // Populasi Dropdown Nama
+        namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
+        if (data.nama && data.nama.length > 0) {
+          data.nama.forEach(n => {
+            if (n) {
+              const option = document.createElement('option');
+              option.value = n;
+              option.textContent = n;
+              namaSelect.appendChild(option);
+            }
+          });
+        } else {
+          namaSelect.innerHTML = '<option value="">-- Daftar nama tidak ditemukan --</option>';
+        }
+
+        // Populasi Dropdown Kelas
+        kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        if (data.kelas && data.kelas.length > 0) {
+          data.kelas.forEach(k => {
+            if (k) {
+              const option = document.createElement('option');
+              option.value = k;
+              option.textContent = k;
+              kelasSelect.appendChild(option);
+            }
+          });
+        } else {
+          kelasSelect.innerHTML = '<option value="">-- Daftar kelas tidak ditemukan --</option>';
+        }
+      })
+      .catch(error => {
+        console.error('Gagal memuat data dari Sheet:', error);
+        namaSelect.innerHTML = '<option value="">-- Gagal memuat daftar nama --</option>';
+        kelasSelect.innerHTML = '<option value="">-- Gagal memuat daftar kelas --</option>';
+      });
+  });
+
+  // Proses Submit Jawaban
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Mengirim jawaban...';
+    statusMessage.style.display = 'none';
+
+    const payload = {
+      nama: form.nama.value,
+      kelas: form.kelas.value,
+      jawaban: {
+        soal1: form.soal1.value,
+        soal2: form.soal2.value,
+        soal3: form.soal3.value,
+        soal4: form.soal4.value,
+        soal5: form.soal5.value,
+        soal6: form.soal6.value,
+        soal7: form.soal7.value,
+        soal8: form.soal8.value,
+        soal9: form.soal9.value,
+        soal10: form.soal10.value
+      }
+    };
+
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.result === 'success') {
+        statusMessage.className = 'status-success';
+        statusMessage.innerText = 'Jawaban berhasil terkirim dan tersimpan di Google Sheet!';
+        statusMessage.style.display = 'block';
+        form.reset();
+      } else {
+        throw new Error(data.error || 'Terjadi kesalahan sistem.');
+      }
+    })
+    .catch(error => {
+      statusMessage.className = 'status-error';
+      statusMessage.innerText = 'Gagal mengirim jawaban: ' + error.message;
+      statusMessage.style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Kirim Semua Jawaban';
+    });
+  });
+</script>
+
+</body>
+</html>
