@@ -88,11 +88,11 @@
     .btn-retry {
       display: inline-block;
       margin-top: 8px;
-      padding: 6px 12px;
+      padding: 8px 14px;
       background-color: #ef4444;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       font-size: 0.85rem;
       font-weight: bold;
       cursor: pointer;
@@ -249,7 +249,7 @@
         <select id="kelas" name="kelas" required>
           <option value="">-- Memuat Daftar Kelas... --</option>
         </select>
-        <button type="button" id="retryBtn" class="btn-retry" style="display:none;" onclick="loadInitialData()">Coba Muat Ulang Data</button>
+        <button type="button" id="retryBtn" class="btn-retry" style="display:none;" onclick="loadInitialData()">🔄 Muat Ulang Daftar Kelas</button>
       </div>
       <div class="form-group" style="margin-bottom: 0;">
         <label for="nama">2. Pilih Nama Siswa:</label>
@@ -436,7 +436,7 @@
 </div>
 
 <script>
-  // PASTA URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+  // SILAKAN GANTI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
 
   const form = document.getElementById('quizForm');
@@ -447,41 +447,63 @@
   const retryBtn = document.getElementById('retryBtn');
 
   let allSiswaData = [];
-  let loadTimeout = null;
 
-  function loadInitialData() {
+  // Panggilan Menggunakan FETCH Standar (Melintasi Blokir Chrome Android)
+  async function loadInitialData() {
     kelasSelect.innerHTML = '<option value="">-- Memuat Daftar Kelas... --</option>';
     retryBtn.style.display = 'none';
 
-    // Bersihkan script tag lama jika ada
+    try {
+      // Panggil endpoint Apps Script via fetch biasa
+      const response = await fetch(scriptURL + '?get_data=1&_t=' + new Date().getTime(), {
+        method: 'GET',
+        redirect: 'follow'
+      });
+
+      if (!response.ok) throw new Error('Network error');
+
+      const data = await response.json();
+      renderDropdownData(data);
+    } catch (error) {
+      console.warn('Fetch standar dicegat browser, mencoba fallback JSONP...', error);
+      // Fallback jika fetch terhalang
+      loadDataJSONP();
+    }
+  }
+
+  function loadDataJSONP() {
     const oldScript = document.getElementById('jsonp-script');
     if (oldScript) oldScript.remove();
 
-    // Timer Timeout 8 Detik jika jaringan HP lambat
-    loadTimeout = setTimeout(() => {
-      kelasSelect.innerHTML = '<option value="">-- Gagal Memuat Data (Koneksi Lambat) --</option>';
-      retryBtn.style.display = 'inline-block';
-    }, 8000);
-
-    // Tambahkan Timestamp anti-cache
     const script = document.createElement('script');
     script.id = 'jsonp-script';
     script.src = scriptURL + '?callback=handleDataResponse&_t=' + new Date().getTime();
     document.body.appendChild(script);
+
+    setTimeout(() => {
+      if (kelasSelect.value === '') {
+        kelasSelect.innerHTML = '<option value="">-- Gagal Memuat Data otomatis --</option>';
+        retryBtn.style.display = 'inline-block';
+      }
+    }, 5000);
   }
 
   window.handleDataResponse = function(data) {
-    clearTimeout(loadTimeout);
-    
+    renderDropdownData(data);
+  };
+
+  function renderDropdownData(data) {
     if (data && data.kelas && data.siswa) {
       allSiswaData = data.siswa;
       
       kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
       data.kelas.forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k;
-        opt.textContent = k;
-        kelasSelect.appendChild(opt);
+        if(k) {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = k;
+          kelasSelect.appendChild(opt);
+        }
       });
       
       namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
@@ -489,8 +511,9 @@
       retryBtn.style.display = 'none';
     } else {
       kelasSelect.innerHTML = '<option value="">-- Data Kelas Kosong --</option>';
+      retryBtn.style.display = 'inline-block';
     }
-  };
+  }
 
   kelasSelect.addEventListener('change', function() {
     const selectedKelas = this.value;
@@ -567,7 +590,7 @@
     })
     .then(() => {
       statusMessage.className = 'status-success';
-      statusMessage.innerText = 'Jawaban berhasil terkirim dan Nilai PG telah dihitung!';
+      statusMessage.innerText = 'Jawaban berhasil terkirim dan Nilai PG telah tersimpan!';
       statusMessage.style.display = 'block';
       form.reset();
       namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
