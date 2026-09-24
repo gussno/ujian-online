@@ -47,7 +47,7 @@
       margin-bottom: 5px;
       color: #1e40af;
     }
-    .form-group select {
+    .form-group select, .form-group input[type="text"] {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
@@ -81,7 +81,7 @@
       font-size: 14px;
       resize: vertical;
     }
-    textarea:focus, select:focus {
+    textarea:focus, select:focus, input:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
@@ -128,27 +128,27 @@
 <body>
 
 <div class="container">
-  <h1>Soal : Dinamika Penduduk</h1>
+  <h1>Soal Dinamika Penduduk</h1>
   <div class="subtitle">Mata Pelajaran: IPS | Kelas VIII SMP</div>
 
   <form id="quizForm">
-    <!-- Identitas Siswa -->
+    <!-- Identitas Siswa Bertingkat -->
     <div class="identitas-box">
       <div class="form-group">
-        <label for="nama">Pilih Nama Siswa:</label>
-        <select id="nama" name="nama" required>
-          <option value="">-- Memuat Daftar Nama... --</option>
-        </select>
-      </div>
-      <div class="form-group" style="margin-bottom: 0;">
-        <label for="kelas">Pilih Kelas:</label>
+        <label for="kelas">1. Pilih Kelas </label>
         <select id="kelas" name="kelas" required>
           <option value="">-- Memuat Daftar Kelas... --</option>
         </select>
       </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="nama">2. Pilih Nama </label>
+        <select id="nama" name="nama" required disabled>
+          <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+        </select>
+      </div>
     </div>
 
-    <!-- 10 Soal Essay -->
+    <!-- Daftar 10 Soal -->
     <div class="soal-card">
       <div class="soal-text">1. Jelaskan apa yang dimaksud dengan dinamika penduduk!</div>
       <textarea name="soal1" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
@@ -206,7 +206,7 @@
 </div>
 
 <script>
-  // PASTA URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
 
   const form = document.getElementById('quizForm');
@@ -215,49 +215,69 @@
   const submitBtn = document.getElementById('submitBtn');
   const statusMessage = document.getElementById('statusMessage');
 
-  // Callback function untuk menerima data JSONP
-  function handleData(data) {
-    namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
-    if (data.nama && data.nama.length > 0) {
-      data.nama.forEach(n => {
-        if(n) {
-          const option = document.createElement('option');
-          option.value = n;
-          option.textContent = n;
-          namaSelect.appendChild(option);
-        }
-      });
-    } else {
-      namaSelect.innerHTML = '<option value="">-- Nama tidak ditemukan di Sheet --</option>';
-    }
+  let allSiswaData = [];
 
-    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-    if (data.kelas && data.kelas.length > 0) {
-      data.kelas.forEach(k => {
-        if(k) {
-          const option = document.createElement('option');
-          option.value = k;
-          option.textContent = k;
-          kelasSelect.appendChild(option);
-        }
-      });
-    } else {
-      kelasSelect.innerHTML = '<option value="">-- Kelas tidak ditemukan di Sheet --</option>';
-    }
+  // Fungsi memuat data Kelas dan Siswa menggunakan JSONP (Bebas CORS)
+  function loadInitialData() {
+    const script = document.createElement('script');
+    script.src = scriptURL + '?callback=handleDataResponse';
+    document.body.appendChild(script);
   }
 
-  // Mengambil data menggunakan teknik JSONP (Bebas Isu CORS)
-  window.addEventListener('DOMContentLoaded', () => {
-    const script = document.createElement('script');
-    script.src = scriptURL + '?callback=handleData';
-    script.onerror = function() {
-      namaSelect.innerHTML = '<option value="">-- Gagal Memuat (Periksa URL App) --</option>';
-      kelasSelect.innerHTML = '<option value="">-- Gagal Memuat (Periksa URL App) --</option>';
-    };
-    document.body.appendChild(script);
+  // Callback penerima data dari Google Apps Script
+  window.handleDataResponse = function(data) {
+    if (data && data.kelas && data.siswa) {
+      allSiswaData = data.siswa;
+      
+      // Isi Dropdown Kelas (Unik)
+      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      data.kelas.forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = k;
+        kelasSelect.appendChild(opt);
+      });
+      
+      namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+      namaSelect.disabled = true;
+    } else {
+      kelasSelect.innerHTML = '<option value="">-- Data Kelas Kosong --</option>';
+    }
+  };
+
+  // Event ketika Kelas dipilih -> Filter Nama Siswa berdasarkan Kelas
+  kelasSelect.addEventListener('change', function() {
+    const selectedKelas = this.value;
+    namaSelect.innerHTML = '';
+
+    if (!selectedKelas) {
+      namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+      namaSelect.disabled = true;
+      return;
+    }
+
+    // Filter siswa yang memiliki kelas yang sesuai
+    const filteredSiswa = allSiswaData.filter(item => item.kelas === selectedKelas);
+
+    if (filteredSiswa.length > 0) {
+      namaSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+      filteredSiswa.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.nama;
+        opt.textContent = item.nama;
+        namaSelect.appendChild(opt);
+      });
+      namaSelect.disabled = false;
+    } else {
+      namaSelect.innerHTML = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+      namaSelect.disabled = true;
+    }
   });
 
-  // Proses Submit Jawaban menggunakan fetch (mode no-cors untuk keamanan pengiriman)
+  // Panggil data saat pertama kali halaman terbuka
+  window.addEventListener('DOMContentLoaded', loadInitialData);
+
+  // Proses Submit Jawaban
   form.addEventListener('submit', e => {
     e.preventDefault();
     
@@ -291,15 +311,16 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      // Karena menggunakan mode 'no-cors', kita anggap respons berhasil dikirim
       statusMessage.className = 'status-success';
-      statusMessage.innerText = 'Jawaban Anda telah berhasil dikirim dan tersimpan!';
+      statusMessage.innerText = 'Jawaban berhasil terkirim dan tersimpan!';
       statusMessage.style.display = 'block';
       form.reset();
+      namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+      namaSelect.disabled = true;
     })
     .catch(error => {
       statusMessage.className = 'status-error';
-      statusMessage.innerText = 'Terjadi kesalahan pengiriman: ' + error.message;
+      statusMessage.innerText = 'Gagal mengirim jawaban. Silakan coba lagi.';
       statusMessage.style.display = 'block';
     })
     .finally(() => {
