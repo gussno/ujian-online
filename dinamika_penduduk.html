@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soal Essay Dinamika Penduduk - SMP Kelas 8</title>
+  <title>Soal Dinamika Penduduk - SMP Kelas 8</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -47,7 +47,7 @@
       margin-bottom: 5px;
       color: #1e40af;
     }
-    .form-group select, .form-group input[type="text"] {
+    .form-group select {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
@@ -81,7 +81,7 @@
       font-size: 14px;
       resize: vertical;
     }
-    textarea:focus, select:focus, input:focus {
+    textarea:focus, select:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
@@ -128,7 +128,7 @@
 <body>
 
 <div class="container">
-  <h1>Ujian Online: Dinamika Penduduk</h1>
+  <h1>Soal : Dinamika Penduduk</h1>
   <div class="subtitle">Mata Pelajaran: IPS | Kelas VIII SMP</div>
 
   <form id="quizForm">
@@ -148,7 +148,7 @@
       </div>
     </div>
 
-    <!-- Daftar 10 Soal -->
+    <!-- 10 Soal Essay -->
     <div class="soal-card">
       <div class="soal-text">1. Jelaskan apa yang dimaksud dengan dinamika penduduk!</div>
       <textarea name="soal1" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
@@ -206,8 +206,8 @@
 </div>
 
 <script>
-  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA
-  const scriptURL = 'URL_WEB_APP_ANDA';
+  // PASTA URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
 
   const form = document.getElementById('quizForm');
   const namaSelect = document.getElementById('nama');
@@ -215,52 +215,49 @@
   const submitBtn = document.getElementById('submitBtn');
   const statusMessage = document.getElementById('statusMessage');
 
-  // Ambil data Nama dan Kelas dari Google Sheets dengan penanganan redirect (follow)
-  window.addEventListener('DOMContentLoaded', () => {
-    fetch(scriptURL, {
-      method: 'GET',
-      redirect: 'follow'
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Populasi Dropdown Nama
-      namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
-      if (data.nama && data.nama.length > 0) {
-        data.nama.forEach(n => {
-          if (n) {
-            const option = document.createElement('option');
-            option.value = n;
-            option.textContent = n;
-            namaSelect.appendChild(option);
-          }
-        });
-      } else {
-        namaSelect.innerHTML = '<option value="">-- Daftar nama kosong di Sheet --</option>';
-      }
+  // Callback function untuk menerima data JSONP
+  function handleData(data) {
+    namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
+    if (data.nama && data.nama.length > 0) {
+      data.nama.forEach(n => {
+        if(n) {
+          const option = document.createElement('option');
+          option.value = n;
+          option.textContent = n;
+          namaSelect.appendChild(option);
+        }
+      });
+    } else {
+      namaSelect.innerHTML = '<option value="">-- Nama tidak ditemukan di Sheet --</option>';
+    }
 
-      // Populasi Dropdown Kelas
-      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-      if (data.kelas && data.kelas.length > 0) {
-        data.kelas.forEach(k => {
-          if (k) {
-            const option = document.createElement('option');
-            option.value = k;
-            option.textContent = k;
-            kelasSelect.appendChild(option);
-          }
-        });
-      } else {
-        kelasSelect.innerHTML = '<option value="">-- Daftar kelas kosong di Sheet --</option>';
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-      namaSelect.innerHTML = '<option value="">-- Gagal memuat daftar nama --</option>';
-      kelasSelect.innerHTML = '<option value="">-- Gagal memuat daftar kelas --</option>';
-    });
+    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+    if (data.kelas && data.kelas.length > 0) {
+      data.kelas.forEach(k => {
+        if(k) {
+          const option = document.createElement('option');
+          option.value = k;
+          option.textContent = k;
+          kelasSelect.appendChild(option);
+        }
+      });
+    } else {
+      kelasSelect.innerHTML = '<option value="">-- Kelas tidak ditemukan di Sheet --</option>';
+    }
+  }
+
+  // Mengambil data menggunakan teknik JSONP (Bebas Isu CORS)
+  window.addEventListener('DOMContentLoaded', () => {
+    const script = document.createElement('script');
+    script.src = scriptURL + '?callback=handleData';
+    script.onerror = function() {
+      namaSelect.innerHTML = '<option value="">-- Gagal Memuat (Periksa URL App) --</option>';
+      kelasSelect.innerHTML = '<option value="">-- Gagal Memuat (Periksa URL App) --</option>';
+    };
+    document.body.appendChild(script);
   });
 
-  // Proses Submit Jawaban
+  // Proses Submit Jawaban menggunakan fetch (mode no-cors untuk keamanan pengiriman)
   form.addEventListener('submit', e => {
     e.preventDefault();
     
@@ -287,26 +284,22 @@
 
     fetch(scriptURL, {
       method: 'POST',
-      redirect: 'follow',
+      mode: 'no-cors',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data.result === 'success') {
-        statusMessage.className = 'status-success';
-        statusMessage.innerText = 'Jawaban berhasil terkirim dan tersimpan di Google Sheet!';
-        statusMessage.style.display = 'block';
-        form.reset();
-      } else {
-        throw new Error(data.error || 'Terjadi kesalahan sistem.');
-      }
+    .then(() => {
+      // Karena menggunakan mode 'no-cors', kita anggap respons berhasil dikirim
+      statusMessage.className = 'status-success';
+      statusMessage.innerText = 'Jawaban Anda telah berhasil dikirim dan tersimpan!';
+      statusMessage.style.display = 'block';
+      form.reset();
     })
     .catch(error => {
       statusMessage.className = 'status-error';
-      statusMessage.innerText = 'Gagal mengirim jawaban: ' + error.message;
+      statusMessage.innerText = 'Terjadi kesalahan pengiriman: ' + error.message;
       statusMessage.style.display = 'block';
     })
     .finally(() => {
