@@ -206,8 +206,8 @@
 </div>
 
 <script>
-  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT
-  const scriptURL = 'https://script.google.com/a/macros/guru.smp.belajar.id/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
+  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA
+  const scriptURL = 'URL_WEB_APP_ANDA';
 
   const form = document.getElementById('quizForm');
   const namaSelect = document.getElementById('nama');
@@ -215,46 +215,49 @@
   const submitBtn = document.getElementById('submitBtn');
   const statusMessage = document.getElementById('statusMessage');
 
-  // Ambil daftar Nama (Kolom B) dan Kelas (Kolom A) dari Sheet 2
+  // Ambil data Nama dan Kelas dari Google Sheets dengan penanganan redirect (follow)
   window.addEventListener('DOMContentLoaded', () => {
-    fetch(scriptURL)
-      .then(response => response.json())
-      .then(data => {
-        // Populasi Dropdown Nama
-        namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
-        if (data.nama && data.nama.length > 0) {
-          data.nama.forEach(n => {
-            if (n) {
-              const option = document.createElement('option');
-              option.value = n;
-              option.textContent = n;
-              namaSelect.appendChild(option);
-            }
-          });
-        } else {
-          namaSelect.innerHTML = '<option value="">-- Daftar nama tidak ditemukan --</option>';
-        }
+    fetch(scriptURL, {
+      method: 'GET',
+      redirect: 'follow'
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Populasi Dropdown Nama
+      namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
+      if (data.nama && data.nama.length > 0) {
+        data.nama.forEach(n => {
+          if (n) {
+            const option = document.createElement('option');
+            option.value = n;
+            option.textContent = n;
+            namaSelect.appendChild(option);
+          }
+        });
+      } else {
+        namaSelect.innerHTML = '<option value="">-- Daftar nama kosong di Sheet --</option>';
+      }
 
-        // Populasi Dropdown Kelas
-        kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-        if (data.kelas && data.kelas.length > 0) {
-          data.kelas.forEach(k => {
-            if (k) {
-              const option = document.createElement('option');
-              option.value = k;
-              option.textContent = k;
-              kelasSelect.appendChild(option);
-            }
-          });
-        } else {
-          kelasSelect.innerHTML = '<option value="">-- Daftar kelas tidak ditemukan --</option>';
-        }
-      })
-      .catch(error => {
-        console.error('Gagal memuat data dari Sheet:', error);
-        namaSelect.innerHTML = '<option value="">-- Gagal memuat daftar nama --</option>';
-        kelasSelect.innerHTML = '<option value="">-- Gagal memuat daftar kelas --</option>';
-      });
+      // Populasi Dropdown Kelas
+      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      if (data.kelas && data.kelas.length > 0) {
+        data.kelas.forEach(k => {
+          if (k) {
+            const option = document.createElement('option');
+            option.value = k;
+            option.textContent = k;
+            kelasSelect.appendChild(option);
+          }
+        });
+      } else {
+        kelasSelect.innerHTML = '<option value="">-- Daftar kelas kosong di Sheet --</option>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      namaSelect.innerHTML = '<option value="">-- Gagal memuat daftar nama --</option>';
+      kelasSelect.innerHTML = '<option value="">-- Gagal memuat daftar kelas --</option>';
+    });
   });
 
   // Proses Submit Jawaban
@@ -284,6 +287,10 @@
 
     fetch(scriptURL, {
       method: 'POST',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify(payload)
     })
     .then(response => response.json())
