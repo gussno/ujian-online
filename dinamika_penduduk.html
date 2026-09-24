@@ -3,121 +3,210 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soal Dinamika Penduduk - SMP Kelas 8</title>
+  <title>Asesmen IPS Kelas 8 - Dinamika Penduduk</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-      color: #333;
+    :root {
+      --primary-blue: #2563eb;
+      --primary-purple: #7c3aed;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
     }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 15px;
+      color: var(--text-color);
+    }
+
     .container {
       max-width: 800px;
       margin: 0 auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
+
     h1 {
       text-align: center;
       color: #1e3a8a;
       margin-bottom: 5px;
+      font-size: 1.6rem;
     }
+
     .subtitle {
       text-align: center;
-      color: #666;
-      margin-bottom: 30px;
-      font-size: 0.95em;
+      color: #4b5563;
+      margin-bottom: 25px;
+      font-size: 0.95rem;
     }
+
+    /* Box Identitas Siswa */
     .identitas-box {
       background-color: #eff6ff;
       border: 1px solid #bfdbfe;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 30px;
     }
+
     .form-group {
       margin-bottom: 15px;
     }
+
     .form-group label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 600;
+      margin-bottom: 6px;
       color: #1e40af;
     }
-    .form-group select, .form-group input[type="text"] {
+
+    .form-group select {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      padding: 11px;
+      border: 1px solid #93c5fd;
+      border-radius: 6px;
       box-sizing: border-box;
       font-size: 14px;
       background-color: #fff;
     }
-    .soal-card {
-      background-color: #fafafa;
-      border-left: 4px solid #2563eb;
+
+    /* Judul Bagian Soal */
+    .section-title {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 30px 0 20px 0;
+      color: #ffffff;
+    }
+
+    .section-uraian {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    }
+
+    .section-pg {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+
+    /* Card Soal Uraian (Tema Biru) */
+    .card-uraian {
+      background-color: #f8fafc;
+      border-left: 5px solid var(--primary-blue);
       padding: 18px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       border-radius: 0 8px 8px 0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     }
-    .soal-text {
+
+    .card-uraian .soal-text {
       font-weight: 600;
-      font-size: 1.05em;
-      margin-bottom: 12px;
-      color: #1f2937;
+      margin-bottom: 10px;
+      color: #1e293b;
     }
+
     textarea {
       width: 100%;
-      height: 90px;
+      height: 85px;
       padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
       box-sizing: border-box;
       font-family: inherit;
       font-size: 14px;
       resize: vertical;
     }
-    textarea:focus, select:focus, input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+
+    /* Card Soal Pilihan Ganda (Tema Ungu) */
+    .card-pg {
+      background-color: #faf5ff;
+      border-left: 5px solid var(--primary-purple);
+      padding: 18px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     }
+
+    .card-pg .soal-text {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #4c1d95;
+    }
+
+    .pg-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pg-option {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      padding: 10px 14px;
+      border: 1px solid #e9d5ff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pg-option:hover {
+      background-color: #f3e8ff;
+      border-color: #c084fc;
+    }
+
+    .pg-option input[type="radio"] {
+      margin-right: 12px;
+      accent-color: var(--primary-purple);
+      transform: scale(1.1);
+    }
+
+    /* Tombol Submit */
     .btn-submit {
       width: 100%;
-      background-color: #2563eb;
+      background: linear-gradient(135deg, #10b981, #059669);
       color: white;
-      padding: 14px;
+      padding: 15px;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s;
+      margin-top: 25px;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+      transition: transform 0.1s, background-color 0.2s;
     }
+
     .btn-submit:hover {
-      background-color: #1d4ed8;
+      background: linear-gradient(135deg, #059669, #047857);
     }
+
     .btn-submit:disabled {
-      background-color: #9ca3af;
+      background: #9ca3af;
       cursor: not-allowed;
+      box-shadow: none;
     }
+
     #statusMessage {
       margin-top: 20px;
       padding: 15px;
-      border-radius: 6px;
+      border-radius: 8px;
       display: none;
       text-align: center;
       font-weight: bold;
     }
+
     .status-success {
       background-color: #d1fae5;
       color: #065f46;
       border: 1px solid #a7f3d0;
     }
+
     .status-error {
       background-color: #fee2e2;
       color: #991b1b;
@@ -128,75 +217,194 @@
 <body>
 
 <div class="container">
-  <h1>Soal Dinamika Penduduk</h1>
-  <div class="subtitle">Mata Pelajaran: IPS | Kelas VIII SMP</div>
+  <h1>Soal IPS Kelas VIII</h1>
+  <div class="subtitle">Materi: Dinamika Penduduk</div>
 
   <form id="quizForm">
-    <!-- Identitas Siswa Bertingkat -->
+    <!-- Identitas Siswa -->
     <div class="identitas-box">
       <div class="form-group">
-        <label for="kelas">1. Pilih Kelas </label>
+        <label for="kelas">1. Pilih Kelas:</label>
         <select id="kelas" name="kelas" required>
           <option value="">-- Memuat Daftar Kelas... --</option>
         </select>
       </div>
       <div class="form-group" style="margin-bottom: 0;">
-        <label for="nama">2. Pilih Nama </label>
+        <label for="nama">2. Pilih Nama:</label>
         <select id="nama" name="nama" required disabled>
           <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
         </select>
       </div>
     </div>
 
-    <!-- Daftar 10 Soal -->
-    <div class="soal-card">
-      <div class="soal-text">1. Jelaskan apa yang dimaksud dengan dinamika penduduk!</div>
-      <textarea name="soal1" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <!-- BAGIAN I: SOAL URAIAN -->
+    <div class="section-title section-uraian">
+      📝 BAGIAN I: SOAL URAIAN (ESSAY)
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">2. Sebutkan tiga faktor utama yang memengaruhi perubahan jumlah penduduk di suatu wilayah!</div>
-      <textarea name="soal2" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">1. Sebutkan satu penyebab utama yang dapat membuat jumlah penduduk di suatu desa bertambah secara alami!</div>
+      <textarea name="u1" placeholder="Tuliskan jawaban singkat Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">3. Jelaskan perbedaan utama antara pertumbuhan penduduk alami dan pertumbuhan penduduk total!</div>
-      <textarea name="soal3" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">2. Berdasarkan tingkatannya, masuk dalam kategori manakah wilayah yang memiliki angka kelahiran kurang dari 20 per 1.000 penduduk per tahun?</div>
+      <textarea name="u2" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">4. Mengapa tingkat kelahiran di daerah pedesaan cenderung lebih tinggi dibandingkan di daerah perkotaan?</div>
-      <textarea name="soal4" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">3. Sebutkan tiga faktor utama yang menyebabkan terjadinya perubahan jumlah penduduk di suatu daerah!</div>
+      <textarea name="u3" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">5. Jelaskan perbedaan antara faktor pro-mortalitas dan faktor anti-mortalitas!</div>
-      <textarea name="soal5" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">4. Sebutkan dua contoh negara berkembang yang memiliki bentuk Piramida Penduduk Muda (Ekspansif)!</div>
+      <textarea name="u4" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">6. Jelaskan dampak positif dari pengiriman Tenaga Kerja Indonesia (TKI) ke luar negeri bagi perekonomian negara asal!</div>
-      <textarea name="soal6" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">5. Bagaimana hubungan antara ketersediaan fasilitas kesehatan yang baik di suatu daerah dengan tingkat angka kematian (mortalitas) penduduknya?</div>
+      <textarea name="u5" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">7. Jelaskan apa yang dimaksud dengan migrasi komutasi (laju ulang-alik) beserta contohnya!</div>
-      <textarea name="soal7" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">6. Mengapa wilayah dengan Piramida Penduduk Muda (Ekspansif) selalu ditandai dengan angka kelahiran yang tinggi dan angka kematian yang rendah?</div>
+      <textarea name="u6" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">8. Bagaimana karakteristik angka kelahiran dan angka kematian pada negara yang memiliki piramida penduduk berbentuk ekspansif?</div>
-      <textarea name="soal8" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">7. Mengapa banyaknya penduduk usia non-produktif (anak-anak dan lansia) dapat menjadi beban ekonomi bagi penduduk usia produktif (15-65 tahun)?</div>
+      <textarea name="u7" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">9. Jelaskan apa yang dimaksud dengan Rasio Ketergantungan (Dependency Ratio) dalam komposisi penduduk!</div>
-      <textarea name="soal9" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">8. Jika banyak pemuda di suatu desa pindah bekerja ke kota besar (emigrasi desa), prediksikan apa yang akan terjadi pada kondisi perekonomian dan pertanian di desa tersebut!</div>
+      <textarea name="u8" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
     </div>
 
-    <div class="soal-card">
-      <div class="soal-text">10. Apa yang dimaksud dengan kondisi Bonus Demografi pada suatu negara?</div>
-      <textarea name="soal10" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    <div class="card-uraian">
+      <div class="soal-text">9. Sebuah negara maju seperti Jerman mengalami penurunan angka kelahiran yang sangat drastis (Piramida Tua). Analisis dampak jangka panjang kondisi ini terhadap ketersediaan tenaga kerja di negara tersebut!</div>
+      <textarea name="u9" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <div class="card-uraian">
+      <div class="soal-text">10. Bagaimana pemerintah dapat memanfaatkan data Sex Ratio (perbandingan laki-laki dan perempuan) untuk merencanakan program pemberdayaan masyarakat yang tepat sasaran?</div>
+      <textarea name="u10" placeholder="Tuliskan jawaban Anda di sini..." required></textarea>
+    </div>
+
+    <!-- BAGIAN II: SOAL PILIHAN GANDA -->
+    <div class="section-title section-pg">
+      🔘 BAGIAN II: SOAL PILIHAN GANDA (PG)
+    </div>
+
+    <!-- PG 1 -->
+    <div class="card-pg">
+      <div class="soal-text">1. Istilah demografi yang menunjukkan jumlah bayi yang lahir dari setiap 1.000 penduduk per tahun adalah ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg1" value="A" required> A. Natalitas</label>
+        <label class="pg-option"><input type="radio" name="pg1" value="B"> B. Mortalitas</label>
+        <label class="pg-option"><input type="radio" name="pg1" value="C"> C. Migrasi</label>
+        <label class="pg-option"><input type="radio" name="pg1" value="D"> D. Emigrasi</label>
+      </div>
+    </div>
+
+    <!-- PG 2 -->
+    <div class="card-pg">
+      <div class="soal-text">2. Suatu daerah dikategorikan memiliki angka kematian rendah jika jumlah kematian per tahun berkisar antara ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg2" value="A" required> A. Lebih dari 18</label>
+        <label class="pg-option"><input type="radio" name="pg2" value="B"> B. 14 – 18</label>
+        <label class="pg-option"><input type="radio" name="pg2" value="C"> C. 9 – 13</label>
+        <label class="pg-option"><input type="radio" name="pg2" value="D"> D. Kurang dari 9</label>
+      </div>
+    </div>
+
+    <!-- PG 3 -->
+    <div class="card-pg">
+      <div class="soal-text">3. Komponen penambah dan pengurang jumlah penduduk dalam perhitungan pertambahan penduduk adalah ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg3" value="A" required> A. Kelahiran, kematian, dan migrasi</label>
+        <label class="pg-option"><input type="radio" name="pg3" value="B"> B. Pendidikan, kesehatan, dan ekonomi</label>
+        <label class="pg-option"><input type="radio" name="pg3" value="C"> C. Usia, jenis kelamin, dan pekerjaan</label>
+        <label class="pg-option"><input type="radio" name="pg3" value="D"> D. Pertanian, industri, dan jasa</label>
+      </div>
+    </div>
+
+    <!-- PG 4 -->
+    <div class="card-pg">
+      <div class="soal-text">4. Ciri-ciri Piramida Penduduk Tua (Konstruktif) ditunjukkan oleh kombinasi kondisi ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg4" value="A" required> A. Kelahiran tinggi dan kematian tinggi</label>
+        <label class="pg-option"><input type="radio" name="pg4" value="B"> B. Kelahiran mengalami penurunan dan kematian rendah</label>
+        <label class="pg-option"><input type="radio" name="pg4" value="C"> C. Kelahiran seimbang dengan kematian</label>
+        <label class="pg-option"><input type="radio" name="pg4" value="D"> D. Kelahiran melonjak tajam dan kematian tinggi</label>
+      </div>
+    </div>
+
+    <!-- PG 5 -->
+    <div class="card-pg">
+      <div class="soal-text">5. Suatu kota mengalami pertumbuhan penduduk yang cepat karena banyaknya pabrik baru. Komponen pertumbuhan penduduk yang dominan adalah ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg5" value="A" required> A. Angka kematian yang melonjak</label>
+        <label class="pg-option"><input type="radio" name="pg5" value="B"> B. Angka kelahiran alami yang stabil</label>
+        <label class="pg-option"><input type="radio" name="pg5" value="C"> C. Tingginya migrasi penduduk yang masuk (imigrasi)</label>
+        <label class="pg-option"><input type="radio" name="pg5" value="D"> D. Meningkatnya emigrasi penduduk ke luar kota</label>
+      </div>
+    </div>
+
+    <!-- PG 6 -->
+    <div class="card-pg">
+      <div class="soal-text">6. Piramida penduduk bentuk Stasioner (Dewasa) menggambarkan pertumbuhan penduduk yang stabil karena ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg6" value="A" required> A. Angka kelahiran jauh melebihi angka kematian</label>
+        <label class="pg-option"><input type="radio" name="pg6" value="B"> B. Tingkat kematian bayi sangat tinggi</label>
+        <label class="pg-option"><input type="radio" name="pg6" value="C"> C. Terdapat keseimbangan antara angka kelahiran dan kematian</label>
+        <label class="pg-option"><input type="radio" name="pg6" value="D"> D. Terjadi perpindahan penduduk secara masif ke luar negeri</label>
+      </div>
+    </div>
+
+    <!-- PG 7 -->
+    <div class="card-pg">
+      <div class="soal-text">7. Kelompok penduduk usia 15–65 tahun dinamakan kelompok usia produktif karena ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg7" value="A" required> A. Masih membutuhkan biaya pendidikan dari orang tua</label>
+        <label class="pg-option"><input type="radio" name="pg7" value="B"> B. Sudah memasuki masa pensiun</label>
+        <label class="pg-option"><input type="radio" name="pg7" value="C"> C. Memiliki kemampuan fisik dan ekonomi untuk bekerja</label>
+        <label class="pg-option"><input type="radio" name="pg7" value="D"> D. Bebas dari kewajiban membayar pajak negara</label>
+      </div>
+    </div>
+
+    <!-- PG 8 -->
+    <div class="card-pg">
+      <div class="soal-text">8. Suatu pedesaan diserang wabah penyakit dan fasilitas kesehatan sangat minim. Berdasarkan dinamika penduduk, kondisi ini mengakibatkan ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg8" value="A" required> A. Angka natalitas melonjak drastis</label>
+        <label class="pg-option"><input type="radio" name="pg8" value="B"> B. Angka mortalitas meningkat sehingga jumlah penduduk menurun</label>
+        <label class="pg-option"><input type="radio" name="pg8" value="C"> C. Terjadinya piramida penduduk konstruktif</label>
+        <label class="pg-option"><input type="radio" name="pg8" value="D"> D. Tingkat migrasi masuk bertambah cepat</label>
+      </div>
+    </div>
+
+    <!-- PG 9 -->
+    <div class="card-pg">
+      <div class="soal-text">9. Jika sebuah wilayah memiliki piramida penduduk berbentuk kerucut dengan alas sangat lebar, kebijakan pemerintah yang paling tepat diprioritaskan adalah ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg9" value="A" required> A. Membangun lebih banyak panti jompo untuk lansia</label>
+        <label class="pg-option"><input type="radio" name="pg9" value="B"> B. Memperbanyak sarana sekolah dan fasilitas kesehatan anak</label>
+        <label class="pg-option"><input type="radio" name="pg9" value="C"> C. Mendatangkan tenaga kerja asing dari luar negeri</label>
+        <label class="pg-option"><input type="radio" name="pg9" value="D"> D. Menghentikan program Keluarga Berencana (KB)</label>
+      </div>
+    </div>
+
+    <!-- PG 10 -->
+    <div class="card-pg">
+      <div class="soal-text">10. Apabila Sex Ratio menunjukkan jumlah perempuan jauh lebih banyak dibandingkan laki-laki di usia kerja, langkah pemberdayaan SDM yang efektif adalah ...</div>
+      <div class="pg-options">
+        <label class="pg-option"><input type="radio" name="pg10" value="A" required> A. Membuka program pelatihan kewirausahaan dan keterampilan kerja berbasis wanita</label>
+        <label class="pg-option"><input type="radio" name="pg10" value="B"> B. Membatasi jumlah anak perempuan yang bersekolah</label>
+        <label class="pg-option"><input type="radio" name="pg10" value="C"> C. Mengurangi fasilitas kesehatan ibu dan anak</label>
+        <label class="pg-option"><input type="radio" name="pg10" value="D"> D. Mewajibkan seluruh perempuan untuk pindah ke daerah lain</label>
+      </div>
     </div>
 
     <button type="submit" id="submitBtn" class="btn-submit">Kirim Semua Jawaban</button>
@@ -206,7 +414,7 @@
 </div>
 
 <script>
-  // GANTI URL DI BAWAH INI DENGAN URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA
+  // GANTI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
   const scriptURL = 'https://script.google.com/macros/s/AKfycbx0_v61EzuOxeZpxvFD3ZLALSmRYH78x8UiYUefYdqeDLsm8fZQ3b4OfKp1GkfyfMA/exec';
 
   const form = document.getElementById('quizForm');
@@ -217,19 +425,16 @@
 
   let allSiswaData = [];
 
-  // Fungsi memuat data Kelas dan Siswa menggunakan JSONP (Bebas CORS)
   function loadInitialData() {
     const script = document.createElement('script');
     script.src = scriptURL + '?callback=handleDataResponse';
     document.body.appendChild(script);
   }
 
-  // Callback penerima data dari Google Apps Script
   window.handleDataResponse = function(data) {
     if (data && data.kelas && data.siswa) {
       allSiswaData = data.siswa;
       
-      // Isi Dropdown Kelas (Unik)
       kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
       data.kelas.forEach(k => {
         const opt = document.createElement('option');
@@ -245,7 +450,6 @@
     }
   };
 
-  // Event ketika Kelas dipilih -> Filter Nama Siswa berdasarkan Kelas
   kelasSelect.addEventListener('change', function() {
     const selectedKelas = this.value;
     namaSelect.innerHTML = '';
@@ -256,7 +460,6 @@
       return;
     }
 
-    // Filter siswa yang memiliki kelas yang sesuai
     const filteredSiswa = allSiswaData.filter(item => item.kelas === selectedKelas);
 
     if (filteredSiswa.length > 0) {
@@ -274,10 +477,8 @@
     }
   });
 
-  // Panggil data saat pertama kali halaman terbuka
   window.addEventListener('DOMContentLoaded', loadInitialData);
 
-  // Proses Submit Jawaban
   form.addEventListener('submit', e => {
     e.preventDefault();
     
@@ -288,17 +489,29 @@
     const payload = {
       nama: form.nama.value,
       kelas: form.kelas.value,
-      jawaban: {
-        soal1: form.soal1.value,
-        soal2: form.soal2.value,
-        soal3: form.soal3.value,
-        soal4: form.soal4.value,
-        soal5: form.soal5.value,
-        soal6: form.soal6.value,
-        soal7: form.soal7.value,
-        soal8: form.soal8.value,
-        soal9: form.soal9.value,
-        soal10: form.soal10.value
+      uraian: {
+        u1: form.u1.value,
+        u2: form.u2.value,
+        u3: form.u3.value,
+        u4: form.u4.value,
+        u5: form.u5.value,
+        u6: form.u6.value,
+        u7: form.u7.value,
+        u8: form.u8.value,
+        u9: form.u9.value,
+        u10: form.u10.value
+      },
+      pg: {
+        pg1: form.pg1.value,
+        pg2: form.pg2.value,
+        pg3: form.pg3.value,
+        pg4: form.pg4.value,
+        pg5: form.pg5.value,
+        pg6: form.pg6.value,
+        pg7: form.pg7.value,
+        pg8: form.pg8.value,
+        pg9: form.pg9.value,
+        pg10: form.pg10.value
       }
     };
 
@@ -312,7 +525,7 @@
     })
     .then(() => {
       statusMessage.className = 'status-success';
-      statusMessage.innerText = 'Jawaban berhasil terkirim dan tersimpan!';
+      statusMessage.innerText = 'Jawaban berhasil terkirim dan Nilai PG telah dihitung!';
       statusMessage.style.display = 'block';
       form.reset();
       namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
